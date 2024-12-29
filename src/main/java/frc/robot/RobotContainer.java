@@ -14,7 +14,6 @@
 package frc.robot;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
-import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,10 +24,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.DriveCommands;
+import frc.robot.commands.drive.AlignTo;
+import frc.robot.commands.drive.DriveCommands;
+import frc.robot.commands.drive.DriveTo;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.vision.*;
+import frc.robot.util.zones.ZoneManager;
+import java.io.IOException;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -43,6 +46,7 @@ public class RobotContainer {
     // Subsystems
     private final Drive drive;
     private final Vision vision;
+    private ZoneManager BlueSpeakerZone;
 
     private SwerveDriveSimulation driveSimulation = null;
 
@@ -68,6 +72,11 @@ public class RobotContainer {
                         new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
                         new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
 
+                try {
+                    BlueSpeakerZone = new ZoneManager(drive, "BlueSpeakerZone");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 break;
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
@@ -91,6 +100,11 @@ public class RobotContainer {
                         new VisionIOPhotonVisionSim(
                                 camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
 
+                try {
+                    BlueSpeakerZone = new ZoneManager(drive, "BlueSpeakerZone");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 break;
 
             default:
@@ -99,6 +113,11 @@ public class RobotContainer {
                         new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {});
                 vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
 
+                try {
+                    BlueSpeakerZone = new ZoneManager(drive, "BlueSpeakerZone");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 break;
         }
 
@@ -114,6 +133,10 @@ public class RobotContainer {
                 "Drive SysId (Quasistatic Reverse)", drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
         autoChooser.addOption("Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
         autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        autoChooser.addOption("Align to 5 X, 5 Y", new AlignTo(drive, 5, 5, 5));
+        autoChooser.addOption("Align to Tag 7", new AlignTo(drive, 7, 5));
+        autoChooser.addOption("Drive to 5 X, 5 Y", new DriveTo(5, 5, 90, 15));
+        autoChooser.addOption("Drive to blue speaker zone", new DriveTo(BlueSpeakerZone, 7, 15));
 
         // Configure the button bindings
         configureButtonBindings();
@@ -144,7 +167,8 @@ public class RobotContainer {
                         driveSimulation
                                 .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
                 : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
-        controller.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
+
+        controller.povRight().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
     }
 
     /**
