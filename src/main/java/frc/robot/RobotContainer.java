@@ -24,9 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.drive.AlignTo;
-import frc.robot.commands.drive.DriveCommands;
-import frc.robot.commands.drive.DriveTo;
+import frc.robot.commands.drive.*;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.vision.*;
@@ -137,6 +135,7 @@ public class RobotContainer {
         autoChooser.addOption("Align to Tag 7", new AlignTo(drive, 7, 5));
         autoChooser.addOption("Drive to 5 X, 5 Y", new DriveTo(5, 5, 90, 15));
         autoChooser.addOption("Drive to blue speaker zone", new DriveTo(BlueSpeakerZone, 7, 15));
+        autoChooser.addOption("AutoChoreo", new ChoreoAuto("FirstAuto", 20));
 
         // Configure the button bindings
         configureButtonBindings();
