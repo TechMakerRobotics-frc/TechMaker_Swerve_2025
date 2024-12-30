@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.util.GeomUtil;
 import frc.robot.util.zones.ZoneManager;
 
 /** Command to drive the robot to a specified pose or target with various input options. */
@@ -127,9 +128,9 @@ public class DriveTo extends Command {
 
         Pose2d currentPose = this.zoneManager.getCurrentPose();
 
-        double desiredTheta = Math.atan2(tagPose.getY() - currentPose.getY(), tagPose.getX() - currentPose.getX());
-
-        this.goalPose = new Pose2d(this.zoneManager.getClosestPose().getTranslation(), new Rotation2d(desiredTheta));
+        this.goalPose = new Pose2d(
+                this.zoneManager.getClosestPose().getTranslation(),
+                new Rotation2d(GeomUtil.thetaToTarget(currentPose, tagPose)));
     }
 
     @Override

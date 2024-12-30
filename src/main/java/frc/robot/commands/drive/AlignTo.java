@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.util.GeomUtil;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class AlignTo extends Command {
@@ -69,9 +70,8 @@ public class AlignTo extends Command {
         Pose2d currentPose = drive.getPose();
         Rotation2d currentRotation = currentPose.getRotation();
 
-        double desiredTheta =
-                Math.atan2(targetPose.getY() - currentPose.getY(), targetPose.getX() - currentPose.getX());
-        double rotationSpeed = thetaController.calculate(currentRotation.getRadians(), desiredTheta);
+        double rotationSpeed = thetaController.calculate(
+                currentRotation.getRadians(), GeomUtil.thetaToTarget(currentPose, targetPose));
 
         ChassisSpeeds speed = new ChassisSpeeds(0, 0, rotationSpeed);
 
