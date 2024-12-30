@@ -12,20 +12,21 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class AlignTo extends Command {
     private final Drive drive;
     private final Pose2d targetPose;
-    private final PIDController thetaController;
+    private PIDController thetaController;
     private final Timer time = new Timer();
     private final double timeOut;
+    private LoggedNetworkNumber tP = new LoggedNetworkNumber("/Tuning/P", 1);
+    private LoggedNetworkNumber tI = new LoggedNetworkNumber("/Tuning/I", 0);
+    private LoggedNetworkNumber tD = new LoggedNetworkNumber("/Tuning/D", 0);
 
     public AlignTo(Drive drive, double x, double y, double timeOut) {
         this.drive = drive;
         this.targetPose = new Pose2d(x, y, new Rotation2d());
-        this.thetaController = new PIDController(1.0, 0.0, 0.0);
-        this.thetaController.enableContinuousInput(-Math.PI, Math.PI);
-        this.thetaController.setTolerance(0.05);
         this.timeOut = timeOut;
         addRequirements(drive);
     }
@@ -33,9 +34,6 @@ public class AlignTo extends Command {
     public AlignTo(Drive drive, Pose2d pose, double timeOut) {
         this.drive = drive;
         this.targetPose = pose;
-        this.thetaController = new PIDController(1.0, 0.0, 0.0);
-        this.thetaController.enableContinuousInput(-Math.PI, Math.PI);
-        this.thetaController.setTolerance(0.05);
         this.timeOut = timeOut;
         addRequirements(drive);
     }
@@ -43,9 +41,6 @@ public class AlignTo extends Command {
     public AlignTo(Drive drive, Translation2d translation, double timeOut) {
         this.drive = drive;
         this.targetPose = new Pose2d(translation, new Rotation2d());
-        this.thetaController = new PIDController(1.0, 0.0, 0.0);
-        this.thetaController.enableContinuousInput(-Math.PI, Math.PI);
-        this.thetaController.setTolerance(0.05);
         this.timeOut = timeOut;
         addRequirements(drive);
     }
@@ -55,15 +50,15 @@ public class AlignTo extends Command {
         AprilTagFieldLayout fTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
 
         this.targetPose = fTagFieldLayout.getTagPose(tag).get().toPose2d();
-        this.thetaController = new PIDController(1.0, 0.0, 0.0);
-        this.thetaController.enableContinuousInput(-Math.PI, Math.PI);
-        this.thetaController.setTolerance(0.05);
         this.timeOut = timeOut;
         addRequirements(drive);
     }
 
     @Override
     public void initialize() {
+        thetaController = new PIDController(tP.get(), tI.get(), tD.get());
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        thetaController.setTolerance(0.05);
         thetaController.reset();
         time.reset();
         time.start();
