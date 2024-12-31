@@ -46,6 +46,7 @@ import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.lockwheel.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.util.RegisNamedCommands;
+import frc.robot.util.RobotModeTo;
 import frc.robot.util.zones.ZoneManager;
 import java.io.IOException;
 import org.ironmaple.simulation.SimulatedArena;
@@ -84,6 +85,7 @@ public class RobotContainer {
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
+    private final LoggedDashboardChooser<Command> robotModeChooser;
 
     // tunable flywheel velocity
     private LoggedNetworkNumber flywheelSpeedInside = new LoggedNetworkNumber("Flywheel Speed Inside", 300.0);
@@ -176,7 +178,7 @@ public class RobotContainer {
         }
 
         // Set up auto routines
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());       
 
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -192,6 +194,12 @@ public class RobotContainer {
         autoChooser.addOption("Drive to 5 X, 5 Y", new DriveTo(5, 5, 90, 15));
         autoChooser.addOption("Drive to blue speaker zone", new DriveTo(BlueSpeakerZone, 7, 15));
         autoChooser.addOption("AutoChoreo", new ChoreoAuto("FirstAuto", 20));
+
+        
+        robotModeChooser = new LoggedDashboardChooser<>("Robot Mode", AutoBuilder.buildAutoChooser()); 
+
+        robotModeChooser.addDefaultOption("Robot Mode Brake", new RobotModeTo("Brake", drive));
+        robotModeChooser.addOption("Robot Mode Coast", new RobotModeTo("Coast", drive));
 
         ledCommands = new Command[] {
             new LedRed(leds),

@@ -58,6 +58,8 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
     private final Debouncer turnConnectedDebounce = new Debouncer(0.5);
     private final Debouncer turnEncoderConnectedDebounce = new Debouncer(0.5);
 
+    protected final TalonFXConfiguration driveConfig;
+
     protected ModuleIOTalonFX(SwerveModuleConstants constants) {
         this.constants = constants;
 
@@ -66,7 +68,7 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
         cancoder = new CANcoder(constants.CANcoderId, TunerConstants.DrivetrainConstants.CANBusName);
 
         // Configure drive motor
-        var driveConfig = constants.DriveMotorInitialConfigs;
+        driveConfig = constants.DriveMotorInitialConfigs;
         driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         driveConfig.Slot0 = constants.DriveMotorGains;
         driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = constants.SlipCurrent;

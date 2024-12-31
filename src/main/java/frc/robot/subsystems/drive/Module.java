@@ -131,4 +131,10 @@ public class Module {
     public double getFFCharacterizationVelocity() {
         return Units.radiansToRotations(inputs.driveVelocityRadPerSec);
     }
+
+    /** Sets whether brake mode is enabled. */
+    public void setBrakeMode(boolean enabled) {
+        io.setDriveBrakeMode(enabled);
+        io.setTurnBrakeMode(enabled);
+    }
 }

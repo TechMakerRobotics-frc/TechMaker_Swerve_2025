@@ -134,6 +134,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
         // Start odometry thread
         PhoenixOdometryThread.getInstance().start();
+        SparkOdometryThread.getInstance().start();
 
         // Configure AutoBuilder for PathPlanner
         AutoBuilder.configure(
@@ -358,5 +359,12 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
             new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
             new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
         };
+    }
+
+    public void setBrakeMode(boolean enable) {
+        modules[0].setBrakeMode(enable);
+        modules[0].setBrakeMode(enable);
+        modules[0].setBrakeMode(enable);
+        modules[0].setBrakeMode(enable);
     }
 }

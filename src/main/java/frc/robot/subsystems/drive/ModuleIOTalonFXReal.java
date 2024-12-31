@@ -16,6 +16,7 @@ package frc.robot.subsystems.drive;
 import static frc.robot.util.subsystemUtils.SparkUtil.ifOk;
 import static frc.robot.util.subsystemUtils.SparkUtil.tryUntilOk;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase;
@@ -55,6 +56,8 @@ public class ModuleIOTalonFXReal extends ModuleIOTalonFX {
     private final SparkBase turnSpark;
     private final AbsoluteEncoder turnEncoder;
 
+    private SparkMaxConfig turnConfig = new SparkMaxConfig(); 
+
     private final Debouncer turnConnectedDebounce = new Debouncer(0.5);
 
     public ModuleIOTalonFXReal(SwerveModuleConstants constants, int module) {
@@ -79,10 +82,9 @@ public class ModuleIOTalonFXReal extends ModuleIOTalonFX {
         turnEncoder = turnSpark.getAbsoluteEncoder();
         turnController = turnSpark.getClosedLoopController();
 
-        var turnConfig = new SparkMaxConfig();
+        turnConfig = new SparkMaxConfig();
         turnConfig
                 .inverted(DriveConstants.turnInverted)
-                .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(DriveConstants.turnMotorCurrentLimit)
                 .voltageCompensation(12.0);
         turnConfig
@@ -161,5 +163,17 @@ public class ModuleIOTalonFXReal extends ModuleIOTalonFX {
                 DriveConstants.turnPIDMinInput,
                 DriveConstants.turnPIDMaxInput);
         turnController.setReference(setpoint, ControlType.kPosition);
+    }
+
+    @Override
+    public void setTurnBrakeMode(boolean enable) {
+        this.turnConfig.idleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
+        turnSpark.configure(turnConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    }
+
+    @Override
+    public void setDriveBrakeMode(boolean enable) {
+        driveConfig.MotorOutput.NeutralMode = enable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+        driveTalon.getConfigurator().apply(driveConfig);
     }
 }
