@@ -1,16 +1,3 @@
-// Copyright 2021-2024 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
 package frc.robot;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
@@ -25,19 +12,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.drive.*;
-import frc.robot.commands.flywheel.InsideFlywheelCommand;
-import frc.robot.commands.flywheel.OutsideFlywheelCommand;
-import frc.robot.commands.flywheel.StopFlywheelCommand;
-import frc.robot.commands.intake.ExtendIntakeCommand;
-import frc.robot.commands.intake.InsideIntakeCommand;
-import frc.robot.commands.intake.OutsideIntakeCommand;
-import frc.robot.commands.intake.RetractIntakeCommand;
-import frc.robot.commands.intake.StopIntakeCommand;
+import frc.robot.commands.flywheel.*;
+import frc.robot.commands.intake.*;
 import frc.robot.commands.leds.*;
-import frc.robot.commands.lockwheel.AlignBall;
-import frc.robot.commands.lockwheel.InsideLockwheelCommand;
-import frc.robot.commands.lockwheel.OutsideLockwheelCommand;
-import frc.robot.commands.lockwheel.StopLockwheelCommand;
+import frc.robot.commands.lockwheel.*;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.flywheel.*;
@@ -106,10 +84,10 @@ public class RobotContainer {
                 // Real robot, instantiate hardware IO implementations
                 drive = new Drive(
                         new GyroIOPigeon2(),
-                        new ModuleIOTalonFXReal(TunerConstants.FrontLeft, 0),
-                        new ModuleIOTalonFXReal(TunerConstants.FrontRight, 1),
-                        new ModuleIOTalonFXReal(TunerConstants.BackLeft, 2),
-                        new ModuleIOTalonFXReal(TunerConstants.BackRight, 3));
+                        new ModuleIOSparkAndTalonFXReal(TunerConstants.FrontLeft, 0),
+                        new ModuleIOSparkAndTalonFXReal(TunerConstants.FrontRight, 1),
+                        new ModuleIOSparkAndTalonFXReal(TunerConstants.BackLeft, 2),
+                        new ModuleIOSparkAndTalonFXReal(TunerConstants.BackRight, 3));
                 this.vision = new Vision(drive, new VisionIOPhotonVision(FL_CAM_NAME, ROBOT_TO_FL_CAM));
                 new VisionIOPhotonVision(FR_CAM_NAME, ROBOT_TO_FR_CAM);
                 new VisionIOPhotonVision(LIMELIGHT_NAME, ROBOT_TO_FR_CAM);
@@ -178,7 +156,7 @@ public class RobotContainer {
         }
 
         // Set up auto routines
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());       
+        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -195,8 +173,7 @@ public class RobotContainer {
         autoChooser.addOption("Drive to blue speaker zone", new DriveTo(BlueSpeakerZone, 7, 15));
         autoChooser.addOption("AutoChoreo", new ChoreoAuto("FirstAuto", 20));
 
-        
-        robotModeChooser = new LoggedDashboardChooser<>("Robot Mode", AutoBuilder.buildAutoChooser()); 
+        robotModeChooser = new LoggedDashboardChooser<>("Robot Mode", AutoBuilder.buildAutoChooser());
 
         robotModeChooser.addDefaultOption("Robot Mode Brake", new RobotModeTo("Brake", drive));
         robotModeChooser.addOption("Robot Mode Coast", new RobotModeTo("Coast", drive));

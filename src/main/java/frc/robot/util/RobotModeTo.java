@@ -5,20 +5,20 @@ import frc.robot.subsystems.drive.Drive;
 
 public class RobotModeTo extends InstantCommand {
 
-  private final Drive drive;
-  private String mode;
+    private final Drive drive;
+    private String mode;
 
-  public RobotModeTo(String mode, Drive drive) {
-    this.mode = mode;
-    this.drive = drive;
-  }
+    public RobotModeTo(String mode, Drive drive) {
+        this.mode = mode;
+        this.drive = drive;
+    }
 
-  @Override
-  public void initialize() {
-  if (mode.equalsIgnoreCase("Coast")) {
-    drive.setBrakeMode(false);
-  } else if (mode.equalsIgnoreCase("Brake") || mode.equalsIgnoreCase("Break")) {
-    drive.setBrakeMode(true);
-  }
-  }
+    @Override
+    public void initialize() {
+        if (mode.equalsIgnoreCase("Coast")) {
+            drive.setBrakeMode(false);
+        } else if (mode.equalsIgnoreCase("Brake") || mode.equalsIgnoreCase("Break")) {
+            drive.setBrakeMode(true);
+        }
+    }
 }
