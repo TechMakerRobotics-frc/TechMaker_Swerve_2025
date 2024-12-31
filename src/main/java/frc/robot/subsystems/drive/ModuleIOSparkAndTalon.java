@@ -73,18 +73,18 @@ public abstract class ModuleIOSparkAndTalon implements ModuleIO {
         cancoder = new CANcoder(constants.CANcoderId, TunerConstants.DrivetrainConstants.CANBusName);
 
         zeroRotation = switch (module) {
-            case 0 -> DriveConstants.frontLeftZeroRotation;
-            case 1 -> DriveConstants.frontRightZeroRotation;
-            case 2 -> DriveConstants.backLeftZeroRotation;
-            case 3 -> DriveConstants.backRightZeroRotation;
+            case 0 -> new Rotation2d(Units.rotationsToRadians(TunerConstants.FrontLeft.CANcoderOffset));
+            case 1 -> new Rotation2d(Units.rotationsToRadians(TunerConstants.FrontRight.CANcoderOffset));
+            case 2 -> new Rotation2d(Units.rotationsToRadians(TunerConstants.BackLeft.CANcoderOffset));
+            case 3 -> new Rotation2d(Units.rotationsToRadians(TunerConstants.BackRight.CANcoderOffset));
             default -> new Rotation2d();};
 
         turnSpark = new SparkMax(
                 switch (module) {
-                    case 0 -> DriveConstants.frontLeftTurnCanId;
-                    case 1 -> DriveConstants.frontRightTurnCanId;
-                    case 2 -> DriveConstants.backLeftTurnCanId;
-                    case 3 -> DriveConstants.backRightTurnCanId;
+                    case 0 -> TunerConstants.FrontLeft.SteerMotorId;
+                    case 1 -> TunerConstants.FrontRight.SteerMotorId;
+                    case 2 -> TunerConstants.BackLeft.SteerMotorId;
+                    case 3 -> TunerConstants.BackRight.SteerMotorId;
                     default -> 0;
                 },
                 MotorType.kBrushless);
@@ -109,25 +109,25 @@ public abstract class ModuleIOSparkAndTalon implements ModuleIO {
 
         turnConfig = new SparkMaxConfig();
         turnConfig
-                .inverted(DriveConstants.turnInverted)
-                .smartCurrentLimit(DriveConstants.turnMotorCurrentLimit)
+                .inverted(TunerConstants.turnInverted)
+                .smartCurrentLimit(TunerConstants.turnMotorCurrentLimit)
                 .voltageCompensation(12.0);
         turnConfig
                 .absoluteEncoder
-                .inverted(DriveConstants.turnEncoderInverted)
-                .positionConversionFactor(DriveConstants.turnEncoderPositionFactor)
-                .velocityConversionFactor(DriveConstants.turnEncoderVelocityFactor)
+                .inverted(TunerConstants.turnEncoderInverted)
+                .positionConversionFactor(TunerConstants.turnEncoderPositionFactor)
+                .velocityConversionFactor(TunerConstants.turnEncoderVelocityFactor)
                 .averageDepth(2);
         turnConfig
                 .closedLoop
                 .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
                 .positionWrappingEnabled(true)
-                .positionWrappingInputRange(DriveConstants.turnPIDMinInput, DriveConstants.turnPIDMaxInput)
-                .pidf(DriveConstants.turnKp, 0.0, DriveConstants.turnKd, 0.0);
+                .positionWrappingInputRange(TunerConstants.turnPIDMinInput, TunerConstants.turnPIDMaxInput)
+                .pidf(TunerConstants.turnKp, 0.0, TunerConstants.turnKd, 0.0);
         turnConfig
                 .signals
                 .absoluteEncoderPositionAlwaysOn(true)
-                .absoluteEncoderPositionPeriodMs((int) (1000.0 / DriveConstants.odometryFrequency))
+                .absoluteEncoderPositionPeriodMs((int) (1000.0 / TunerConstants.odometryFrequency))
                 .absoluteEncoderVelocityAlwaysOn(true)
                 .absoluteEncoderVelocityPeriodMs(20)
                 .appliedOutputPeriodMs(20)
@@ -202,8 +202,8 @@ public abstract class ModuleIOSparkAndTalon implements ModuleIO {
     public void setTurnPosition(Rotation2d rotation) {
         double setpoint = MathUtil.inputModulus(
                 rotation.plus(zeroRotation).getRadians(),
-                DriveConstants.turnPIDMinInput,
-                DriveConstants.turnPIDMaxInput);
+                TunerConstants.turnPIDMinInput,
+                TunerConstants.turnPIDMaxInput);
         turnController.setReference(setpoint, ControlType.kPosition);
     }
 }
