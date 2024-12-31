@@ -108,10 +108,9 @@ public class RobotContainer {
                         new ModuleIOTalonFXReal(TunerConstants.FrontRight, 1),
                         new ModuleIOTalonFXReal(TunerConstants.BackLeft, 2),
                         new ModuleIOTalonFXReal(TunerConstants.BackRight, 3));
-                this.vision = new Vision(
-                        drive,
-                        new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                        new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
+                this.vision = new Vision(drive, new VisionIOPhotonVision(FL_CAM_NAME, ROBOT_TO_FL_CAM));
+                new VisionIOPhotonVision(FR_CAM_NAME, ROBOT_TO_FR_CAM);
+                new VisionIOPhotonVision(LIMELIGHT_NAME, ROBOT_TO_FR_CAM);
                 flywheel = new Flywheel(new FlywheelIOVictorSPX());
                 intake = new Intake(new IntakeIOSparkMax());
                 lockwheel = new Lockwheel(new LockwheelIOVictorSPX());
@@ -142,9 +141,11 @@ public class RobotContainer {
                 vision = new Vision(
                         drive,
                         new VisionIOPhotonVisionSim(
-                                camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
+                                FL_CAM_NAME, ROBOT_TO_FL_CAM, driveSimulation::getSimulatedDriveTrainPose),
                         new VisionIOPhotonVisionSim(
-                                camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+                                FR_CAM_NAME, ROBOT_TO_FR_CAM, driveSimulation::getSimulatedDriveTrainPose),
+                        new VisionIOPhotonVisionSim(
+                                LIMELIGHT_NAME, ROBOT_TO_LIMELIGHT, driveSimulation::getSimulatedDriveTrainPose));
                 flywheel = new Flywheel(new FlywheelIOSim());
                 intake = new Intake(new IntakeIOSim());
                 lockwheel = new Lockwheel(new LockwheelIOSim());
@@ -161,7 +162,7 @@ public class RobotContainer {
                 // Replayed robot, disable IO implementations
                 drive = new Drive(
                         new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {});
-                vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
+                vision = new Vision(drive, new VisionIO() {}, new VisionIO() {}, new VisionIO() {});
                 flywheel = new Flywheel(new FlywheelIO() {});
                 intake = new Intake(new IntakeIO() {});
                 lockwheel = new Lockwheel(new LockwheelIO() {});
