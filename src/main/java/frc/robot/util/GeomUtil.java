@@ -5,7 +5,7 @@ import java.util.List;
 
 /** Geometry utilities for working with translations, rotations, transforms, and poses. */
 public class GeomUtil {
-    
+
     /**
      * Creates a pure translating transform
      *
