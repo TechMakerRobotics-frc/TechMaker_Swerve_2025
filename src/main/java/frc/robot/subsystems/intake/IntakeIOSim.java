@@ -1,21 +1,21 @@
-package frc.robot.subsystems.flywheel;
+package frc.robot.subsystems.intake;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import frc.robot.util.subsystemUtils.IntakeSim;
 
-public class FlywheelIOSim implements FlywheelIO {
-    // Novo construtor do FlywheelSim usando LinearSystemId.createFlywheelSystem
-    private FlywheelSim sim = new FlywheelSim(
+public class IntakeIOSim implements IntakeIO {
+    // Novo construtor do IntakeSim usando LinearSystemId.createFlywheelSystem
+    private IntakeSim sim = new IntakeSim(
             LinearSystemId.createFlywheelSystem(
                     DCMotor.getNEO(1), // Modelo do motor
                     1.5, // Razão de transmissão
                     0.004 // Momento de inércia (kg·m²)
-                    ),
+            ),
             DCMotor.getNEO(1) // Gearbox (modelo do motor)
-            );
+    );
 
     private PIDController pid = new PIDController(0.0, 0.0, 0.0);
 
@@ -24,7 +24,7 @@ public class FlywheelIOSim implements FlywheelIO {
     private double appliedVolts = 0.0;
 
     @Override
-    public void updateInputs(FlywheelIOInputs inputs) {
+    public void updateInputs(IntakeIOInputs inputs) {
         if (closedLoop) {
             appliedVolts = MathUtil.clamp(pid.calculate(sim.getAngularVelocityRadPerSec()) + ffVolts, -12.0, 12.0);
             sim.setInputVoltage(appliedVolts);
@@ -35,7 +35,7 @@ public class FlywheelIOSim implements FlywheelIO {
         inputs.positionRad = 0.0;
         inputs.velocityRadPerSec = sim.getAngularVelocityRadPerSec();
         inputs.appliedVolts = appliedVolts;
-        inputs.currentAmps = new double[] {sim.getCurrentDrawAmps()};
+        inputs.currentAmps = new double[] { sim.getCurrentDrawAmps() };
     }
 
     @Override
