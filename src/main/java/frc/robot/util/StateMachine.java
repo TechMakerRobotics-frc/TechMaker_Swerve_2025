@@ -14,11 +14,11 @@ public class StateMachine {
     private final ScheduledExecutorService scheduler;
 
     public enum RobotState {
-        SEM_ELEMENTO,
-        CARREGANDO,
-        COM_ELEMENTO_NÃO_ALINHADO,
-        PRONTO_PARA_LANCAR,
-        LANCANDO,
+        WITHOUT_ELEMENT,
+        CHARGING,
+        WITH_NOT_ALIGNED_ELEMENT,
+        READY_TO_SHOOT,
+        SHOOTING,
     }
 
     private RobotState currentState;
@@ -29,7 +29,7 @@ public class StateMachine {
     public StateMachine(Lockwheel lockwheel, Flywheel flywheel) {
         this.lockwheel = lockwheel;
         this.flywheel = flywheel;
-        this.currentState = RobotState.SEM_ELEMENTO;
+        this.currentState = RobotState.WITHOUT_ELEMENT;
 
         scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(this::updateState, 0, 20, TimeUnit.MILLISECONDS);
@@ -38,28 +38,28 @@ public class StateMachine {
     public void updateState() {
         performAction();
         switch (currentState) {
-            case SEM_ELEMENTO:
+            case WITHOUT_ELEMENT:
                 if ((lockwheel.backSensorIsTrue() && !lockwheel.frontSensorIsTrue())
                         || (!lockwheel.backSensorIsTrue() && lockwheel.frontSensorIsTrue())) {
-                    currentState = RobotState.COM_ELEMENTO_NÃO_ALINHADO;
+                    currentState = RobotState.WITH_NOT_ALIGNED_ELEMENT;
                 }
                 break;
 
-            case COM_ELEMENTO_NÃO_ALINHADO:
+            case WITH_NOT_ALIGNED_ELEMENT:
                 if (lockwheel.backSensorIsTrue() && lockwheel.frontSensorIsTrue()) {
-                    currentState = RobotState.PRONTO_PARA_LANCAR;
+                    currentState = RobotState.READY_TO_SHOOT;
                 }
                 break;
 
-            case PRONTO_PARA_LANCAR:
+            case READY_TO_SHOOT:
                 if (flywheel.getVelocityRPM() >= 800) {
-                    currentState = RobotState.LANCANDO;
+                    currentState = RobotState.SHOOTING;
                 }
                 break;
 
-            case LANCANDO:
+            case SHOOTING:
                 if (!lockwheel.backSensorIsTrue() && !lockwheel.frontSensorIsTrue()) {
-                    currentState = RobotState.SEM_ELEMENTO;
+                    currentState = RobotState.WITHOUT_ELEMENT;
                 }
                 break;
 
@@ -75,18 +75,18 @@ public class StateMachine {
 
     public void performAction() {
         switch (currentState) {
-            case SEM_ELEMENTO:
+            case WITHOUT_ELEMENT:
                 break;
 
-            case COM_ELEMENTO_NÃO_ALINHADO:
+            case WITH_NOT_ALIGNED_ELEMENT:
                 new AlignBall(lockwheel).schedule();
                 break;
 
-            case PRONTO_PARA_LANCAR:
+            case READY_TO_SHOOT:
                 new OutsideFlywheelCommand(flywheel, 800).schedule();
                 break;
 
-            case LANCANDO:
+            case SHOOTING:
                 break;
 
             default:
