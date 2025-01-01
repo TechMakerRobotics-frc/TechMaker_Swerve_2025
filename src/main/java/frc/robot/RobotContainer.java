@@ -128,7 +128,7 @@ public class RobotContainer {
                         new VisionIOPhotonVisionSim(
                                 LIMELIGHT_NAME, ROBOT_TO_LIMELIGHT, driveSimulation::getSimulatedDriveTrainPose));
                 flywheel = new Flywheel(new FlywheelIOSim());
-                intake = new Intake(new IntakeIOSim());
+                intake = new Intake(new IntakeIOSim(driveSimulation));
                 lockwheel = new Lockwheel(new LockwheelIOSim());
 
                 leds = new Leds();
@@ -240,7 +240,7 @@ public class RobotContainer {
                 .onTrue(new OutsideIntakeCommand(intake, intakeSpeedOutside.get()))
                 .onFalse(new StopIntakeCommand(intake));
 
-        OperatorController.povLeft().onTrue(new ExtendIntakeCommand(intake));
+        OperatorController.povLeft().onFalse(new ExtendIntakeCommand(intake));
         OperatorController.povRight().onTrue(new RetractIntakeCommand(intake));
 
         OperatorController.leftBumper().onTrue(new AlignBall(lockwheel));

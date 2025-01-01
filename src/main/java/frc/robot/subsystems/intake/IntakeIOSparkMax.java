@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class IntakeIOSparkMax implements IntakeIO {
     private static final double GEAR_RATIO = 1;
@@ -16,7 +17,15 @@ public class IntakeIOSparkMax implements IntakeIO {
     private final RelativeEncoder encoder;
     private final SparkMaxConfig motorConfig = new SparkMaxConfig();
 
+    private final DoubleSolenoid solenoid;
+
     public IntakeIOSparkMax() {
+        solenoid = new DoubleSolenoid(
+                IntakeConstants.SOLENOID_MODULE_CAN_ID,
+                IntakeConstants.SOLENOID_MODULE_TYPE,
+                IntakeConstants.SOLENOID_FORWARD_CHANNEL,
+                IntakeConstants.SOLENOID_REVERSE_CHANNEL);
+
         motor = new SparkMax(13, SparkBase.MotorType.kBrushless);
 
         motor.setCANTimeout(250);
@@ -39,6 +48,18 @@ public class IntakeIOSparkMax implements IntakeIO {
         inputs.velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity() / GEAR_RATIO);
         inputs.appliedVolts = motor.getAppliedOutput() * motor.getBusVoltage();
         inputs.currentAmps = new double[] {motor.getOutputCurrent()};
+    }
+
+    /** Ativa o solenoide para o estado forward. */
+    @Override
+    public void extend() {
+        solenoid.set(DoubleSolenoid.Value.kForward);
+    }
+
+    /** Ativa o solenoide para o estado reverse. */
+    @Override
+    public void retract() {
+        solenoid.set(DoubleSolenoid.Value.kReverse);
     }
 
     @Override

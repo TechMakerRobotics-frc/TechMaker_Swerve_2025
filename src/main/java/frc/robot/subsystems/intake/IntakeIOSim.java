@@ -1,10 +1,14 @@
 package frc.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import frc.robot.util.subsystemUtils.IntakeSim;
+import org.ironmaple.simulation.IntakeSimulation;
+import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
 
 public class IntakeIOSim implements IntakeIO {
     // Novo construtor do IntakeSim usando LinearSystemId.createFlywheelSystem
@@ -23,6 +27,25 @@ public class IntakeIOSim implements IntakeIO {
     private double ffVolts = 0.0;
     private double appliedVolts = 0.0;
 
+    private final IntakeSimulation intakeSimulation;
+
+    public IntakeIOSim(AbstractDriveTrainSimulation driveTrain) {
+        // Here, create the intake simulation with respect to the intake on your real robot
+        this.intakeSimulation = IntakeSimulation.OverTheBumperIntake(
+                // Specify the type of game pieces that the intake can collect
+                "Note",
+                // Specify the drivetrain to which this intake is attached
+                driveTrain,
+                // Width of the intake
+                Meters.of(0.7),
+                // The extension length of the intake beyond the robot's frame (when activated)
+                Meters.of(0.2),
+                // The intake is mounted on the back side of the chassis
+                IntakeSimulation.IntakeSide.BACK,
+                // The intake can hold up to 1 note
+                1);
+    }
+
     @Override
     public void updateInputs(IntakeIOInputs inputs) {
         if (closedLoop) {
@@ -36,6 +59,18 @@ public class IntakeIOSim implements IntakeIO {
         inputs.velocityRadPerSec = sim.getAngularVelocityRadPerSec();
         inputs.appliedVolts = appliedVolts;
         inputs.currentAmps = new double[] {sim.getCurrentDrawAmps()};
+    }
+
+    @Override // Defined by IntakeIO
+    public void extend() {
+        intakeSimulation
+                .startIntake(); // Extends the intake out from the chassis frame and starts detecting contacts with game
+        // pieces
+    }
+
+    @Override // Defined by IntakeIO
+    public void retract() {
+        intakeSimulation.stopIntake(); // Retracts the intake into the chassis frame, disabling game piece collection
     }
 
     @Override

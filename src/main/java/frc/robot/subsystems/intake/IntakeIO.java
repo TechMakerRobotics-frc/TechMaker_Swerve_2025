@@ -33,4 +33,10 @@ public interface IntakeIO {
 
     /** Set velocity PID constants. */
     public default void configurePID(double kP, double kI, double kD) {}
+
+    /** Ativa o solenoide para o estado forward. */
+    public default void extend() {}
+
+    /** Ativa o solenoide para o estado reverse. */
+    public default void retract() {}
 }
