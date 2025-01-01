@@ -3,6 +3,7 @@ package frc.robot.util.zones;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.Constants.Zones;
 import frc.robot.subsystems.drive.Drive;
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +16,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ZoneManager {
     private Map<String, List<ZoneCircle>> zones;
-    private final String zoneName;
+    private String zoneName = "totalZones";
     private final Drive drive;
     private Pose2d closestPose = new Pose2d();
     private Pose2d currentPose;
@@ -32,9 +33,15 @@ public class ZoneManager {
         }
     }
 
-    public ZoneManager(Drive drive, String zoneName) throws IOException {
+    public ZoneManager(Zones zone, Drive drive) throws IOException {
+        switch (zone) {
+            case BlueSpeakerZone:
+                this.zoneName = "BlueSpeakerZone";
+            case RedSpeakerZone:
+                this.zoneName = "RedSpeakerZone";
+                break;
+        }
         this.drive = drive;
-        this.zoneName = zoneName;
 
         ObjectMapper mapper = new ObjectMapper();
         File jsonFile = new File("src/main/java/frc/robot/util/zones/zones.json");
@@ -77,14 +84,18 @@ public class ZoneManager {
     }
 
     private void calculateClosestPose() {
-        List<ZoneCircle> zoneCircles = getZoneCircles(zoneName);
+        if (!zoneName.equalsIgnoreCase("totalZones")) {
+            List<ZoneCircle> zoneCircles = getZoneCircles(zoneName);
 
-        closestPose = zoneCircles.stream()
-                .map(this::findClosestPointInCircle)
-                .min((p1, p2) -> Double.compare(
-                        p1.getTranslation().getDistance(currentPose.getTranslation()),
-                        p2.getTranslation().getDistance(currentPose.getTranslation())))
-                .orElseThrow(() -> new IllegalArgumentException("Lista de zonas está vazia!"));
+            closestPose = zoneCircles.stream()
+                    .map(this::findClosestPointInCircle)
+                    .min((p1, p2) -> Double.compare(
+                            p1.getTranslation().getDistance(currentPose.getTranslation()),
+                            p2.getTranslation().getDistance(currentPose.getTranslation())))
+                    .orElseThrow(() -> new IllegalArgumentException("Lista de zonas está vazia!"));
+        } else {
+            closestPose = currentPose;
+        }
     }
 
     private Pose2d findClosestPointInCircle(ZoneCircle circle) {
@@ -121,5 +132,27 @@ public class ZoneManager {
 
     public static class ZoneData {
         public Map<String, List<ZoneCircle>> zones;
+    }
+
+    @AutoLogOutput(key = "ZoneManager/currentZone")
+    public String getCurrentZone() {
+        Translation2d robotPosition = currentPose.getTranslation();
+
+        // Itera por todas as zonas e verifica se o robô está dentro de alguma
+        for (Map.Entry<String, List<ZoneCircle>> entry : zones.entrySet()) {
+            String zoneName = entry.getKey();
+            List<ZoneCircle> zoneCircles = entry.getValue();
+
+            for (ZoneCircle circle : zoneCircles) {
+                Translation2d center = circle.getCenter();
+                double distance = robotPosition.getDistance(center);
+
+                if (distance <= circle.radius) {
+                    return zoneName; // Retorna o nome da zona em que o robô está
+                }
+            }
+        }
+
+        return "Is not"; // Se o robô não estiver em nenhuma zona
     }
 }

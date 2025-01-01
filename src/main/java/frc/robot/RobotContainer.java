@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.Zones;
 import frc.robot.commands.drive.*;
 import frc.robot.commands.flywheel.*;
 import frc.robot.commands.intake.*;
@@ -25,6 +26,7 @@ import frc.robot.subsystems.lockwheel.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.util.RegisNamedCommands;
 import frc.robot.util.RobotModeTo;
+import frc.robot.util.StateMachine;
 import frc.robot.util.zones.ZoneManager;
 import java.io.IOException;
 import org.ironmaple.simulation.SimulatedArena;
@@ -51,7 +53,9 @@ public class RobotContainer {
     private int currentLedState = 0;
     private final Command[] ledCommands;
 
-    private ZoneManager BlueSpeakerZone;
+    private ZoneManager blueSpeakerZone;
+    private ZoneManager redSpeakerZone;
+    private StateMachine stateMachine;
 
     private SwerveDriveSimulation driveSimulation = null;
 
@@ -97,12 +101,6 @@ public class RobotContainer {
                 lockwheel = new Lockwheel(new LockwheelIOVictorSPX());
                 leds = new Leds();
                 new RegisNamedCommands(flywheel, intake, lockwheel, drive, leds);
-
-                try {
-                    BlueSpeakerZone = new ZoneManager(drive, "BlueSpeakerZone");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 break;
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
@@ -132,11 +130,6 @@ public class RobotContainer {
                 lockwheel = new Lockwheel(new LockwheelIOSim());
 
                 leds = new Leds();
-                try {
-                    BlueSpeakerZone = new ZoneManager(drive, "BlueSpeakerZone");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 break;
 
             default:
@@ -148,13 +141,17 @@ public class RobotContainer {
                 intake = new Intake(new IntakeIO() {});
                 lockwheel = new Lockwheel(new LockwheelIO() {});
                 leds = new Leds();
-                try {
-                    BlueSpeakerZone = new ZoneManager(drive, "BlueSpeakerZone");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 break;
         }
+
+        try {
+            blueSpeakerZone = new ZoneManager(Zones.BlueSpeakerZone, drive);
+            redSpeakerZone = new ZoneManager(Zones.RedSpeakerZone, drive);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        stateMachine = new StateMachine(blueSpeakerZone, redSpeakerZone, lockwheel);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -171,7 +168,8 @@ public class RobotContainer {
         autoChooser.addOption("Align to 5 X, 5 Y", new AlignTo(drive, 5, 5, 5));
         autoChooser.addOption("Align to Tag 7", new AlignTo(drive, 7, 5));
         autoChooser.addOption("Drive to 5 X, 5 Y", new DriveTo(5, 5, 90, 15));
-        autoChooser.addOption("Drive to blue speaker zone", new DriveTo(BlueSpeakerZone, 7, 15));
+        autoChooser.addOption("Drive to blue speaker zone", new DriveTo(blueSpeakerZone, 15));
+        autoChooser.addOption("Drive to red speaker zone", new DriveTo(redSpeakerZone, 15));
         autoChooser.addOption("AutoChoreo", new ChoreoAuto("FirstAuto", 20));
 
         robotModeChooser = new LoggedDashboardChooser<>("Robot Mode", AutoBuilder.buildAutoChooser());
