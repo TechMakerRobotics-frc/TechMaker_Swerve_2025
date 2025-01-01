@@ -60,7 +60,7 @@ public class VisionConstants {
     public static final double LIMELIGHT_X = 0.155;
     public static final double LIMELIGHT_Y = 0;
     public static final double LIMELIGHT_Z = 0.545;
-    public static final double LIMELIGHT_ROLL = 180;
+    public static final double LIMELIGHT_ROLL = 0;
     public static final double LIMELIGHT_PITCH = -25;
     public static final double LIMELIGHT_YAW = 180;
 

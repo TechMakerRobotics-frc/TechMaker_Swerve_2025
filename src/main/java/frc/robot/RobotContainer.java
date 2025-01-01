@@ -66,16 +66,17 @@ public class RobotContainer {
     private final LoggedDashboardChooser<Command> robotModeChooser;
 
     // tunable flywheel velocity
-    private LoggedNetworkNumber flywheelSpeedInside = new LoggedNetworkNumber("Flywheel Speed Inside", 300.0);
-    private LoggedNetworkNumber flywheelSpeedOutside = new LoggedNetworkNumber("Flywheel Speed Outside", 3000.0);
+    private LoggedNetworkNumber flywheelSpeedInside = new LoggedNetworkNumber("/Tuning/Flywheel Speed Inside", 300.0);
+    private LoggedNetworkNumber flywheelSpeedOutside =
+            new LoggedNetworkNumber("/Tuning/Flywheel Speed Outside", 3000.0);
 
     // tunable intake velocity
-    private LoggedNetworkNumber intakeSpeedInside = new LoggedNetworkNumber("Intake Speed Inside", 600);
-    private LoggedNetworkNumber intakeSpeedOutside = new LoggedNetworkNumber("Intake Speed Outside", 600);
+    private LoggedNetworkNumber intakeSpeedInside = new LoggedNetworkNumber("/Tuning/Intake Speed Inside", 600);
+    private LoggedNetworkNumber intakeSpeedOutside = new LoggedNetworkNumber("/Tuning/Intake Speed Outside", 600);
 
     // tunable lockwheel velocity
-    private LoggedNetworkNumber lockwheelSpeedInside = new LoggedNetworkNumber("Flywheel Speed Inside", 800);
-    private LoggedNetworkNumber lockwheelSpeedOutside = new LoggedNetworkNumber("Flywheel Speed Outside", 800);
+    private LoggedNetworkNumber lockwheelSpeedInside = new LoggedNetworkNumber("/Tuning/Flywheel Speed Inside", 800);
+    private LoggedNetworkNumber lockwheelSpeedOutside = new LoggedNetworkNumber("/Tuning/Flywheel Speed Outside", 800);
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
