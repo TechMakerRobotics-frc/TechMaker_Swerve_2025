@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants.Zones;
 import frc.robot.commands.drive.*;
 import frc.robot.commands.flywheel.*;
 import frc.robot.commands.intake.*;
@@ -28,7 +27,6 @@ import frc.robot.util.RegisNamedCommands;
 import frc.robot.util.RobotModeTo;
 import frc.robot.util.StateMachine;
 import frc.robot.util.zones.ZoneManager;
-import java.io.IOException;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -43,7 +41,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
-    private final Vision vision;
+    public final Vision vision;
     private final Flywheel flywheel;
     private final Intake intake;
     private final Lockwheel lockwheel;
@@ -53,9 +51,8 @@ public class RobotContainer {
     private int currentLedState = 0;
     private final Command[] ledCommands;
 
-    private ZoneManager blueSpeakerZone;
-    private ZoneManager redSpeakerZone;
-    private StateMachine stateMachine;
+    public final ZoneManager zones;
+    public final StateMachine stateMachine;
 
     private SwerveDriveSimulation driveSimulation = null;
 
@@ -144,13 +141,7 @@ public class RobotContainer {
                 break;
         }
 
-        try {
-            blueSpeakerZone = new ZoneManager(Zones.BlueSpeakerZone, drive);
-            redSpeakerZone = new ZoneManager(Zones.RedSpeakerZone, drive);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        zones = new ZoneManager(drive);
         stateMachine = new StateMachine(lockwheel, flywheel);
 
         // Set up auto routines
@@ -168,8 +159,6 @@ public class RobotContainer {
         autoChooser.addOption("Align to 5 X, 5 Y", new AlignTo(drive, 5, 5, 5));
         autoChooser.addOption("Align to Tag 7", new AlignTo(drive, 7, 5));
         autoChooser.addOption("Drive to 5 X, 5 Y", new DriveTo(5, 5, 90, 15));
-        autoChooser.addOption("Drive to blue speaker zone", new DriveTo(blueSpeakerZone, 15));
-        autoChooser.addOption("Drive to red speaker zone", new DriveTo(redSpeakerZone, 15));
         autoChooser.addOption("AutoChoreo", new ChoreoAuto("FirstAuto", 20));
 
         robotModeChooser = new LoggedDashboardChooser<>("Robot Mode", AutoBuilder.buildAutoChooser());

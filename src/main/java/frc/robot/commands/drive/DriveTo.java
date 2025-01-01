@@ -10,8 +10,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.util.GeomUtil;
-import frc.robot.util.zones.ZoneManager;
 
 /** Command to drive the robot to a specified pose or target with various input options. */
 public class DriveTo extends Command {
@@ -21,7 +21,6 @@ public class DriveTo extends Command {
     private Pose2d goalPose;
     private Command pathfollower;
     private Timer time = new Timer();
-    private ZoneManager zoneManager;
     private boolean isFinished = false;
 
     /**
@@ -84,53 +83,22 @@ public class DriveTo extends Command {
     }
 
     /**
-     * Constructs a DriveTo command targeting the closest zone pose from a ZoneManager.
-     *
-     * @param zoneManager the ZoneManager instance to retrieve the closest zone pose.
-     * @param timeOut the timeout for the command in seconds.
-     */
-    public DriveTo(ZoneManager zoneManager, double timeOut) {
-        this.timeOut = timeOut;
-        this.zoneManager = zoneManager;
-        this.goalPose = this.zoneManager.getClosestPose();
-    }
-
-    /**
-     * Constructs a DriveTo command targeting the closest zone pose with a specific angle.
-     *
-     * @param zoneManager the ZoneManager instance to retrieve the closest zone pose.
-     * @param angle the desired angle at the destination (in degrees).
-     * @param timeOut the timeout for the command in seconds.
-     */
-    public DriveTo(ZoneManager zoneManager, double angle, double timeOut) {
-        this.timeOut = timeOut;
-        this.zoneManager = zoneManager;
-        this.goalPose = new Pose2d(
-                this.zoneManager.getClosestPose().getTranslation(), new Rotation2d(Units.degreesToRadians(angle)));
-    }
-
-    /**
      * Constructs a DriveTo command targeting a specific AprilTag pose from its ID.
      *
      * @param zoneManager the ZoneManager instance to retrieve the closest zone pose.
      * @param tag the ID of the AprilTag to target.
      * @param timeOut the timeout for the command in seconds.
      */
-    public DriveTo(ZoneManager zoneManager, int tag, double timeOut) {
+    public DriveTo(Drive drive, double x, double y, int tag, double timeOut) {
         AprilTagFieldLayout fTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
         this.timeOut = timeOut;
-        this.zoneManager = zoneManager;
 
         Pose2d tagPose = fTagFieldLayout
                 .getTagPose(tag)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid AprilTag ID: " + tag))
                 .toPose2d();
 
-        Pose2d currentPose = this.zoneManager.getCurrentPose();
-
-        this.goalPose = new Pose2d(
-                this.zoneManager.getClosestPose().getTranslation(),
-                new Rotation2d(GeomUtil.thetaToTarget(currentPose, tagPose)));
+        this.goalPose = new Pose2d(x, y, new Rotation2d(GeomUtil.thetaToTarget(drive.getPose(), tagPose)));
     }
 
     @Override
