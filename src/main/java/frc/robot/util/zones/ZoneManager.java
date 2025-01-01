@@ -3,7 +3,6 @@ package frc.robot.util.zones;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drive.Drive;
 import java.io.File;
 import java.io.IOException;
@@ -56,9 +55,6 @@ public class ZoneManager {
             for (Map.Entry<String, List<ZoneCircle>> entry : zoneData.zones.entrySet()) {
                 this.zones.put(entry.getKey(), entry.getValue());
             }
-
-            SmartDashboard.putString(
-                    "ZonesManager/zones", "Zonas carregadas com sucesso: " + this.zones.size() + " zonas");
         } catch (IOException e) {
             throw new IOException("Erro ao ler o arquivo JSON: " + e.getMessage(), e);
         }
