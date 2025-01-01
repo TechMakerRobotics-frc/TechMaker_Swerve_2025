@@ -28,7 +28,7 @@ public class ModuleIOSparkAndTalonFXReal extends ModuleIOSparkAndTalon {
     public ModuleIOSparkAndTalonFXReal(SwerveModuleConstants constants, int module) {
         super(constants, module);
 
-        this.turnPositionQueue = SparkOdometryThread.getInstance().registerSignal(turnSpark, turnEncoder::getPosition);
+        this.turnPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(turnEncoder::getPosition);
 
         this.timestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
         this.drivePositionQueue = PhoenixOdometryThread.getInstance().registerSignal(super.drivePosition);
