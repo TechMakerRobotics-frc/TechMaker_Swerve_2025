@@ -1,10 +1,9 @@
 package frc.robot.util;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.commands.flywheel.OutsideFlywheelCommand;
+import frc.robot.commands.lockwheel.AlignBall;
+import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.lockwheel.Lockwheel;
-import frc.robot.util.zones.ZoneManager;
-import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -12,73 +11,90 @@ import org.littletonrobotics.junction.AutoLogOutput;
 
 public class StateMachine {
 
-    private final ZoneManager blueZoneManager;
-    private final ZoneManager redZoneManager;
-
-    private final Lockwheel lockwheel;
-
     private final ScheduledExecutorService scheduler;
 
-    // Map para associar estados e seus comandos
-    private final Map<String, Command> stateCommands;
-    private String currentState = "WithoutElement"; // Estado inicial
-    private final String blueSpeakerZoneName = "BlueSpeakerZone";
-    private final String redSpeakerZoneName = "RedSpeakerZone";
+    public enum RobotState {
+        SEM_ELEMENTO,
+        CARREGANDO,
+        COM_ELEMENTO_NÃO_ALINHADO,
+        PRONTO_PARA_LANCAR,
+        LANCANDO,
+    }
 
-    public StateMachine(ZoneManager blueSpeakerzone, ZoneManager redSpeakerzone, Lockwheel lockwheel) {
-        this.blueZoneManager = blueSpeakerzone;
-        this.redZoneManager = redSpeakerzone;
+    private RobotState currentState;
+
+    private final Lockwheel lockwheel;
+    private final Flywheel flywheel;
+
+    public StateMachine(Lockwheel lockwheel, Flywheel flywheel) {
         this.lockwheel = lockwheel;
-
-        stateCommands = Map.of(
-                "WithElement", new InstantCommand(() -> lockwheel.rotateForward(), lockwheel),
-                "WithoutElement", new InstantCommand(() -> lockwheel.stop(), lockwheel),
-                "InBlueScoringZone", new InstantCommand(() -> System.out.println("In Scoring Zone"), lockwheel));
+        this.flywheel = flywheel;
+        this.currentState = RobotState.SEM_ELEMENTO;
 
         scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(this::periodicVerify, 0, 20, TimeUnit.MILLISECONDS);
+        scheduler.scheduleAtFixedRate(this::updateState, 0, 20, TimeUnit.MILLISECONDS);
     }
 
-    private void periodicVerify() {
-        String newState = detectState();
+    public void updateState() {
+        performAction();
+        switch (currentState) {
+            case SEM_ELEMENTO:
+                if ((lockwheel.backSensorIsTrue() && !lockwheel.frontSensorIsTrue())
+                        || (!lockwheel.backSensorIsTrue() && lockwheel.frontSensorIsTrue())) {
+                    currentState = RobotState.COM_ELEMENTO_NÃO_ALINHADO;
+                }
+                break;
 
-        if (!newState.equals(currentState)) {
-            currentState = newState;
-            executeStateCommand();
+            case COM_ELEMENTO_NÃO_ALINHADO:
+                if (lockwheel.backSensorIsTrue() && lockwheel.frontSensorIsTrue()) {
+                    currentState = RobotState.PRONTO_PARA_LANCAR;
+                }
+                break;
+
+            case PRONTO_PARA_LANCAR:
+                if (flywheel.getVelocityRPM() >= 800) {
+                    currentState = RobotState.LANCANDO;
+                }
+                break;
+
+            case LANCANDO:
+                if (!lockwheel.backSensorIsTrue() && !lockwheel.frontSensorIsTrue()) {
+                    currentState = RobotState.SEM_ELEMENTO;
+                }
+                break;
+
+            default:
+                throw new IllegalStateException("Estado desconhecido: " + currentState);
         }
     }
 
-    @AutoLogOutput(key = "StateMachine/State")
-    private String detectState() {
-        if (lockwheel.backSensorIsTrue()) {
-            return "WithElement";
-        } else if (isInBlueScoringZone()) {
-            return "InBlueScoringZone";
-        } else if (isInRedScoringZone()) {
-            return "InRedScoringZone";
-        } else {
-            return "Is not in a ScoringZone";
+    @AutoLogOutput(key = "StateMachine/CurrentState")
+    public RobotState getCurrentState() {
+        return currentState;
+    }
+
+    public void performAction() {
+        switch (currentState) {
+            case SEM_ELEMENTO:
+                break;
+
+            case COM_ELEMENTO_NÃO_ALINHADO:
+                new AlignBall(lockwheel).schedule();
+                break;
+
+            case PRONTO_PARA_LANCAR:
+                new OutsideFlywheelCommand(flywheel, 800).schedule();
+                break;
+
+            case LANCANDO:
+                break;
+
+            default:
+                break;
         }
-    }
-
-    @AutoLogOutput(key = "StateMachine/StateZoneScoring")
-    private boolean isInBlueScoringZone() {
-        return blueZoneManager.getCurrentZone().equalsIgnoreCase(blueSpeakerZoneName);
-    }
-
-    @AutoLogOutput(key = "StateMachine/StateZoneRedScoring")
-    private boolean isInRedScoringZone() {
-        return redZoneManager.getCurrentZone().equalsIgnoreCase(redSpeakerZoneName);
-    }
-
-    private void executeStateCommand() {
     }
 
     public void stop() {
         scheduler.shutdown();
-    }
-
-    public String getCurrentState() {
-        return currentState;
     }
 }

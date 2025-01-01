@@ -151,7 +151,7 @@ public class RobotContainer {
             e.printStackTrace();
         }
 
-        stateMachine = new StateMachine(blueSpeakerZone, redSpeakerZone, lockwheel);
+        stateMachine = new StateMachine(lockwheel, flywheel);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

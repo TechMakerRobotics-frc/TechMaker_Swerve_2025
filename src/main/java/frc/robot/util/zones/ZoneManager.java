@@ -16,7 +16,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ZoneManager {
     private Map<String, List<ZoneCircle>> zones;
-    private String zoneName = "totalZones";
+    private String zoneName;
     private final Drive drive;
     private Pose2d closestPose = new Pose2d();
     private Pose2d currentPose;
@@ -84,18 +84,14 @@ public class ZoneManager {
     }
 
     private void calculateClosestPose() {
-        if (!zoneName.equalsIgnoreCase("totalZones")) {
-            List<ZoneCircle> zoneCircles = getZoneCircles(zoneName);
+        List<ZoneCircle> zoneCircles = getZoneCircles(zoneName);
 
-            closestPose = zoneCircles.stream()
-                    .map(this::findClosestPointInCircle)
-                    .min((p1, p2) -> Double.compare(
-                            p1.getTranslation().getDistance(currentPose.getTranslation()),
-                            p2.getTranslation().getDistance(currentPose.getTranslation())))
-                    .orElseThrow(() -> new IllegalArgumentException("Lista de zonas está vazia!"));
-        } else {
-            closestPose = currentPose;
-        }
+        closestPose = zoneCircles.stream()
+                .map(this::findClosestPointInCircle)
+                .min((p1, p2) -> Double.compare(
+                        p1.getTranslation().getDistance(currentPose.getTranslation()),
+                        p2.getTranslation().getDistance(currentPose.getTranslation())))
+                .orElseThrow(() -> new IllegalArgumentException("Lista de zonas está vazia!"));
     }
 
     private Pose2d findClosestPointInCircle(ZoneCircle circle) {
