@@ -58,9 +58,9 @@ public class AlignTo extends Command {
     @Override
     public void initialize() {
         thetaController = new PIDController(tP.get(), tI.get(), tD.get());
+        thetaController.reset();
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
         thetaController.setTolerance(0.05);
-        thetaController.reset();
         time.reset();
         time.start();
     }

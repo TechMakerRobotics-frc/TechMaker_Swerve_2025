@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.drive.*;
 import frc.robot.commands.flywheel.*;
@@ -142,7 +143,7 @@ public class RobotContainer {
         }
 
         zones = new ZoneManager(drive);
-        stateMachine = new StateMachine(lockwheel, flywheel);
+        stateMachine = new StateMachine(zones, drive, lockwheel, flywheel);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -196,6 +197,10 @@ public class RobotContainer {
                 .a()
                 .whileTrue(DriveCommands.joystickDriveAtAngle(
                         drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> new Rotation2d()));
+
+        new Trigger(() -> stateMachine.isReadyToAlign())
+                .whileTrue(DriveCommands.joystickDriveAtPoint(
+                        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), 0, 5.5));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
