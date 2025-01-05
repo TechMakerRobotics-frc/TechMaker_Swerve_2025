@@ -73,14 +73,14 @@ public class AlignTo extends Command {
         double rotationSpeed = thetaController.calculate(
                 currentRotation.getRadians(), GeomUtil.thetaToTarget(currentPose, targetPose));
 
-        ChassisSpeeds speed = new ChassisSpeeds(0, 0, rotationSpeed);
+        ChassisSpeeds speeds = new ChassisSpeeds(0, 0, rotationSpeed);
 
         boolean isFlipped = DriverStation.getAlliance().isPresent()
                 && DriverStation.getAlliance().get() == Alliance.Red;
-        speed.toRobotRelativeSpeeds(
+        speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, 
                 isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation());
 
-        drive.runVelocity(speed);
+        drive.runVelocity(speeds);
     }
 
     @Override
