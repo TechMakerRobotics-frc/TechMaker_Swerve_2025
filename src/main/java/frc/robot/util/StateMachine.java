@@ -15,8 +15,6 @@ public class StateMachine {
 
     private final ScheduledExecutorService scheduler;
 
-    private boolean alignCommandScheduled = false;
-
     public enum RobotState {
         WITHOUT_ELEMENT,
         CHARGING,
