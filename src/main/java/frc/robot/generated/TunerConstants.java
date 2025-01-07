@@ -23,6 +23,7 @@ import edu.wpi.first.units.measure.*;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 
 public class TunerConstants {
 
@@ -220,6 +221,7 @@ public class TunerConstants {
             .withRobotMass(Kilogram.of(robotMassKg))
             .withGyro(COTS.ofPigeon2())
             .withSwerveModule(() -> new SwerveModuleSimulation(
+                new SwerveModuleSimulationConfig(
                     driveGearbox,
                     turnGearbox,
                     driveMotorReduction,
@@ -228,7 +230,7 @@ public class TunerConstants {
                     Volts.of(0.1),
                     Meters.of(wheelRadiusMeters),
                     KilogramSquareMeters.of(0.02),
-                    wheelCOF));
+                    wheelCOF)));
 
     public static final SwerveDrivetrainConstants DrivetrainConstants = new SwerveDrivetrainConstants()
             .withCANBusName(kCANBus.getName())
