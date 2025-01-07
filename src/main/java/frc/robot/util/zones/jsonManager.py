@@ -12,8 +12,10 @@ class ZoneEditor:
         self.start_x = self.start_y = None
 
         # Dimensões oficiais do campo em metros
-        self.field_width_m = 16.54
-        self.field_height_m = 8.21
+        # Crescendo = 16.54/8.21
+        # Reefscape = 17.548225/8.0518
+        self.field_width_m = 17.548225
+        self.field_height_m = 8.0518
 
         # Configurar a interface gráfica
         self.canvas = tk.Canvas(root)
@@ -118,6 +120,6 @@ class ZoneEditor:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    editor = ZoneEditor(root, "src/main/java/frc/robot/util/zones/Crescendo.png")
+    editor = ZoneEditor(root, "src/main/java/frc/robot/util/zones/Reefscape.png")
     print(f"Diretório atual: {os.getcwd()}")
     root.mainloop()
