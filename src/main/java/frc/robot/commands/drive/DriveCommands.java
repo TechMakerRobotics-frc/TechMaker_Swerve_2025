@@ -136,7 +136,7 @@ public class DriveCommands {
     }
 
     public static Command joystickDriveAtPoint(
-            Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, double targetX, double targetY) {
+            Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, double targetX, double targetY) {
 
         // Criação do controlador PID para controle de rotação
         ProfiledPIDController angleController = new ProfiledPIDController(
@@ -157,9 +157,19 @@ public class DriveCommands {
                             double desiredTheta =
                                     Math.atan2(targetY - currentPose.getY(), targetX - currentPose.getX());
 
+                            // Apply rotation deadband
+                            double omegaController = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+
+                            // Square rotation value for more precise control
+                            omegaController = Math.copySign(omegaController * omegaController, omegaController);
+
                             // Calcula a velocidade angular usando o controlador PID
                             double omega = angleController.calculate(
                                     drive.getRotation().getRadians(), desiredTheta);
+
+                            if (!(omegaController == 0)) {
+                                omega = omegaController * drive.getMaxAngularSpeedRadPerSec();
+                            }
 
                             // Converte as velocidades para referencia de campo e envia o comando
                             ChassisSpeeds speeds = new ChassisSpeeds(

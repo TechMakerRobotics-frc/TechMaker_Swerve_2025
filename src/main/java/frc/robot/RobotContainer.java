@@ -188,6 +188,12 @@ public class RobotContainer {
      * and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
+        final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM
+                ? () -> drive.setPose(
+                        driveSimulation
+                                .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
+                : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
+
         // Default command, normal field-relative drive
         drive.setDefaultCommand(DriveCommands.joystickDrive(
                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
@@ -200,18 +206,12 @@ public class RobotContainer {
 
         new Trigger(() -> stateMachine.isReadyToAlign())
                 .whileTrue(DriveCommands.joystickDriveAtPoint(
-                        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), 0, 5.5));
+                        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), 0, 5.5));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
         // Reset gyro / odometry
-        final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM
-                ? () -> drive.setPose(
-                        driveSimulation
-                                .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
-                : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
-
         controller.povRight().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
         // Operator commands
