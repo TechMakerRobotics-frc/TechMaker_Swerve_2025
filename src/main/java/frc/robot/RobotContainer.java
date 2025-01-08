@@ -232,7 +232,7 @@ public class RobotContainer {
                 .onTrue(new OutsideIntakeCommand(intake, intakeSpeedOutside.get()))
                 .onFalse(new StopIntakeCommand(intake));
 
-        OperatorController.povLeft().onFalse(new ExtendIntakeCommand(intake));
+        OperatorController.povLeft().onTrue(new ExtendIntakeCommand(intake));
         OperatorController.povRight().onTrue(new RetractIntakeCommand(intake));
 
         OperatorController.leftBumper().onTrue(new AlignBall(lockwheel));
@@ -277,6 +277,7 @@ public class RobotContainer {
 
         Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
         Logger.recordOutput(
-                "FieldSimulation/Notes", SimulatedArena.getInstance().getGamePiecesArrayByType("Note"));
+                "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+        Logger.recordOutput("FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
     }
 }
