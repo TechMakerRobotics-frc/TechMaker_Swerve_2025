@@ -31,7 +31,7 @@ import edu.wpi.first.units.measure.*;
 import frc.robot.generated.TunerConstants;
 
 public abstract class ModuleIOSparkAndTalon implements ModuleIO {
-    protected final SwerveModuleConstants constants;
+    protected final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants;
 
     protected final TalonFX driveTalon;
     protected final SparkBase turnSpark;
@@ -66,31 +66,31 @@ public abstract class ModuleIOSparkAndTalon implements ModuleIO {
 
     protected final Rotation2d zeroRotation;
 
-    protected ModuleIOSparkAndTalon(SwerveModuleConstants constants, int module) {
+    protected ModuleIOSparkAndTalon(SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants, int module) {
         this.constants = constants;
 
         driveTalon = new TalonFX(constants.DriveMotorId, TunerConstants.DrivetrainConstants.CANBusName);
-        cancoder = new CANcoder(constants.CANcoderId, TunerConstants.DrivetrainConstants.CANBusName);
+        cancoder = new CANcoder(constants.EncoderId, TunerConstants.DrivetrainConstants.CANBusName);
 
         zeroRotation = switch (module) {
-            case 0 -> new Rotation2d(Units.rotationsToRadians(TunerConstants.FrontLeft.CANcoderOffset));
-            case 1 -> new Rotation2d(Units.rotationsToRadians(TunerConstants.FrontRight.CANcoderOffset));
-            case 2 -> new Rotation2d(Units.rotationsToRadians(TunerConstants.BackLeft.CANcoderOffset));
-            case 3 -> new Rotation2d(Units.rotationsToRadians(TunerConstants.BackRight.CANcoderOffset));
+            case 0 -> new Rotation2d(Units.rotationsToRadians(TunerConstants.kFrontLeftEncoderOffsetRotations));
+            case 1 -> new Rotation2d(Units.rotationsToRadians(TunerConstants.kFrontRightEncoderOffsetRotations));
+            case 2 -> new Rotation2d(Units.rotationsToRadians(TunerConstants.kBackLeftEncoderOffsetRotations));
+            case 3 -> new Rotation2d(Units.rotationsToRadians(TunerConstants.kBackRightEncoderOffsetRotations));
             default -> new Rotation2d();};
 
         turnSpark = new SparkMax(
                 switch (module) {
-                    case 0 -> TunerConstants.FrontLeft.SteerMotorId;
-                    case 1 -> TunerConstants.FrontRight.SteerMotorId;
-                    case 2 -> TunerConstants.BackLeft.SteerMotorId;
-                    case 3 -> TunerConstants.BackRight.SteerMotorId;
+                    case 0 -> TunerConstants.kFrontLeftSteerMotorId;
+                    case 1 -> TunerConstants.kFrontRightSteerMotorId;
+                    case 2 -> TunerConstants.kBackLeftSteerMotorId;
+                    case 3 -> TunerConstants.kBackRightSteerMotorId;
                     default -> 0;
                 },
                 MotorType.kBrushless);
 
         // Configure drive motor
-        driveConfig = constants.DriveMotorInitialConfigs;
+        driveConfig = new TalonFXConfiguration();
         driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         driveConfig.Slot0 = constants.DriveMotorGains;
         driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = constants.SlipCurrent;
@@ -139,9 +139,9 @@ public abstract class ModuleIOSparkAndTalon implements ModuleIO {
                 () -> turnSpark.configure(turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
 
         // Configure CANCoder
-        CANcoderConfiguration cancoderConfig = constants.CANcoderInitialConfigs;
-        cancoderConfig.MagnetSensor.MagnetOffset = constants.CANcoderOffset;
-        cancoderConfig.MagnetSensor.SensorDirection = constants.CANcoderInverted
+        CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
+        cancoderConfig.MagnetSensor.MagnetOffset = constants.EncoderOffset;
+        cancoderConfig.MagnetSensor.SensorDirection = constants.EncoderInverted
                 ? SensorDirectionValue.Clockwise_Positive
                 : SensorDirectionValue.CounterClockwise_Positive;
         cancoder.getConfigurator().apply(cancoderConfig);

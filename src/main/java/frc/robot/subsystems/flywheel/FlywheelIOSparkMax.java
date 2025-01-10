@@ -1,6 +1,5 @@
 package frc.robot.subsystems.flywheel;
 
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -14,18 +13,15 @@ public class FlywheelIOSparkMax implements FlywheelIO {
 
     private final SparkMax upMotor;
     private final SparkMax downMotor;
-    private final RelativeEncoder encoder;
     private final SparkMaxConfig upMotorConfig = new SparkMaxConfig();
     private final SparkMaxConfig downMotorConfig = new SparkMaxConfig();
 
     public FlywheelIOSparkMax() {
-        upMotor = new SparkMax(13, SparkBase.MotorType.kBrushless);
-        downMotor = new SparkMax(15, SparkBase.MotorType.kBrushless);
+        upMotor = new SparkMax(15, SparkBase.MotorType.kBrushless);
+        downMotor = new SparkMax(16, SparkBase.MotorType.kBrushless);
 
         upMotor.setCANTimeout(250);
         downMotor.setCANTimeout(250);
-
-        encoder = upMotor.getEncoder();
 
         upMotorConfig
                 .inverted(false)
@@ -47,8 +43,8 @@ public class FlywheelIOSparkMax implements FlywheelIO {
     /** @param inputs */
     @Override
     public void updateInputs(FlywheelIOInputs inputs) {
-        inputs.positionRad = Units.rotationsToRadians(encoder.getPosition() / GEAR_RATIO);
-        inputs.velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity() / GEAR_RATIO);
+        inputs.positionRad = Units.rotationsToRadians(GEAR_RATIO);
+        inputs.velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(GEAR_RATIO);
         inputs.appliedVolts = upMotor.getAppliedOutput() * upMotor.getBusVoltage();
         inputs.currentAmps = new double[] {upMotor.getOutputCurrent(), downMotor.getOutputCurrent()};
     }

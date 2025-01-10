@@ -2,6 +2,8 @@ package frc.robot.subsystems.drive;
 
 import static frc.robot.util.subsystemUtils.SparkUtil.ifOk;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.revrobotics.spark.SparkBase.*;
@@ -25,11 +27,10 @@ public class ModuleIOSparkAndTalonFXReal extends ModuleIOSparkAndTalon {
     private final Queue<Double> drivePositionQueue;
     private final Queue<Double> turnPositionQueue;
 
-    public ModuleIOSparkAndTalonFXReal(SwerveModuleConstants constants, int module) {
+    public ModuleIOSparkAndTalonFXReal(SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants, int module) {
         super(constants, module);
 
         this.turnPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(turnEncoder::getPosition);
-
         this.timestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
         this.drivePositionQueue = PhoenixOdometryThread.getInstance().registerSignal(super.drivePosition);
     }

@@ -17,7 +17,7 @@ public class LockwheelIOSparkMax implements LockwheelIO {
     private final SparkMaxConfig motorConfig = new SparkMaxConfig();
 
     public LockwheelIOSparkMax() {
-        motor = new SparkMax(13, SparkBase.MotorType.kBrushless);
+        motor = new SparkMax(18, SparkBase.MotorType.kBrushless);
 
         motor.setCANTimeout(250);
 

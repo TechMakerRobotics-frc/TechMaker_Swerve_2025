@@ -26,7 +26,7 @@ public class IntakeIOSparkMax implements IntakeIO {
                 IntakeConstants.SOLENOID_FORWARD_CHANNEL,
                 IntakeConstants.SOLENOID_REVERSE_CHANNEL);
 
-        motor = new SparkMax(13, SparkBase.MotorType.kBrushless);
+        motor = new SparkMax(20, SparkBase.MotorType.kBrushless);
 
         motor.setCANTimeout(250);
 

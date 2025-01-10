@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj.Encoder;
 public class FlywheelIOVictorSPX implements FlywheelIO {
     private static final int ENCODER_PULSES_PER_REV = 2048; // Ajuste de acordo com o encoder usado
 
-    private final WPI_VictorSPX leader = new WPI_VictorSPX(15);
-    private final WPI_VictorSPX follower = new WPI_VictorSPX(16);
+    private final WPI_VictorSPX leader = new WPI_VictorSPX(29);
+    private final WPI_VictorSPX follower = new WPI_VictorSPX(30);
 
     private double currentVelocityRotations = 0;
     private double appliedVolts = 0;

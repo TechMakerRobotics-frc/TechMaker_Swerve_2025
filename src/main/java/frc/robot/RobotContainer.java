@@ -10,29 +10,29 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+//import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.drive.*;
-import frc.robot.commands.flywheel.*;
-import frc.robot.commands.intake.*;
+//import frc.robot.commands.flywheel.*;
+//import frc.robot.commands.intake.*;
 import frc.robot.commands.leds.*;
-import frc.robot.commands.lockwheel.*;
+//import frc.robot.commands.lockwheel.*;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
-import frc.robot.subsystems.flywheel.*;
-import frc.robot.subsystems.intake.*;
+//import frc.robot.subsystems.flywheel.*;
+//import frc.robot.subsystems.intake.*;
 import frc.robot.subsystems.leds.Leds;
-import frc.robot.subsystems.lockwheel.*;
+//import frc.robot.subsystems.lockwheel.*;
 import frc.robot.subsystems.vision.*;
-import frc.robot.util.RegisNamedCommands;
+//import frc.robot.util.RegisNamedCommands;
 import frc.robot.util.RobotModeTo;
-import frc.robot.util.StateMachine;
-import frc.robot.util.zones.ZoneManager;
+/*import frc.robot.util.StateMachine;
+import frc.robot.util.zones.ZoneManager;*/
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+//import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -42,18 +42,18 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
-    public final Vision vision;
-    private final Flywheel flywheel;
+    public Vision vision;
+    /*private final Flywheel flywheel;
     private final Intake intake;
-    private final Lockwheel lockwheel;
+    private final Lockwheel lockwheel;*/
     public final Leds leds;
 
     // control leds
     private int currentLedState = 0;
     private final Command[] ledCommands;
 
-    public final ZoneManager zones;
-    public final StateMachine stateMachine;
+    /*public final ZoneManager zones;
+    public final StateMachine stateMachine;*/
 
     private SwerveDriveSimulation driveSimulation = null;
 
@@ -67,7 +67,7 @@ public class RobotContainer {
     private final LoggedDashboardChooser<Command> autoChooser;
     private final LoggedDashboardChooser<Command> robotModeChooser;
 
-    // tunable flywheel velocity
+    /*// tunable flywheel velocity
     private LoggedNetworkNumber flywheelSpeedInside = new LoggedNetworkNumber("/Tuning/Flywheel Speed Inside", 300.0);
     private LoggedNetworkNumber flywheelSpeedOutside =
             new LoggedNetworkNumber("/Tuning/Flywheel Speed Outside", 3000.0);
@@ -78,7 +78,7 @@ public class RobotContainer {
 
     // tunable lockwheel velocity
     private LoggedNetworkNumber lockwheelSpeedInside = new LoggedNetworkNumber("/Tuning/Flywheel Speed Inside", 800);
-    private LoggedNetworkNumber lockwheelSpeedOutside = new LoggedNetworkNumber("/Tuning/Flywheel Speed Outside", 800);
+    private LoggedNetworkNumber lockwheelSpeedOutside = new LoggedNetworkNumber("/Tuning/Flywheel Speed Outside", 800);*/
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
@@ -91,14 +91,14 @@ public class RobotContainer {
                         new ModuleIOSparkAndTalonFXReal(TunerConstants.FrontRight, 1),
                         new ModuleIOSparkAndTalonFXReal(TunerConstants.BackLeft, 2),
                         new ModuleIOSparkAndTalonFXReal(TunerConstants.BackRight, 3));
-                this.vision = new Vision(drive, new VisionIOPhotonVision(FL_CAM_NAME, ROBOT_TO_FL_CAM));
+               // this.vision = new Vision(drive, new VisionIOPhotonVision(FL_CAM_NAME, ROBOT_TO_FL_CAM));
                 new VisionIOPhotonVision(FR_CAM_NAME, ROBOT_TO_FR_CAM);
                 new VisionIOPhotonVision(LIMELIGHT_NAME, ROBOT_TO_FR_CAM);
-                flywheel = new Flywheel(new FlywheelIOVictorSPX());
+                /*flywheel = new Flywheel(new FlywheelIOVictorSPX());
                 intake = new Intake(new IntakeIOSparkMax());
-                lockwheel = new Lockwheel(new LockwheelIOVictorSPX());
+                lockwheel = new Lockwheel(new LockwheelIOVictorSPX());*/
                 leds = new Leds();
-                new RegisNamedCommands(flywheel, intake, lockwheel, drive, leds);
+                //new RegisNamedCommands(flywheel, intake, lockwheel, drive, leds);
                 break;
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
@@ -123,9 +123,9 @@ public class RobotContainer {
                                 FR_CAM_NAME, ROBOT_TO_FR_CAM, driveSimulation::getSimulatedDriveTrainPose),
                         new VisionIOPhotonVisionSim(
                                 LIMELIGHT_NAME, ROBOT_TO_LIMELIGHT, driveSimulation::getSimulatedDriveTrainPose));
-                flywheel = new Flywheel(new FlywheelIOSim());
+                /*flywheel = new Flywheel(new FlywheelIOSim());
                 intake = new Intake(new IntakeIOSim(driveSimulation));
-                lockwheel = new Lockwheel(new LockwheelIOSim());
+                lockwheel = new Lockwheel(new LockwheelIOSim());*/
 
                 leds = new Leds();
                 break;
@@ -135,15 +135,15 @@ public class RobotContainer {
                 drive = new Drive(
                         new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {});
                 vision = new Vision(drive, new VisionIO() {}, new VisionIO() {}, new VisionIO() {});
-                flywheel = new Flywheel(new FlywheelIO() {});
+                /*flywheel = new Flywheel(new FlywheelIO() {});
                 intake = new Intake(new IntakeIO() {});
-                lockwheel = new Lockwheel(new LockwheelIO() {});
+                lockwheel = new Lockwheel(new LockwheelIO() {});*/
                 leds = new Leds();
                 break;
         }
 
-        zones = new ZoneManager(drive);
-        stateMachine = new StateMachine(zones, drive, lockwheel, flywheel);
+        /*zones = new ZoneManager(drive);
+        stateMachine = new StateMachine(zones, drive);*/
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -204,10 +204,10 @@ public class RobotContainer {
                 .whileTrue(DriveCommands.joystickDriveAtAngle(
                         drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> new Rotation2d()));
 
-        new Trigger(() -> stateMachine.isReadyToAlign())
+        /*new Trigger(() -> stateMachine.isReadyToAlign())
                 .whileTrue(DriveCommands.joystickDriveAtPoint(
                         drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), 0, 5.5));
-
+*/
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
@@ -216,7 +216,7 @@ public class RobotContainer {
 
         // Operator commands
 
-        // flywheel
+        /*// flywheel
         OperatorController.y()
                 .onTrue(new OutsideFlywheelCommand(flywheel, flywheelSpeedOutside.get()))
                 .onFalse(new StopFlywheelCommand(flywheel));
@@ -232,7 +232,7 @@ public class RobotContainer {
                 .onTrue(new OutsideIntakeCommand(intake, intakeSpeedOutside.get()))
                 .onFalse(new StopIntakeCommand(intake));
 
-        OperatorController.povLeft().onTrue(new ExtendIntakeCommand(intake));
+        OperatorController.povLeft().onFalse(new ExtendIntakeCommand(intake));
         OperatorController.povRight().onTrue(new RetractIntakeCommand(intake));
 
         OperatorController.leftBumper().onTrue(new AlignBall(lockwheel));
@@ -243,7 +243,7 @@ public class RobotContainer {
                 .onFalse(new StopLockwheelCommand(lockwheel));
         OperatorController.b()
                 .onTrue(new InsideLockwheelCommand(lockwheel, lockwheelSpeedOutside.get()))
-                .onFalse(new StopLockwheelCommand(lockwheel));
+                .onFalse(new StopLockwheelCommand(lockwheel));*/
 
         // leds
         OperatorController.leftStick().onTrue(Commands.runOnce(() -> {
@@ -277,7 +277,6 @@ public class RobotContainer {
 
         Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
         Logger.recordOutput(
-                "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-        Logger.recordOutput("FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+                "FieldSimulation/Notes", SimulatedArena.getInstance().getGamePiecesArrayByType("Note"));
     }
 }

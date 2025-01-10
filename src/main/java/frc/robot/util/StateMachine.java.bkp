@@ -28,14 +28,14 @@ public class StateMachine {
 
     private final ZoneManager zones;
     private final Drive drive;
-    private final Lockwheel lockwheel;
-    private final Flywheel flywheel;
+    /*private final Lockwheel lockwheel;
+    private final Flywheel flywheel;*/
 
-    public StateMachine(ZoneManager zones, Drive drive, Lockwheel lockwheel, Flywheel flywheel) {
+    public StateMachine(ZoneManager zones, Drive drive) {
         this.zones = zones;
         this.drive = drive;
-        this.lockwheel = lockwheel;
-        this.flywheel = flywheel;
+        /*this.lockwheel = lockwheel;
+        this.flywheel = flywheel;*/
         this.currentState = RobotState.WITHOUT_ELEMENT;
 
         scheduler = Executors.newScheduledThreadPool(1);
@@ -60,12 +60,12 @@ public class StateMachine {
                         || (!lockwheel.backSensorIsTrue() && lockwheel.frontSensorIsTrue())) {
                     currentState = RobotState.WITH_NOT_ALIGNED_ELEMENT;
                 }*/
-                if (zones.getCurrentZone().equals("BlueSpeakerZone")) {
+                /*if (zones.getCurrentZone().equals("BlueSpeakerZone")) {
                     currentState = RobotState.READY_TO_ALIGN;
-                }
+                }*/
                 break;
 
-            case WITH_NOT_ALIGNED_ELEMENT:
+            /*case WITH_NOT_ALIGNED_ELEMENT:
                 if (lockwheel.backSensorIsTrue() && lockwheel.frontSensorIsTrue()) {
                     currentState = RobotState.READY_TO_SHOOT;
                 }
@@ -81,7 +81,7 @@ public class StateMachine {
                 if (!lockwheel.backSensorIsTrue() && !lockwheel.frontSensorIsTrue()) {
                     currentState = RobotState.WITHOUT_ELEMENT;
                 }
-                break;
+                break;*/
 
             default:
                 throw new IllegalStateException("Estado desconhecido: " + currentState);
@@ -100,13 +100,13 @@ public class StateMachine {
             case WITHOUT_ELEMENT:
                 break;
 
-            case WITH_NOT_ALIGNED_ELEMENT:
+            /*case WITH_NOT_ALIGNED_ELEMENT:
                 new AlignBall(lockwheel).schedule();
                 break;
 
             case READY_TO_SHOOT:
                 new OutsideFlywheelCommand(flywheel, 800).schedule();
-                break;
+                break;*/
 
             case SHOOTING:
                 break;
