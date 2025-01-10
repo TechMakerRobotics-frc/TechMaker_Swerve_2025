@@ -6,6 +6,7 @@ import static frc.robot.util.subsystemUtils.SparkUtil.tryUntilOk;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.ParentConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -31,7 +32,7 @@ import edu.wpi.first.units.measure.*;
 import frc.robot.generated.TunerConstants;
 
 public abstract class ModuleIOSparkAndTalon implements ModuleIO {
-    protected final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants;
+    protected final SwerveModuleConstants<ParentConfiguration,ParentConfiguration,ParentConfiguration> constants;
 
     protected final TalonFX driveTalon;
     protected final SparkBase turnSpark;
@@ -66,7 +67,7 @@ public abstract class ModuleIOSparkAndTalon implements ModuleIO {
 
     protected final Rotation2d zeroRotation;
 
-    protected ModuleIOSparkAndTalon(SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants, int module) {
+    protected ModuleIOSparkAndTalon(SwerveModuleConstants<ParentConfiguration,ParentConfiguration,ParentConfiguration> constants, int module) {
         this.constants = constants;
 
         driveTalon = new TalonFX(constants.DriveMotorId, TunerConstants.DrivetrainConstants.CANBusName);

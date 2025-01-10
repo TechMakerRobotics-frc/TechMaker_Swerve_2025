@@ -5,6 +5,7 @@ import static frc.robot.util.subsystemUtils.PhoenixUtil.tryUntilOk;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.ParentConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -23,7 +24,7 @@ import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 
 public abstract class ModuleIOTalonFX implements ModuleIO {
-    protected final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants;
+    protected final SwerveModuleConstants<ParentConfiguration,ParentConfiguration,ParentConfiguration> constants;
 
     protected final TalonFX driveTalon;
     protected final TalonFX turnTalon;
@@ -57,7 +58,7 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
 
     protected final TalonFXConfiguration driveConfig;
 
-    protected ModuleIOTalonFX(SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants) {
+    protected ModuleIOTalonFX(SwerveModuleConstants<ParentConfiguration,ParentConfiguration,ParentConfiguration> constants) {
         this.constants = constants;
 
         driveTalon = new TalonFX(constants.DriveMotorId, TunerConstants.DrivetrainConstants.CANBusName);
