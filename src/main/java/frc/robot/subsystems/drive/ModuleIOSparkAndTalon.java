@@ -16,6 +16,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.*;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -34,7 +35,7 @@ public abstract class ModuleIOSparkAndTalon implements ModuleIO {
     protected final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants;
 
     protected final TalonFX driveTalon;
-    protected final SparkBase turnSpark;
+    protected final SparkMax turnSpark;
     protected final CANcoder cancoder;
 
     // Closed loop controllers
@@ -120,19 +121,20 @@ public abstract class ModuleIOSparkAndTalon implements ModuleIO {
                 .averageDepth(2);
         turnConfig
                 .closedLoop
-                .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-                .positionWrappingEnabled(true)
-                .positionWrappingInputRange(TunerConstants.turnPIDMinInput, TunerConstants.turnPIDMaxInput)
-                .pidf(TunerConstants.turnKp, 0.0, TunerConstants.turnKd, 0.0);
-        turnConfig
-                .signals
-                .absoluteEncoderPositionAlwaysOn(true)
-                .absoluteEncoderPositionPeriodMs((int) (1000.0 / TunerConstants.odometryFrequency))
-                .absoluteEncoderVelocityAlwaysOn(true)
-                .absoluteEncoderVelocityPeriodMs(20)
-                .appliedOutputPeriodMs(20)
-                .busVoltagePeriodMs(20)
-                .outputCurrentPeriodMs(20);
+                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                // Set PID values for position control. We don't need to pass a closed loop
+                // slot, as it will default to slot 0.
+                .p(TunerConstants.turnKp)
+                .i(0)
+                .d(TunerConstants.turnKd)
+                .outputRange(-1, 1)
+                // Set PID values for velocity control in slot 1
+                .p(TunerConstants.turnKp, ClosedLoopSlot.kSlot1)
+                .i(0, ClosedLoopSlot.kSlot1)
+                .d(TunerConstants.turnKd, ClosedLoopSlot.kSlot1)
+                .velocityFF(1.0 / 5767, ClosedLoopSlot.kSlot1)
+                .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
+
         tryUntilOk(
                 turnSpark,
                 5,

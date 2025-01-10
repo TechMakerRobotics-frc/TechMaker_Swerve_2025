@@ -17,6 +17,8 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkMax;
+
 import edu.wpi.first.wpilibj.Timer;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
@@ -29,7 +31,7 @@ public class SparkUtil {
     public static boolean sparkStickyFault = false;
 
     /** Processes a value from a Spark only if the value is valid. */
-    public static void ifOk(SparkBase spark, DoubleSupplier supplier, DoubleConsumer consumer) {
+    public static void ifOk(SparkMax spark, DoubleSupplier supplier, DoubleConsumer consumer) {
         double value = supplier.getAsDouble();
         if (spark.getLastError() == REVLibError.kOk) {
             consumer.accept(value);
