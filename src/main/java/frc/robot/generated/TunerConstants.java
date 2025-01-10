@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.ParentConfiguration;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -241,7 +242,7 @@ public class TunerConstants {
             .withPigeon2Id(kPigeonId)
             .withPigeon2Configs(pigeonConfigs);
         
-            private static final SwerveModuleConstantsFactory ConstantCreator = new SwerveModuleConstantsFactory()
+            private static final SwerveModuleConstantsFactory<ParentConfiguration,ParentConfiguration,ParentConfiguration> ConstantCreator = new SwerveModuleConstantsFactory<>()
             .withDriveMotorGearRatio(kDriveGearRatio)
             .withSteerMotorGearRatio(kSteerGearRatio)
             .withCouplingGearRatio(kCoupleRatio)
@@ -260,7 +261,7 @@ public class TunerConstants {
             .withDriveInertia(kDriveInertia)
             .withSteerFrictionVoltage(kSteerFrictionVoltage)
             .withDriveFrictionVoltage(kDriveFrictionVoltage);
-    public static final SwerveModuleConstants FrontLeft = ConstantCreator.createModuleConstants(
+    public static final SwerveModuleConstants<ParentConfiguration,ParentConfiguration,ParentConfiguration> FrontLeft = ConstantCreator.createModuleConstants(
             kFrontLeftSteerMotorId,
             kFrontLeftDriveMotorId,
             kFrontLeftEncoderId,
@@ -270,7 +271,7 @@ public class TunerConstants {
             kInvertLeftSide,
             kFrontLeftSteerMotorInverted,
             kFrontLeftCANcoderInverted);
-    public static final SwerveModuleConstants FrontRight = ConstantCreator.createModuleConstants(
+    public static final SwerveModuleConstants<ParentConfiguration,ParentConfiguration,ParentConfiguration> FrontRight = ConstantCreator.createModuleConstants(
             kFrontRightSteerMotorId,
             kFrontRightDriveMotorId,
             kFrontRightEncoderId,
@@ -280,7 +281,7 @@ public class TunerConstants {
             kInvertRightSide,
             kFrontRightSteerMotorInverted,
             kFrontRightCANcoderInverted);
-    public static final SwerveModuleConstants BackLeft = ConstantCreator.createModuleConstants(
+    public static final SwerveModuleConstants<ParentConfiguration,ParentConfiguration,ParentConfiguration> BackLeft = ConstantCreator.createModuleConstants(
             kBackLeftSteerMotorId,
             kBackLeftDriveMotorId,
             kBackLeftEncoderId,
@@ -290,7 +291,7 @@ public class TunerConstants {
             kInvertLeftSide,
             kBackLeftSteerMotorInverted,
             kBackLeftCANcoderInverted);
-    public static final SwerveModuleConstants BackRight = ConstantCreator.createModuleConstants(
+    public static final SwerveModuleConstants<ParentConfiguration,ParentConfiguration,ParentConfiguration> BackRight = ConstantCreator.createModuleConstants(
             kBackRightSteerMotorId,
             kBackRightDriveMotorId,
             kBackRightEncoderId,

@@ -17,6 +17,7 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.ParentConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import frc.robot.util.subsystemUtils.PhoenixUtil;
@@ -30,7 +31,7 @@ import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 public class ModuleIOTalonFXSim extends ModuleIOTalonFX {
     private final SwerveModuleSimulation simulation;
 
-    public ModuleIOTalonFXSim(SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants, SwerveModuleSimulation simulation) {
+    public ModuleIOTalonFXSim(SwerveModuleConstants<ParentConfiguration,ParentConfiguration,ParentConfiguration> constants, SwerveModuleSimulation simulation) {
         super(constants);
 
         this.simulation = simulation;
