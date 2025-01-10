@@ -87,10 +87,10 @@ public class RobotContainer {
                 // Real robot, instantiate hardware IO implementations
                 drive = new Drive(
                         new GyroIOPigeon2(),
-                        new ModuleIOSparkAndTalonFXReal(TunerConstants.FrontLeft, 0),
-                        new ModuleIOSparkAndTalonFXReal(TunerConstants.FrontRight, 1),
-                        new ModuleIOSparkAndTalonFXReal(TunerConstants.BackLeft, 2),
-                        new ModuleIOSparkAndTalonFXReal(TunerConstants.BackRight, 3));
+                        new ModuleIOSparkTalon(0),
+                        new ModuleIOSparkTalon(1),
+                        new ModuleIOSparkTalon(2),
+                        new ModuleIOSparkTalon(3));
                // this.vision = new Vision(drive, new VisionIOPhotonVision(FL_CAM_NAME, ROBOT_TO_FL_CAM));
                 new VisionIOPhotonVision(FR_CAM_NAME, ROBOT_TO_FR_CAM);
                 new VisionIOPhotonVision(LIMELIGHT_NAME, ROBOT_TO_FR_CAM);
