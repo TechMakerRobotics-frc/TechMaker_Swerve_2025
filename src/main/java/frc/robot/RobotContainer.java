@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.RobotIdleMode;
 import frc.robot.commands.drive.*;
 import frc.robot.commands.leds.*;
 import frc.robot.generated.TunerConstants;
@@ -121,10 +122,10 @@ public class RobotContainer {
         autoChooser.addOption("Drive to 5 X, 5 Y", new DriveTo(5, 5, 90, 15));
         autoChooser.addOption("AutoChoreo", new ChoreoAuto("FirstAuto", 20));
 
-        robotModeChooser = new LoggedDashboardChooser<>("Robot Mode", AutoBuilder.buildAutoChooser());
+        robotModeChooser = new LoggedDashboardChooser<>("Robot Mode");
 
-        robotModeChooser.addDefaultOption("Robot Mode Brake", new RobotModeTo("Brake", drive));
-        robotModeChooser.addOption("Robot Mode Coast", new RobotModeTo("Coast", drive));
+        robotModeChooser.addDefaultOption("Robot Mode Brake", new RobotModeTo(RobotIdleMode.BRAKE, drive));
+        robotModeChooser.addOption("Robot Mode Coast", new RobotModeTo(RobotIdleMode.COAST, drive));
 
         leds = new Leds();
         ledCommands = new Command[] {
