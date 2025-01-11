@@ -2,9 +2,7 @@ package frc.robot.subsystems.drive;
 
 import static frc.robot.util.subsystemUtils.SparkUtil.ifOk;
 
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.ParentConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.revrobotics.spark.SparkBase.*;

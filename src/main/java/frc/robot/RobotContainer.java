@@ -10,29 +10,18 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-//import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.drive.*;
-//import frc.robot.commands.flywheel.*;
-//import frc.robot.commands.intake.*;
 import frc.robot.commands.leds.*;
-//import frc.robot.commands.lockwheel.*;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
-//import frc.robot.subsystems.flywheel.*;
-//import frc.robot.subsystems.intake.*;
 import frc.robot.subsystems.leds.Leds;
-//import frc.robot.subsystems.lockwheel.*;
 import frc.robot.subsystems.vision.*;
-//import frc.robot.util.RegisNamedCommands;
 import frc.robot.util.RobotModeTo;
-/*import frc.robot.util.StateMachine;
-import frc.robot.util.zones.ZoneManager;*/
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-//import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -43,9 +32,6 @@ public class RobotContainer {
     // Subsystems
     private final Drive drive;
     public Vision vision;
-    /*private final Flywheel flywheel;
-    private final Intake intake;
-    private final Lockwheel lockwheel;*/
     public final Leds leds;
 
     // control leds
@@ -67,19 +53,6 @@ public class RobotContainer {
     private final LoggedDashboardChooser<Command> autoChooser;
     private final LoggedDashboardChooser<Command> robotModeChooser;
 
-    /*// tunable flywheel velocity
-    private LoggedNetworkNumber flywheelSpeedInside = new LoggedNetworkNumber("/Tuning/Flywheel Speed Inside", 300.0);
-    private LoggedNetworkNumber flywheelSpeedOutside =
-            new LoggedNetworkNumber("/Tuning/Flywheel Speed Outside", 3000.0);
-
-    // tunable intake velocity
-    private LoggedNetworkNumber intakeSpeedInside = new LoggedNetworkNumber("/Tuning/Intake Speed Inside", 600);
-    private LoggedNetworkNumber intakeSpeedOutside = new LoggedNetworkNumber("/Tuning/Intake Speed Outside", 600);
-
-    // tunable lockwheel velocity
-    private LoggedNetworkNumber lockwheelSpeedInside = new LoggedNetworkNumber("/Tuning/Flywheel Speed Inside", 800);
-    private LoggedNetworkNumber lockwheelSpeedOutside = new LoggedNetworkNumber("/Tuning/Flywheel Speed Outside", 800);*/
-
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         switch (Constants.currentMode) {
@@ -94,15 +67,10 @@ public class RobotContainer {
                // this.vision = new Vision(drive, new VisionIOPhotonVision(FL_CAM_NAME, ROBOT_TO_FL_CAM));
                 new VisionIOPhotonVision(FR_CAM_NAME, ROBOT_TO_FR_CAM);
                 new VisionIOPhotonVision(LIMELIGHT_NAME, ROBOT_TO_FR_CAM);
-                /*flywheel = new Flywheel(new FlywheelIOVictorSPX());
-                intake = new Intake(new IntakeIOSparkMax());
-                lockwheel = new Lockwheel(new LockwheelIOVictorSPX());*/
-                leds = new Leds();
-                //new RegisNamedCommands(flywheel, intake, lockwheel, drive, leds);
+
                 break;
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
-
                 driveSimulation = new SwerveDriveSimulation(Drive.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
                 drive = new Drive(
@@ -123,11 +91,6 @@ public class RobotContainer {
                                 FR_CAM_NAME, ROBOT_TO_FR_CAM, driveSimulation::getSimulatedDriveTrainPose),
                         new VisionIOPhotonVisionSim(
                                 LIMELIGHT_NAME, ROBOT_TO_LIMELIGHT, driveSimulation::getSimulatedDriveTrainPose));
-                /*flywheel = new Flywheel(new FlywheelIOSim());
-                intake = new Intake(new IntakeIOSim(driveSimulation));
-                lockwheel = new Lockwheel(new LockwheelIOSim());*/
-
-                leds = new Leds();
                 break;
 
             default:
@@ -135,10 +98,6 @@ public class RobotContainer {
                 drive = new Drive(
                         new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {});
                 vision = new Vision(drive, new VisionIO() {}, new VisionIO() {}, new VisionIO() {});
-                /*flywheel = new Flywheel(new FlywheelIO() {});
-                intake = new Intake(new IntakeIO() {});
-                lockwheel = new Lockwheel(new LockwheelIO() {});*/
-                leds = new Leds();
                 break;
         }
 
@@ -167,6 +126,7 @@ public class RobotContainer {
         robotModeChooser.addDefaultOption("Robot Mode Brake", new RobotModeTo("Brake", drive));
         robotModeChooser.addOption("Robot Mode Coast", new RobotModeTo("Coast", drive));
 
+        leds = new Leds();
         ledCommands = new Command[] {
             new LedRed(leds),
             new LedGreen(leds),
@@ -213,37 +173,6 @@ public class RobotContainer {
 
         // Reset gyro / odometry
         controller.povRight().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
-
-        // Operator commands
-
-        /*// flywheel
-        OperatorController.y()
-                .onTrue(new OutsideFlywheelCommand(flywheel, flywheelSpeedOutside.get()))
-                .onFalse(new StopFlywheelCommand(flywheel));
-        OperatorController.a()
-                .onTrue(new InsideFlywheelCommand(flywheel, flywheelSpeedInside.get()))
-                .onFalse(new StopFlywheelCommand(flywheel));
-
-        // intake
-        OperatorController.povUp()
-                .onTrue(new InsideIntakeCommand(intake, intakeSpeedInside.get()))
-                .onFalse(new StopIntakeCommand(intake));
-        OperatorController.povDown()
-                .onTrue(new OutsideIntakeCommand(intake, intakeSpeedOutside.get()))
-                .onFalse(new StopIntakeCommand(intake));
-
-        OperatorController.povLeft().onFalse(new ExtendIntakeCommand(intake));
-        OperatorController.povRight().onTrue(new RetractIntakeCommand(intake));
-
-        OperatorController.leftBumper().onTrue(new AlignBall(lockwheel));
-
-        // lockwheel
-        OperatorController.x()
-                .onTrue(new OutsideLockwheelCommand(lockwheel, lockwheelSpeedInside.get()))
-                .onFalse(new StopLockwheelCommand(lockwheel));
-        OperatorController.b()
-                .onTrue(new InsideLockwheelCommand(lockwheel, lockwheelSpeedOutside.get()))
-                .onFalse(new StopLockwheelCommand(lockwheel));*/
 
         // leds
         OperatorController.leftStick().onTrue(Commands.runOnce(() -> {
