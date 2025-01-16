@@ -30,7 +30,6 @@ import frc.robot.subsystems.vision.*;
 import frc.robot.util.RegisNamedCommands;
 import frc.robot.util.RobotModeTo;
 import frc.robot.util.StateMachine;
-import frc.robot.util.zones.ZoneManager;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -55,7 +54,6 @@ public class RobotContainer {
     private int currentLedState = 0;
     private final Command[] ledCommands;
 
-    public final ZoneManager zones;
     public final StateMachine stateMachine;
 
     private SwerveDriveSimulation driveSimulation = null;
@@ -145,8 +143,7 @@ public class RobotContainer {
                 break;
         }
 
-        zones = new ZoneManager(drive);
-        stateMachine = new StateMachine(zones, drive, lockwheel, flywheel);
+        stateMachine = new StateMachine(drive, lockwheel, flywheel);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

@@ -5,7 +5,6 @@ import frc.robot.commands.lockwheel.AlignBall;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.lockwheel.Lockwheel;
-import frc.robot.util.zones.ZoneManager;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -26,13 +25,11 @@ public class StateMachine {
 
     private RobotState currentState;
 
-    private final ZoneManager zones;
     private final Drive drive;
     private final Lockwheel lockwheel;
     private final Flywheel flywheel;
 
-    public StateMachine(ZoneManager zones, Drive drive, Lockwheel lockwheel, Flywheel flywheel) {
-        this.zones = zones;
+    public StateMachine(Drive drive, Lockwheel lockwheel, Flywheel flywheel) {
         this.drive = drive;
         this.lockwheel = lockwheel;
         this.flywheel = flywheel;
@@ -50,7 +47,7 @@ public class StateMachine {
                     new AlignTo(drive, 7, 10).schedule();
                     alignCommandScheduled = true;
                 }*/
-                if (zones.getCurrentZone().equals("Is not in a zone")) {
+                if (drive.getCurrentZone().equals("Is not in a zone")) {
                     currentState = RobotState.WITHOUT_ELEMENT;
                 }
                 break;
@@ -60,7 +57,7 @@ public class StateMachine {
                         || (!lockwheel.backSensorIsTrue() && lockwheel.frontSensorIsTrue())) {
                     currentState = RobotState.WITH_NOT_ALIGNED_ELEMENT;
                 }*/
-                if (zones.getCurrentZone().equals("BlueSpeakerZone")) {
+                if (drive.getCurrentZone().equals("BlueSpeakerZone")) {
                     currentState = RobotState.READY_TO_ALIGN;
                 }
                 break;
