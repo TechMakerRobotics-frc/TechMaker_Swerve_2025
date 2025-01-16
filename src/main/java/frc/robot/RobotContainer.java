@@ -21,7 +21,10 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.flywheel.*;
 import frc.robot.subsystems.intake.*;
-import frc.robot.subsystems.leds.Leds;
+import frc.robot.subsystems.led.Led;
+import frc.robot.subsystems.led.LedIO;
+import frc.robot.subsystems.led.LedIOReal;
+import frc.robot.subsystems.led.LedIOSim;
 import frc.robot.subsystems.lockwheel.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.util.RegisNamedCommands;
@@ -46,7 +49,7 @@ public class RobotContainer {
     private final Flywheel flywheel;
     private final Intake intake;
     private final Lockwheel lockwheel;
-    public final Leds leds;
+    private final Led leds;
 
     // control leds
     private int currentLedState = 0;
@@ -97,7 +100,7 @@ public class RobotContainer {
                 flywheel = new Flywheel(new FlywheelIOVictorSPX());
                 intake = new Intake(new IntakeIOSparkMax());
                 lockwheel = new Lockwheel(new LockwheelIOVictorSPX());
-                leds = new Leds();
+                leds = new Led(new LedIOReal());
                 new RegisNamedCommands(flywheel, intake, lockwheel, drive, leds);
                 break;
             case SIM:
@@ -127,7 +130,7 @@ public class RobotContainer {
                 intake = new Intake(new IntakeIOSim(driveSimulation));
                 lockwheel = new Lockwheel(new LockwheelIOSim());
 
-                leds = new Leds();
+                leds = new Led(new LedIOSim());
                 break;
 
             default:
@@ -138,7 +141,7 @@ public class RobotContainer {
                 flywheel = new Flywheel(new FlywheelIO() {});
                 intake = new Intake(new IntakeIO() {});
                 lockwheel = new Lockwheel(new LockwheelIO() {});
-                leds = new Leds();
+                leds = new Led(new LedIO() {});
                 break;
         }
 

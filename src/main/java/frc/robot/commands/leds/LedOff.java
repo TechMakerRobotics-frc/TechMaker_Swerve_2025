@@ -1,11 +1,11 @@
 package frc.robot.commands.leds;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.subsystems.leds.Leds;
+import frc.robot.subsystems.led.Led;
 
 public class LedOff extends InstantCommand {
 
-    public LedOff(Leds leds) {
-        super(() -> leds.setAllColorRGB(0, 0, 0), leds);
+    public LedOff(Led leds) {
+        super(() -> leds.clear(), leds);
     }
 }

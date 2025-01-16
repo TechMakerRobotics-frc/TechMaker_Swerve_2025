@@ -9,7 +9,7 @@ import frc.robot.commands.lockwheel.*;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.leds.Leds;
+import frc.robot.subsystems.led.Led;
 import frc.robot.subsystems.lockwheel.Lockwheel;
 // import frc.robot.vision.VisionPose;
 
@@ -20,7 +20,7 @@ public class RegisNamedCommands {
     private Lockwheel lockwheel;
     // private VisionPose visionPose;
     // private Drive drive;
-    private Leds leds;
+    private Led leds;
 
     /** Register commands in the pathplanner. */
     public RegisNamedCommands(
@@ -29,7 +29,7 @@ public class RegisNamedCommands {
             Lockwheel lockwheel,
             // VisionPose visionPose,
             Drive drive,
-            Leds leds) {
+            Led leds) {
         this.flywheel = flywheel;
         this.intake = intake;
         this.lockwheel = lockwheel;
