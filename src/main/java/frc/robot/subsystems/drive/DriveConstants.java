@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drive;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
 public final class DriveConstants {
@@ -16,25 +18,25 @@ public final class DriveConstants {
     public static final int SPARK_FL = 2;
     public static final int CANCODER_FL = 3;
     public static final double ENCODER_OFFSET_FL =
-        Units.rotationsToRadians(0.091553); // Teste com 180 graus de volta (+ 0.5 rotações)
+        Units.rotationsToRadians(0.461426); // Teste com 180 graus de volta (+ 0.5 rotações)
 
     // Front Right
     public static final int TALON_FR = 4;
     public static final int SPARK_FR = 5;
     public static final int CANCODER_FR = 6;
-    public static final double ENCODER_OFFSET_FR = Units.rotationsToRadians(0.324707);
+    public static final double ENCODER_OFFSET_FR = Units.rotationsToRadians(0.089111);
 
     // Back Left
     public static final int TALON_BL = 7;
     public static final int SPARK_BL = 8;
     public static final int CANCODER_BL = 9;
-    public static final double ENCODER_OFFSET_BL = Units.rotationsToRadians(-0.112549);
+    public static final double ENCODER_OFFSET_BL = Units.rotationsToRadians(-0.448486);
 
     // Back Right
     public static final int TALON_BR = 10;
     public static final int SPARK_BR = 11;
     public static final int CANCODER_BR = 12;
-    public static final double ENCODER_OFFSET_BR = Units.rotationsToRadians(0.373047);
+    public static final double ENCODER_OFFSET_BR = Units.rotationsToRadians(-0.437256);
 
     public static final String CANBUS = "CANivore";
 
@@ -53,5 +55,27 @@ public final class DriveConstants {
     public static final double INITIAL_ENCODER_POSITION = 0.0;
     public static final int ENCODER_MEASUREMENT_PERIOD_MS = 10;
     public static final int ENCODER_AVERAGE_DEPTH = 2;
+
+    public static final Rotation2d frontLeftZeroRotation = new Rotation2d(ENCODER_OFFSET_FL);
+    public static final Rotation2d frontRightZeroRotation = new Rotation2d(ENCODER_OFFSET_FR);
+    public static final Rotation2d backLeftZeroRotation = new Rotation2d(ENCODER_OFFSET_BL);
+    public static final Rotation2d backRightZeroRotation = new Rotation2d(ENCODER_OFFSET_BR);
+
+    
+    // Turn motor configuration
+    public static final boolean turnInverted = false;
+    public static final int turnMotorCurrentLimit = 20;
+    public static final double turnMotorReduction = 9424.0 / 203.0;
+    public static final DCMotor turnGearbox = DCMotor.getNeo550(1);
+
+    // Turn encoder configuration
+    public static final boolean turnEncoderInverted = true;
+    public static final double turnEncoderPositionFactor = 2 * Math.PI; // Rotations -> Radians
+    public static final double turnEncoderVelocityFactor = (2 * Math.PI) / 60.0; // RPM -> Rad/Sec
+
+    public static final double turnSimP = 8.0;
+    public static final double turnSimD = 0.0;
+    public static final double turnPIDMinInput = 0; // Radians
+    public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
   }
 }

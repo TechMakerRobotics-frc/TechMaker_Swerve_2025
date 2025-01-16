@@ -52,7 +52,7 @@ public class ModuleIOSparkAndTalonFXReal extends ModuleIOSparkAndTalon {
         ifOk(
                 turnSpark,
                 turnEncoder::getPosition,
-                (value) -> inputs.turnAbsolutePosition = new Rotation2d(value).minus(zeroRotation));
+                (value) -> inputs.turnPosition = new Rotation2d(value).minus(zeroRotation));
         ifOk(turnSpark, turnEncoder::getVelocity, (value) -> inputs.turnVelocityRadPerSec = value);
         ifOk(
                 turnSpark,
@@ -66,7 +66,7 @@ public class ModuleIOSparkAndTalonFXReal extends ModuleIOSparkAndTalon {
         turnPositionQueue.clear();
     }
 
-    @Override
+    /*@Override
     public void setTurnBrakeMode(boolean enable) {
         this.turnConfig.idleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
         turnSpark.configure(turnConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
@@ -76,5 +76,5 @@ public class ModuleIOSparkAndTalonFXReal extends ModuleIOSparkAndTalon {
     public void setDriveBrakeMode(boolean enable) {
         driveConfig.MotorOutput.NeutralMode = enable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
         driveTalon.getConfigurator().apply(driveConfig);
-    }
+    }*/
 }

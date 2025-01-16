@@ -16,13 +16,13 @@ public class RobotModeTo extends InstantCommand {
 
     @Override
     public void initialize() {
-        switch (mode) {
+        /*switch (mode) {
             case COAST:
             drive.setBrakeMode(false);
                 break;
             default:
                 drive.setBrakeMode(true);
                 break;
-        }
+        }*/
     }
 }

@@ -1,165 +1,170 @@
+// Copyright 2021-2025 FRC 6328
+// http://github.com/Mechanical-Advantage
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// version 3 as published by the Free Software Foundation or
+// available in the root directory of this project.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+
 package frc.robot.subsystems.drive;
 
-import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
+import static frc.robot.subsystems.drive.DriveConstants.ModuleConstants.*;
+import static frc.robot.util.subsystemUtils.SparkUtil.ifOk;
+
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
+import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Voltage;
-import frc.robot.subsystems.drive.DriveConstants.ModuleConstants;
+import frc.robot.generated.TunerConstants;
+import frc.robot.util.subsystemUtils.SparkUtil;
 
+import java.util.Queue;
+import java.util.function.DoubleSupplier;
+
+/**
+ * Module IO implementation for Spark Flex drive motor controller, Spark Max turn motor controller, and duty cycle
+ * absolute encoder.
+ */
 public class ModuleIOSparkTalon implements ModuleIO {
+    private final Rotation2d zeroRotation;
 
-  private static final double DRIVE_GEAR_RATIO = ModuleConstants.DRIVE_GEAR_RATIO;
-  private static final double TURN_GEAR_RATIO = ModuleConstants.TURN_GEAR_RATIO;
+    // Hardware objects
+    private final SparkMax turnSpark;
+    private final RelativeEncoder turnEncoder;
 
-  private final SparkMax turnSparkMax;
-  private final RelativeEncoder turnRelativeEncoder;
-  private final CANcoder cancoder;
-  private final StatusSignal<Angle> turnAbsolutePosition;
-  private final TalonFX driveTalon;
+    // Closed loop controllers
+    private final SparkClosedLoopController turnController;
 
-  private boolean isTurnMotorInverted = ModuleConstants.TURN_MOTOR_INVERTED;
-  private final Rotation2d absoluteEncoderOffset;
+    // Queue inputs from odometry thread
+    private final Queue<Double> timestampQueue;
+    private final Queue<Double> turnPositionQueue;
 
-  private final StatusSignal<Angle> drivePosition;
-  private final StatusSignal<AngularVelocity> driveVelocity;
-  private final StatusSignal<Voltage> driveAppliedVolts;
-  private final StatusSignal<Current> driveCurrent;
+    // Connection debouncers
+    private final Debouncer turnConnectedDebounce = new Debouncer(0.5);
 
-  public ModuleIOSparkTalon(int index) {
-    switch (index) {
-      case 0: // front left
-        driveTalon = new TalonFX(ModuleConstants.TALON_FL, ModuleConstants.CANBUS);
-        turnSparkMax = new SparkMax(ModuleConstants.SPARK_FL, MotorType.kBrushless);
-        cancoder = new CANcoder(ModuleConstants.CANCODER_FL, ModuleConstants.CANBUS);
-        absoluteEncoderOffset = new Rotation2d(ModuleConstants.ENCODER_OFFSET_FL);
-        break;
-      case 1: // front right
-        driveTalon = new TalonFX(ModuleConstants.TALON_FR, ModuleConstants.CANBUS);
-        turnSparkMax = new SparkMax(ModuleConstants.SPARK_FR, MotorType.kBrushless);
-        cancoder = new CANcoder(ModuleConstants.CANCODER_FR, ModuleConstants.CANBUS);
-        absoluteEncoderOffset = new Rotation2d(ModuleConstants.ENCODER_OFFSET_FR);
-        break;
-      case 2: // back left
-        driveTalon = new TalonFX(ModuleConstants.TALON_BL, ModuleConstants.CANBUS);
-        turnSparkMax = new SparkMax(ModuleConstants.SPARK_BL, MotorType.kBrushless);
-        cancoder = new CANcoder(ModuleConstants.CANCODER_BL, ModuleConstants.CANBUS);
-        absoluteEncoderOffset = new Rotation2d(ModuleConstants.ENCODER_OFFSET_BL);
-        break;
-      case 3: // back right
-        driveTalon = new TalonFX(ModuleConstants.TALON_BR, ModuleConstants.CANBUS);
-        turnSparkMax = new SparkMax(ModuleConstants.SPARK_BR, MotorType.kBrushless);
-        cancoder = new CANcoder(ModuleConstants.CANCODER_BR, ModuleConstants.CANBUS);
-        absoluteEncoderOffset = new Rotation2d(ModuleConstants.ENCODER_OFFSET_BR);
-        break;
-      default:
-        throw new RuntimeException("Invalid module index");
+    public ModuleIOSparkTalon(int module) {
+        zeroRotation = switch (module) {
+            case 0 -> frontLeftZeroRotation;
+            case 1 -> frontRightZeroRotation;
+            case 2 -> backLeftZeroRotation;
+            case 3 -> backRightZeroRotation;
+            default -> new Rotation2d();};
+        turnSpark = new SparkMax(
+                switch (module) {
+                    case 0 -> 2;
+                    case 1 -> 5;
+                    case 2 -> 8;
+                    case 3 -> 11;
+                    default -> 0;
+                },
+                MotorType.kBrushless);
+        turnEncoder = turnSpark.getEncoder();
+        turnController = turnSpark.getClosedLoopController();
+
+        
+        // Configure turn motor
+        var turnConfig = new SparkMaxConfig();
+        turnConfig
+                .inverted(turnInverted)
+                .idleMode(IdleMode.kBrake)
+                .smartCurrentLimit(turnMotorCurrentLimit)
+                .voltageCompensation(12.0);
+        turnConfig
+                .absoluteEncoder
+                .inverted(turnEncoderInverted)
+                .positionConversionFactor(turnEncoderPositionFactor)
+                .velocityConversionFactor(turnEncoderVelocityFactor)
+                .averageDepth(2);
+        turnConfig
+                .closedLoop
+                .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+                .positionWrappingEnabled(true)
+                .positionWrappingInputRange(turnPIDMinInput, turnPIDMaxInput)
+                .pidf(0.1, 0.0, 0, 0.0);
+        turnConfig
+                .signals
+                .absoluteEncoderPositionAlwaysOn(true)
+                .absoluteEncoderPositionPeriodMs((int) (1000.0 / TunerConstants.odometryFrequency))
+                .absoluteEncoderVelocityAlwaysOn(true)
+                .absoluteEncoderVelocityPeriodMs(20)
+                .appliedOutputPeriodMs(20)
+                .busVoltagePeriodMs(20)
+                .outputCurrentPeriodMs(20);
+        SparkUtil.tryUntilOk(
+                turnSpark,
+                5,
+                () -> turnSpark.configure(turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+
+        // Create odometry queues
+        timestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
+        turnPositionQueue = SparkOdometryThread.getInstance().registerSignal(turnSpark, turnEncoder::getPosition);
     }
 
-    // Initialize TalonFX configuration
-    var driveConfig = new TalonFXConfiguration();
-    driveConfig.CurrentLimits.SupplyCurrentLimit = ModuleConstants.SUPPLY_CURRENT_LIMIT;
-    driveConfig.CurrentLimits.SupplyCurrentLimitEnable =
-        ModuleConstants.SUPPLY_CURRENT_LIMIT_ENABLE;
-    driveTalon.getConfigurator().apply(driveConfig);
-    setDriveBrakeMode(false);
+    @Override
+    public void updateInputs(ModuleIOInputs inputs) {
+        
+        // Update turn inputs
+        SparkUtil.sparkStickyFault = false;
+        ifOk(
+                turnSpark,
+                turnEncoder::getPosition,
+                (value) -> inputs.turnPosition = new Rotation2d(value).minus(zeroRotation));
+        ifOk(turnSpark, turnEncoder::getVelocity, (value) -> inputs.turnVelocityRadPerSec = value);
+        ifOk(
+                turnSpark,
+                new DoubleSupplier[] {turnSpark::getAppliedOutput, turnSpark::getBusVoltage},
+                (values) -> inputs.turnAppliedVolts = values[0] * values[1]);
+        ifOk(turnSpark, turnSpark::getOutputCurrent, (value) -> inputs.turnCurrentAmps = value);
+        inputs.turnConnected = turnConnectedDebounce.calculate(!SparkUtil.sparkStickyFault);
 
-    drivePosition = driveTalon.getPosition();
-    driveVelocity = driveTalon.getVelocity();
-    driveAppliedVolts = driveTalon.getMotorVoltage();
-    driveCurrent = driveTalon.getSupplyCurrent();
+        // Update odometry inputs
+        inputs.odometryTimestamps =
+                timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
+       
+        inputs.odometryTurnPositions = turnPositionQueue.stream()
+                .map((Double value) -> new Rotation2d(value).minus(zeroRotation))
+                .toArray(Rotation2d[]::new);
+        timestampQueue.clear();
+        turnPositionQueue.clear();
+    }
 
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        ModuleConstants.ODOMETRY_UPDATE_FREQUENCY, drivePosition); // Required for odometry
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        ModuleConstants.OTHER_SIGNALS_UPDATE_FREQUENCY,
-        driveVelocity,
-        driveAppliedVolts,
-        driveCurrent);
+    @Override
+    public void setDriveOpenLoop(double output) {
+    }
 
-    // Initialize SparkMax configuration
-    var turnConfig = new SparkMaxConfig();
-    turnSparkMax.setCANTimeout(ModuleConstants.CAN_TIMEOUT_MS);
-    
-    turnRelativeEncoder = turnSparkMax.getEncoder();
-    turnConfig.inverted(isTurnMotorInverted);
+    @Override
+    public void setTurnOpenLoop(double output) {
+        turnSpark.setVoltage(output);
+    }
 
-    turnConfig.smartCurrentLimit(ModuleConstants.SMART_CURRENT_LIMIT);
-    turnConfig.voltageCompensation(ModuleConstants.VOLTAGE_COMPENSATION);
-    
-    turnConfig.alternateEncoder.measurementPeriod(ModuleConstants.ENCODER_MEASUREMENT_PERIOD_MS);
-    turnRelativeEncoder.setPosition(ModuleConstants.INITIAL_ENCODER_POSITION);
-    turnConfig.alternateEncoder.measurementPeriod(ModuleConstants.ENCODER_MEASUREMENT_PERIOD_MS);
-    turnConfig.alternateEncoder.averageDepth(ModuleConstants.ENCODER_AVERAGE_DEPTH);
+    @Override
+    public void setDriveVelocity(double velocityRadPerSec) {
+    }
 
-    cancoder.getConfigurator().apply(new CANcoderConfiguration());
-    turnAbsolutePosition = cancoder.getAbsolutePosition();
-
-    turnSparkMax.configure(turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-  }
-
-  @Override
-  public void updateInputs(ModuleIOInputs inputs) {
-    // Update drive (TalonFX)
-    BaseStatusSignal.refreshAll(drivePosition, driveVelocity, driveAppliedVolts, driveCurrent);
-    inputs.drivePositionRad =
-        Units.rotationsToRadians(drivePosition.getValueAsDouble()) / DRIVE_GEAR_RATIO;
-    inputs.driveVelocityRadPerSec =
-        Units.rotationsPerMinuteToRadiansPerSecond(driveVelocity.getValueAsDouble())
-            / DRIVE_GEAR_RATIO;
-    inputs.driveAppliedVolts = driveAppliedVolts.getValueAsDouble();
-    inputs.driveCurrentAmps = driveCurrent.getValueAsDouble();
-
-    // Update turn (CANSparkMax)
-    inputs.turnAbsolutePosition =
-        Rotation2d.fromRotations(turnAbsolutePosition.getValueAsDouble())
-            .minus(absoluteEncoderOffset);
-    /*inputs.turnPosition =
-        Rotation2d.fromRotations(turnRelativeEncoder.getPosition() / TURN_GEAR_RATIO);*/
-    inputs.turnVelocityRadPerSec =
-        Units.rotationsPerMinuteToRadiansPerSecond(turnRelativeEncoder.getVelocity())
-            / TURN_GEAR_RATIO;
-    inputs.turnAppliedVolts = turnSparkMax.getAppliedOutput() * turnSparkMax.getBusVoltage();
-    inputs.turnCurrentAmps = turnSparkMax.getOutputCurrent();
-  }
-
-  public void setTurnVoltage(double volts) {
-    turnSparkMax.setVoltage(volts);
-  }
-
-  @Override
-  public void setTurnBrakeMode(boolean enable) {
-    var config = new SparkMaxConfig();
-    config.idleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
-    turnSparkMax.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-  }
-
-  public void setDriveVoltage(double volts) {
-    driveTalon.setControl(new VoltageOut(volts));
-  }
-
-  @Override
-  public void setDriveBrakeMode(boolean enable) {
-    var config = new MotorOutputConfigs();
-    config.NeutralMode = enable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-    driveTalon.getConfigurator().apply(config);
-  }
+    @Override
+    public void setTurnPosition(Rotation2d rotation) {
+        double setpoint =
+                MathUtil.inputModulus(rotation.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput);
+        turnController.setReference(setpoint, ControlType.kPosition);
+    }
 }

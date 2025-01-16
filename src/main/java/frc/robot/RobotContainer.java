@@ -77,13 +77,13 @@ public class RobotContainer {
                 drive = new Drive(
                         new GyroIOSim(driveSimulation.getGyroSimulation()),
                         new ModuleIOTalonFXSim(
-                                TunerConstants.FrontLeft, driveSimulation.getModules()[0]),
+                                TunerConstants.FrontLeftSIM, driveSimulation.getModules()[0]),
                         new ModuleIOTalonFXSim(
-                                TunerConstants.FrontRight, driveSimulation.getModules()[1]),
+                                TunerConstants.FrontRightSIM, driveSimulation.getModules()[1]),
                         new ModuleIOTalonFXSim(
-                                TunerConstants.BackLeft, driveSimulation.getModules()[2]),
+                                TunerConstants.BackLeftSIM, driveSimulation.getModules()[2]),
                         new ModuleIOTalonFXSim(
-                                TunerConstants.BackRight, driveSimulation.getModules()[3]));
+                                TunerConstants.BackRightSIM, driveSimulation.getModules()[3]));
                 vision = new Vision(
                         drive,
                         new VisionIOPhotonVisionSim(
