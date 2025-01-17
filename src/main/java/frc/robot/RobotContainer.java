@@ -402,6 +402,6 @@ public class RobotContainer {
     }
 
     public boolean isReadyToAlign() {
-        return  currentState == RobotState.READY_TO_ALIGN? true : false;
+        return currentState == RobotState.READY_TO_ALIGN? true : false;
     }
 }
