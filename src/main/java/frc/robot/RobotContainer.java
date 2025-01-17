@@ -30,11 +30,11 @@ import frc.robot.subsystems.lockwheel.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.util.RegisNamedCommands;
 import frc.robot.util.RobotModeTo;
-import frc.robot.util.StateMachine;
 import frc.robot.util.FieldPoseConstants.ReefPoses;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
@@ -53,13 +53,23 @@ public class RobotContainer {
     private final Lockwheel lockwheel;
     private final Led leds;
 
+    private SwerveDriveSimulation driveSimulation = null;
+
     // control leds
     private int currentLedState = 0;
     private final Command[] ledCommands;
 
-    public final StateMachine stateMachine;
+    // State Machine
+    public enum RobotState {
+        WITHOUT_ELEMENT,
+        CHARGING,
+        WITH_NOT_ALIGNED_ELEMENT,
+        READY_TO_SHOOT,
+        SHOOTING,
+        READY_TO_ALIGN
+    }
 
-    private SwerveDriveSimulation driveSimulation = null;
+    private RobotState currentState = RobotState.WITHOUT_ELEMENT;
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -146,8 +156,6 @@ public class RobotContainer {
                 leds = new Led(new LedIO() {});
                 break;
         }
-
-        stateMachine = new StateMachine(drive, lockwheel, flywheel);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -247,7 +255,7 @@ public class RobotContainer {
                 .whileTrue(DriveCommands.joystickDriveAtAngle(
                         drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> new Rotation2d()));
 
-        new Trigger(() -> stateMachine.isReadyToAlign())
+        new Trigger(() -> isReadyToAlign())
                 .whileTrue(DriveCommands.joystickDriveAtPoint(
                         drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), 16.697198+0.7, 0.65532-0.7));
 
@@ -325,5 +333,83 @@ public class RobotContainer {
         Logger.recordOutput(
                 "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
         Logger.recordOutput("FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+    }
+
+    //State Machine Configurations
+    public void updateState() {
+        switch (currentState) {
+            case READY_TO_ALIGN:
+                /*if (!alignCommandScheduled) {
+                    new AlignTo(drive, 7, 10).schedule();
+                    alignCommandScheduled = true;
+                }*/
+                if (drive.getCurrentZone().equals("Is not in a zone")) {
+                    currentState = RobotState.WITHOUT_ELEMENT;
+                }
+                break;
+
+            case WITHOUT_ELEMENT:
+                /*if ((lockwheel.backSensorIsTrue() && !lockwheel.frontSensorIsTrue())
+                        || (!lockwheel.backSensorIsTrue() && lockwheel.frontSensorIsTrue())) {
+                    currentState = RobotState.WITH_NOT_ALIGNED_ELEMENT;
+                }*/
+                if (drive.getCurrentZone().equals("RedCoralStation")) {
+                    currentState = RobotState.READY_TO_ALIGN;
+                }
+                break;
+
+            case WITH_NOT_ALIGNED_ELEMENT:
+                if (lockwheel.backSensorIsTrue() && lockwheel.frontSensorIsTrue()) {
+                    currentState = RobotState.READY_TO_SHOOT;
+                }
+                break;
+
+            case READY_TO_SHOOT:
+                if (flywheel.getVelocityRPM() >= 800) {
+                    currentState = RobotState.SHOOTING;
+                }
+                break;
+
+            case SHOOTING:
+                if (!lockwheel.backSensorIsTrue() && !lockwheel.frontSensorIsTrue()) {
+                    currentState = RobotState.WITHOUT_ELEMENT;
+                }
+                break;
+
+            default:
+                throw new IllegalStateException("Estado desconhecido: " + currentState);
+        }
+    }
+
+    @AutoLogOutput(key = "StateMachine/CurrentState")
+    public RobotState getCurrentState() {
+        return currentState;
+    }
+
+    public void performAction() {
+        switch (currentState) {
+            case READY_TO_ALIGN:
+                break;
+            case WITHOUT_ELEMENT:
+                break;
+
+            case WITH_NOT_ALIGNED_ELEMENT:
+                new AlignBall(lockwheel).schedule();
+                break;
+
+            case READY_TO_SHOOT:
+                new OutsideFlywheelCommand(flywheel, 800).schedule();
+                break;
+
+            case SHOOTING:
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    public boolean isReadyToAlign() {
+        return  currentState == RobotState.READY_TO_ALIGN? true : false;
     }
 }
