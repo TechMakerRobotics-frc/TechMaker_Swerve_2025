@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.RobotState;
 import frc.robot.commands.drive.*;
 import frc.robot.commands.flywheel.*;
 import frc.robot.commands.intake.*;
@@ -60,15 +61,6 @@ public class RobotContainer {
     private final Command[] ledCommands;
 
     // State Machine
-    public enum RobotState {
-        WITHOUT_ELEMENT,
-        CHARGING,
-        WITH_NOT_ALIGNED_ELEMENT,
-        READY_TO_SHOOT,
-        SHOOTING,
-        READY_TO_ALIGN
-    }
-
     private RobotState currentState = RobotState.WITHOUT_ELEMENT;
 
     // Controller

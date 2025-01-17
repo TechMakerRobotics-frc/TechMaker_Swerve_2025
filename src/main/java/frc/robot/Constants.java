@@ -33,4 +33,14 @@ public final class Constants {
         /** Replaying from a log file. */
         REPLAY
     }
+
+    // State Machine
+    public static enum RobotState {
+        WITHOUT_ELEMENT,
+        CHARGING,
+        WITH_NOT_ALIGNED_ELEMENT,
+        READY_TO_SHOOT,
+        SHOOTING,
+        READY_TO_ALIGN
+    }
 }
