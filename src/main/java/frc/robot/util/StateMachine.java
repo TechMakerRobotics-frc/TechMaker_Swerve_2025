@@ -57,7 +57,7 @@ public class StateMachine {
                         || (!lockwheel.backSensorIsTrue() && lockwheel.frontSensorIsTrue())) {
                     currentState = RobotState.WITH_NOT_ALIGNED_ELEMENT;
                 }*/
-                if (drive.getCurrentZone().equals("BlueSpeakerZone")) {
+                if (drive.getCurrentZone().equals("RedCoralStation")) {
                     currentState = RobotState.READY_TO_ALIGN;
                 }
                 break;

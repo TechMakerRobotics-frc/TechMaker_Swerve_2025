@@ -5,10 +5,12 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -30,6 +32,8 @@ import frc.robot.subsystems.vision.*;
 import frc.robot.util.RegisNamedCommands;
 import frc.robot.util.RobotModeTo;
 import frc.robot.util.StateMachine;
+import frc.robot.util.FieldPoseConstants.ReefPoses;
+
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -66,6 +70,7 @@ public class RobotContainer {
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
+    private final LoggedDashboardChooser<Command> autoReefTest;
     private final LoggedDashboardChooser<Command> robotModeChooser;
 
     // tunable flywheel velocity
@@ -147,6 +152,7 @@ public class RobotContainer {
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+        autoReefTest = new LoggedDashboardChooser<>("Auto Reef Choices", AutoBuilder.buildAutoChooser());
 
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -166,6 +172,44 @@ public class RobotContainer {
 
         robotModeChooser.addDefaultOption("Robot Mode Brake", new RobotModeTo("Brake", drive));
         robotModeChooser.addOption("Robot Mode Coast", new RobotModeTo("Coast", drive));
+
+        autoReefTest.addDefaultOption("None", Commands.none());
+        autoReefTest.addOption("A1 Blue", new DriveTo(ReefPoses.A1_BLUE, 20));
+        autoReefTest.addOption("B1 Blue", new DriveTo(ReefPoses.B1_BLUE, 20));
+
+        autoReefTest.addOption("A2 Blue", new DriveTo(ReefPoses.A2_BLUE, 20));
+        autoReefTest.addOption("B2 Blue", new DriveTo(ReefPoses.B2_BLUE, 20));
+
+        autoReefTest.addOption("A3 Blue", new DriveTo(ReefPoses.A3_BLUE, 20));
+        autoReefTest.addOption("B3 Blue", new DriveTo(ReefPoses.B3_BLUE, 20));
+
+        autoReefTest.addOption("A4 Blue", new DriveTo(ReefPoses.A4_BLUE, 20));
+        autoReefTest.addOption("B4 Blue", new DriveTo(ReefPoses.B4_BLUE, 20));
+
+        autoReefTest.addOption("A5 Blue", new DriveTo(ReefPoses.A5_BLUE, 20));
+        autoReefTest.addOption("B5 Blue", new DriveTo(ReefPoses.B5_BLUE, 20));
+
+        autoReefTest.addOption("A6 Blue", new DriveTo(ReefPoses.A6_BLUE, 20));
+        autoReefTest.addOption("B6 Blue", new DriveTo(ReefPoses.B6_BLUE, 20));
+
+        autoReefTest.addOption("A1 Red", new DriveTo(ReefPoses.A1_RED, 20));
+        autoReefTest.addOption("B1 Red", new DriveTo(ReefPoses.B1_RED, 20));
+
+        autoReefTest.addOption("A2 Red", new DriveTo(ReefPoses.A2_RED, 20));
+        autoReefTest.addOption("B2 Red", new DriveTo(ReefPoses.B2_RED, 20));
+
+        autoReefTest.addOption("A3 Red", new DriveTo(ReefPoses.A3_RED, 20));
+        autoReefTest.addOption("B3 Red", new DriveTo(ReefPoses.B3_RED, 20));
+
+        autoReefTest.addOption("A4 Red", new DriveTo(ReefPoses.A4_RED, 20));
+        autoReefTest.addOption("B4 Red", new DriveTo(ReefPoses.B4_RED, 20));
+
+        autoReefTest.addOption("A5 Red", new DriveTo(ReefPoses.A5_RED, 20));
+        autoReefTest.addOption("B5 Red", new DriveTo(ReefPoses.B5_RED, 20));
+
+        autoReefTest.addOption("A6 Red", new DriveTo(ReefPoses.A6_RED, 20));
+        autoReefTest.addOption("B6 Red", new DriveTo(ReefPoses.B6_RED, 20));
+
 
         ledCommands = new Command[] {
             new LedRed(leds),
@@ -206,7 +250,7 @@ public class RobotContainer {
 
         new Trigger(() -> stateMachine.isReadyToAlign())
                 .whileTrue(DriveCommands.joystickDriveAtPoint(
-                        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), 0, 5.5));
+                        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), 16.697198, 0.65532));
 
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -214,6 +258,9 @@ public class RobotContainer {
         // Reset gyro / odometry
         controller.povRight().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
+        if (autoReefTest != null) {
+                controller.b().onTrue(new InstantCommand(() -> autoReefTest.get().schedule()));
+        }
         // Operator commands
 
         // flywheel
@@ -262,7 +309,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return autoChooser.get();
+        return autoReefTest.get();
     }
 
     public void resetSimulationField() {

@@ -1,17 +1,10 @@
 {
   "zones": {
-    "BlueSpeakerZone": [
+    "RedCoralStation": [
       {
-        "center_x": 2.17,
-        "center_y": 5.37,
-        "radius": 1.7
-      }
-    ],
-    "RedSpeakerZone": [
-      {
-        "center_x": 14.52,
-        "center_y": 5.4,
-        "radius": 1.86
+        "center_x": 16.697198,
+        "center_y": 0.65532,
+        "radius": 2.6
       }
     ]
   }

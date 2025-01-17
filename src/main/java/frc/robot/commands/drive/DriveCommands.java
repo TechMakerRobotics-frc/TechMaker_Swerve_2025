@@ -154,8 +154,8 @@ public class DriveCommands {
                             Pose2d currentPose = drive.getPose();
 
                             // Calcula o ângulo desejado para o ponto (x, y)
-                            double desiredTheta =
-                                    Math.atan2(targetY - currentPose.getY(), targetX - currentPose.getX());
+                            double desiredTheta = Math.PI + 
+                                    (Math.atan2(targetY - currentPose.getY(), targetX - currentPose.getX()));
 
                             // Apply rotation deadband
                             double omegaController = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
