@@ -189,6 +189,77 @@ public class DriveCommands {
                 // Reseta o controlador PID quando o comando inicia
                 .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
     }
+    public static Command joystickDriveTowardsPoint(
+        Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, double targetX, double targetY) {
+
+    final double targetWeight = 0.3; // 30% para o alvo, 70% para os joysticks
+
+    return Commands.run(
+            () -> {
+                double joystickX = xSupplier.getAsDouble();
+                double joystickY = ySupplier.getAsDouble();
+
+                // Apply rotation deadband
+                double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+
+                // Square rotation value for more precise control
+                omega = Math.copySign(omega * omega, omega);
+
+                // Aplicar deadband
+                joystickX = MathUtil.applyDeadband(joystickX, DEADBAND);
+                joystickY = MathUtil.applyDeadband(joystickY, DEADBAND);
+
+                // Posição atual do robô
+                Pose2d currentPose = drive.getPose();
+                double currentX = currentPose.getX();
+                double currentY = currentPose.getY();
+
+                // Calcular vetor para o ponto alvo
+                double targetVectorX = targetX - currentX;
+                double targetVectorY = targetY - currentY;
+
+                // Normalizar o vetor do alvo
+                double targetMagnitude = Math.hypot(targetVectorX, targetVectorY);
+                if (targetMagnitude > 0.01) {
+                    targetVectorX /= targetMagnitude;
+                    targetVectorY /= targetMagnitude;
+                }
+
+                // Combinar vetores (joystick e direção ao alvo)
+                double blendedX = (1 - targetWeight) * joystickX + targetWeight * targetVectorX;
+                double blendedY = (1 - targetWeight) * joystickY + targetWeight * targetVectorY;
+
+                // Normalizar o vetor combinado (opcional, se necessário)
+                double blendedMagnitude = Math.hypot(blendedX, blendedY);
+                if (blendedMagnitude > 1.0) {
+                    blendedX /= blendedMagnitude;
+                    blendedY /= blendedMagnitude;
+                }
+
+                // Ajuste para aliança (inversão para aliança vermelha)
+                boolean isFlipped = DriverStation.getAlliance().isPresent()
+                            && DriverStation.getAlliance().get() == Alliance.Red;
+
+                // Se os joysticks estão parados, não realiza movimento
+                if (joystickX == 0.0 && joystickY == 0.0) {
+                        blendedX = 0;
+                        blendedY = 0;
+                }
+                // Transformar velocidades para referência de campo
+                ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                        blendedX * drive.getMaxLinearSpeedMetersPerSec(),
+                        blendedY * drive.getMaxLinearSpeedMetersPerSec(),
+                        omega * drive.getMaxAngularSpeedRadPerSec(), // Sem rotação
+                        isFlipped
+                                ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                                : drive.getRotation());
+                drive.runVelocity(speeds);
+            },
+            drive);
+}
+
+
+
 
     /**
      * Measures the velocity feedforward constants for the drive motors.
