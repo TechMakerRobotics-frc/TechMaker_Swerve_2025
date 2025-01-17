@@ -17,9 +17,8 @@ public final class DriveConstants {
     public static final int TALON_FL = 1;
     public static final int SPARK_FL = 2;
     public static final int CANCODER_FL = 3;
-    public static final double ENCODER_OFFSET_FL =
-        Units.rotationsToRadians(0.461426); // Teste com 180 graus de volta (+ 0.5 rotações)
-
+    public static final double ENCODER_OFFSET_FL = Units.rotationsToRadians(0.461426);
+    
     // Front Right
     public static final int TALON_FR = 4;
     public static final int SPARK_FR = 5;

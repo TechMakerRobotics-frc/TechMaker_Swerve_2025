@@ -3,18 +3,25 @@ package frc.robot;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.config.SparkBaseConfig;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.RobotIdleMode;
 import frc.robot.commands.drive.*;
 import frc.robot.commands.leds.*;
 import frc.robot.generated.TunerConstants;
+import frc.robot.interfaces.MotorIOSparkMax;
+import frc.robot.interfaces.motor;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.vision.*;
@@ -31,13 +38,13 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
     // Subsystems
-    private final Drive drive;
-    public Vision vision;
-    public final Leds leds;
+    //private final Drive drive;
+    //public Vision vision;
+    //public final Leds leds;
 
     // control leds
     private int currentLedState = 0;
-    private final Command[] ledCommands;
+    //private final Command[] ledCommands;
 
     /*public final ZoneManager zones;
     public final StateMachine stateMachine;*/
@@ -51,12 +58,14 @@ public class RobotContainer {
     private final CommandXboxController OperatorController = new CommandXboxController(1);
 
     // Dashboard inputs
-    private final LoggedDashboardChooser<Command> autoChooser;
-    private final LoggedDashboardChooser<Command> robotModeChooser;
+   // private final LoggedDashboardChooser<Command> autoChooser;
+    //private final LoggedDashboardChooser<Command> robotModeChooser;
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
+    motor motorIO = new motor();
     public RobotContainer() {
-        switch (Constants.currentMode) {
+
+        /*switch (Constants.currentMode) {
             case REAL:
                 // Real robot, instantiate hardware IO implementations
                 drive = new Drive(
@@ -101,10 +110,10 @@ public class RobotContainer {
                 vision = new Vision(drive, new VisionIO() {}, new VisionIO() {}, new VisionIO() {});
                 break;
         }
-
+        */
         /*zones = new ZoneManager(drive);
         stateMachine = new StateMachine(zones, drive);*/
-
+        /*
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -138,7 +147,7 @@ public class RobotContainer {
             new LedCian(leds),
             new LedRainbow(leds)
         };
-
+*/
         // Configure the button bindings
         configureButtonBindings();
     }
@@ -149,7 +158,11 @@ public class RobotContainer {
      * and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM
+        controller.a().onTrue(new InstantCommand(()->motorIO.setPosition(0)));
+        controller.b().onTrue(new InstantCommand(()->motorIO.setPosition(0.25)));
+        controller.y().onTrue(new InstantCommand(()->motorIO.setPosition(0.5)));
+        controller.x().onTrue(new InstantCommand(()->motorIO.setPosition(0.75)));
+        /*final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM
                 ? () -> drive.setPose(
                         driveSimulation
                                 .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
@@ -170,7 +183,7 @@ public class RobotContainer {
                         drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), 0, 5.5));
 */
         // Switch to X pattern when X button is pressed
-        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+       /* controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
         // Reset gyro / odometry
         controller.povRight().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
@@ -183,7 +196,7 @@ public class RobotContainer {
 
             // Executa o próximo comando
             nextCommand.schedule();
-        }));
+        }));*/
     }
 
     /**
@@ -192,7 +205,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return autoChooser.get();
+        return null;
     }
 
     public void resetSimulationField() {
