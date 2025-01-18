@@ -354,7 +354,6 @@ public class RobotContainer {
     public void updateState() {
         switch (currentState) {
             case NOT_ZONE:
-
                 new Trigger(() -> drive.getCurrentZone() == Zones.BLUE_LEFT_STATION)
                     .onTrue(new InstantCommand(() -> currentState = RobotState.ON_BLUE_LEFT_STATION));
                 new Trigger(() -> drive.getCurrentZone() == Zones.BLUE_RIGHT_STATION)
@@ -391,7 +390,6 @@ public class RobotContainer {
             break;
             case ON_RED_PROCESSOR:
                 new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
-
                     .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
             break;
 
