@@ -45,4 +45,17 @@ public class FieldPoseConstants {
         public static final Pose2d A6_RED = new Pose2d(12.587, 2.856, new Rotation2d(Units.degreesToRadians(60)));
         public static final Pose2d B6_RED = new Pose2d(12.299, 3.024, new Rotation2d(Units.degreesToRadians(60)));  
     }
+
+    public static class CoralStationPoses {
+        public static final Pose2d LEFT_BLUE = new Pose2d(1.100, 4.918, new Rotation2d(Units.degreesToRadians(-53.631)));
+        public static final Pose2d RIGHT_BLUE = new Pose2d(1.100, 0.974, new Rotation2d(Units.degreesToRadians(53.631)));
+
+        public static final Pose2d LEFT_RED = new Pose2d(16.411, 0.974, new Rotation2d(Units.degreesToRadians(125.116))); 
+        public static final Pose2d RIGHT_RED = new Pose2d(16.411, 6.968, new Rotation2d(Units.degreesToRadians(-125.116))); 
+    }
+
+    public static class ProcessorPoses {
+        public static final Pose2d BLUE = new Pose2d(6.341, 0.471, new Rotation2d(Units.degreesToRadians(90)));
+        public static final Pose2d RED = new Pose2d(11.540, 7.651, new Rotation2d(Units.degreesToRadians(-90)));
+    }
 }
