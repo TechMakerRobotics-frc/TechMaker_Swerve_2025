@@ -36,11 +36,12 @@ public final class Constants {
 
     // State Machine
     public static enum RobotState {
-        WITHOUT_ELEMENT,
-        CHARGING,
-        WITH_NOT_ALIGNED_ELEMENT,
-        READY_TO_SHOOT,
-        SHOOTING,
-        READY_TO_ALIGN
+        NOT_ZONE,
+        ON_BLUE_LEFT_STATION,
+        ON_BLUE_RIGHT_STATION,
+        ON_RED_LEFT_STATION,
+        ON_RED_RIGHT_STATION,
+        ON_BLUE_PROCESSOR,
+        ON_RED_PROCESSOR,
     }
 }

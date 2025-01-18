@@ -31,6 +31,8 @@ import frc.robot.subsystems.lockwheel.*;
 import frc.robot.subsystems.vision.*;
 import frc.robot.util.RegisNamedCommands;
 import frc.robot.util.RobotModeTo;
+import frc.robot.util.FieldPoseConstants.CoralStationPoses;
+import frc.robot.util.FieldPoseConstants.ProcessorPoses;
 import frc.robot.util.FieldPoseConstants.ReefPoses;
 
 import org.ironmaple.simulation.SimulatedArena;
@@ -61,7 +63,7 @@ public class RobotContainer {
     private final Command[] ledCommands;
 
     // State Machine
-    private RobotState currentState = RobotState.WITHOUT_ELEMENT;
+    private RobotState currentState = RobotState.NOT_ZONE;
 
     // Controller
     private final CommandXboxController controller = new CommandXboxController(0);
@@ -247,10 +249,30 @@ public class RobotContainer {
                 .whileTrue(DriveCommands.joystickDriveAtAngle(
                         drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> new Rotation2d()));
 
-        new Trigger(() -> isReadyToAlign())
-                .whileTrue(DriveCommands.joystickDriveAtPoint(
-                        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), 16.697198+0.7, 0.65532-0.7));
-
+        new Trigger(() -> currentState == RobotState.ON_BLUE_LEFT_STATION)
+        .whileTrue(DriveCommands.joystickDriveAtPoint(
+        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), 16.697198+0.7, 0.65532-0.7));
+        
+        new Trigger(() -> currentState == RobotState.ON_BLUE_RIGHT_STATION)
+        .whileTrue(DriveCommands.joystickDriveAtPoint(
+        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), CoralStationPoses.RIGHT_BLUE));
+        
+        new Trigger(() -> currentState == RobotState.ON_RED_LEFT_STATION)
+        .whileTrue(DriveCommands.joystickDriveAtPoint(
+        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), CoralStationPoses.LEFT_RED));
+        
+        new Trigger(() -> currentState == RobotState.ON_RED_RIGHT_STATION)
+        .whileTrue(DriveCommands.joystickDriveAtPoint(
+        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), CoralStationPoses.RIGHT_RED));
+        
+        new Trigger(() -> currentState == RobotState.ON_BLUE_PROCESSOR)
+        .whileTrue(DriveCommands.joystickDriveAtPoint(
+        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), ProcessorPoses.BLUE));
+        
+        new Trigger(() -> currentState == RobotState.ON_RED_PROCESSOR)
+        .whileTrue(DriveCommands.joystickDriveAtPoint(
+        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), ProcessorPoses.RED));
+                                                                                                                
         // Switch to X pattern when X button is pressed
         controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
@@ -330,43 +352,45 @@ public class RobotContainer {
     //State Machine Configurations
     public void updateState() {
         switch (currentState) {
-            case READY_TO_ALIGN:
-                /*if (!alignCommandScheduled) {
-                    new AlignTo(drive, 7, 10).schedule();
-                    alignCommandScheduled = true;
-                }*/
-                if (drive.getCurrentZone().equals("Is not in a zone")) {
-                    currentState = RobotState.WITHOUT_ELEMENT;
-                }
-                break;
+            case NOT_ZONE:
+                new Trigger(() -> drive.getCurrentZone().equals("BlueLeftCoralStation"))
+                    .onTrue(new InstantCommand(() -> currentState = RobotState.ON_BLUE_LEFT_STATION));
+                new Trigger(() -> drive.getCurrentZone().equals("BlueRightCoralStation"))
+                    .onTrue(new InstantCommand(() -> currentState = RobotState.ON_BLUE_RIGHT_STATION));
+                new Trigger(() -> drive.getCurrentZone().equals("RedLeftCoralStation"))
+                    .onTrue(new InstantCommand(() -> currentState = RobotState.ON_RED_LEFT_STATION));
+                new Trigger(() -> drive.getCurrentZone().equals("RedRightCoralStation"))
+                    .onTrue(new InstantCommand(() -> currentState = RobotState.ON_RED_RIGHT_STATION));
+                new Trigger(() -> drive.getCurrentZone().equals("BlueProcessor"))
+                    .onTrue(new InstantCommand(() -> currentState = RobotState.ON_BLUE_PROCESSOR));
+                new Trigger(() -> drive.getCurrentZone().equals("RedProcessor"))
+                    .onTrue(new InstantCommand(() -> currentState = RobotState.ON_RED_PROCESSOR));
+            break;
 
-            case WITHOUT_ELEMENT:
-                /*if ((lockwheel.backSensorIsTrue() && !lockwheel.frontSensorIsTrue())
-                        || (!lockwheel.backSensorIsTrue() && lockwheel.frontSensorIsTrue())) {
-                    currentState = RobotState.WITH_NOT_ALIGNED_ELEMENT;
-                }*/
-                if (drive.getCurrentZone().equals("RedCoralStation")) {
-                    currentState = RobotState.READY_TO_ALIGN;
-                }
-                break;
-
-            case WITH_NOT_ALIGNED_ELEMENT:
-                if (lockwheel.backSensorIsTrue() && lockwheel.frontSensorIsTrue()) {
-                    currentState = RobotState.READY_TO_SHOOT;
-                }
-                break;
-
-            case READY_TO_SHOOT:
-                if (flywheel.getVelocityRPM() >= 800) {
-                    currentState = RobotState.SHOOTING;
-                }
-                break;
-
-            case SHOOTING:
-                if (!lockwheel.backSensorIsTrue() && !lockwheel.frontSensorIsTrue()) {
-                    currentState = RobotState.WITHOUT_ELEMENT;
-                }
-                break;
+            case ON_BLUE_LEFT_STATION:
+                new Trigger(() -> drive.getCurrentZone().equals("Is not in a zone"))
+                    .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
+            break;
+            case ON_BLUE_RIGHT_STATION:
+                new Trigger(() -> drive.getCurrentZone().equals("Is not in a zone"))
+                    .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
+            break;
+            case ON_RED_LEFT_STATION:
+                new Trigger(() -> drive.getCurrentZone().equals("Is not in a zone"))
+                    .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
+            break;
+            case ON_RED_RIGHT_STATION:
+                new Trigger(() -> drive.getCurrentZone().equals("Is not in a zone"))
+                    .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
+            break;
+            case ON_BLUE_PROCESSOR:
+                new Trigger(() -> drive.getCurrentZone().equals("Is not in a zone"))
+                    .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
+            break;
+            case ON_RED_PROCESSOR:
+                new Trigger(() -> drive.getCurrentZone().equals("Is not in a zone"))
+                    .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
+            break;
 
             default:
                 throw new IllegalStateException("Estado desconhecido: " + currentState);
@@ -379,29 +403,7 @@ public class RobotContainer {
     }
 
     public void performAction() {
-        switch (currentState) {
-            case READY_TO_ALIGN:
-                break;
-            case WITHOUT_ELEMENT:
-                break;
-
-            case WITH_NOT_ALIGNED_ELEMENT:
-                new AlignBall(lockwheel).schedule();
-                break;
-
-            case READY_TO_SHOOT:
-                new OutsideFlywheelCommand(flywheel, 800).schedule();
-                break;
-
-            case SHOOTING:
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    public boolean isReadyToAlign() {
-        return currentState == RobotState.READY_TO_ALIGN? true : false;
+        /*switch (currentState) {
+        }*/
     }
 }
