@@ -250,7 +250,7 @@ public class RobotContainer {
         // Default command, normal field-relative drive
         drive.setDefaultCommand(DriveCommands.joystickDrive(
                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
-        
+
         controller.a().whileTrue(drive.getDefaultCommand());
 
         new Trigger(() -> (currentState == RobotState.ON_BLUE_LEFT_STATION) && (pathfinderTest.get().isFinished()))
