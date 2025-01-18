@@ -241,37 +241,33 @@ public class RobotContainer {
                 : () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
 
         // Default command, normal field-relative drive
-        drive.setDefaultCommand(DriveCommands.joystickDriveTowardsPoint(
-                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), 0.3, 7.6));
-
-        // Lock to 0° when A button is held
-        controller
-                .a()
-                .whileTrue(DriveCommands.joystickDriveAtAngle(
-                        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> new Rotation2d()));
+        drive.setDefaultCommand(DriveCommands.joystickDrive(
+                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
+        
+        controller.a().whileTrue(drive.getDefaultCommand());
 
         new Trigger(() -> currentState == RobotState.ON_BLUE_LEFT_STATION)
-        .whileTrue(DriveCommands.joystickDriveAtPoint(
-        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), 16.697198+0.7, 0.65532-0.7));
+        .whileTrue(DriveCommands.joystickDriveAimAtPoint(
+        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), CoralStationPoses.LEFT_BLUE));
         
         new Trigger(() -> currentState == RobotState.ON_BLUE_RIGHT_STATION)
-        .whileTrue(DriveCommands.joystickDriveAtPoint(
+        .whileTrue(DriveCommands.joystickDriveAimAtPoint(
         drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), CoralStationPoses.RIGHT_BLUE));
         
         new Trigger(() -> currentState == RobotState.ON_RED_LEFT_STATION)
-        .whileTrue(DriveCommands.joystickDriveAtPoint(
-        drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), CoralStationPoses.LEFT_RED));
+        .whileTrue(DriveCommands.joystickDriveTowardsAimAtPoint(
+                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), 18.2, -1));
         
         new Trigger(() -> currentState == RobotState.ON_RED_RIGHT_STATION)
-        .whileTrue(DriveCommands.joystickDriveAtPoint(
+        .whileTrue(DriveCommands.joystickDriveAimAtPoint(
         drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), CoralStationPoses.RIGHT_RED));
         
         new Trigger(() -> currentState == RobotState.ON_BLUE_PROCESSOR)
-        .whileTrue(DriveCommands.joystickDriveAtPoint(
+        .whileTrue(DriveCommands.joystickDriveAimAtPoint(
         drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), ProcessorPoses.BLUE));
         
         new Trigger(() -> currentState == RobotState.ON_RED_PROCESSOR)
-        .whileTrue(DriveCommands.joystickDriveAtPoint(
+        .whileTrue(DriveCommands.joystickDriveAimAtPoint(
         drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), ProcessorPoses.RED));
                                                                                                                 
         // Switch to X pattern when X button is pressed
