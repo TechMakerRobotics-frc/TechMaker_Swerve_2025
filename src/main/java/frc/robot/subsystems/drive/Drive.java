@@ -16,7 +16,6 @@ package frc.robot.subsystems.drive;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.CANBus;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
@@ -50,13 +49,12 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.drive.DriveConstants.ZoneLocates;
+import frc.robot.subsystems.drive.DriveConstants.ZoneLocates.Zones;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.util.Circle2d;
 import frc.robot.util.LocalADStarAK;
 
-import java.util.List;
-import java.util.Map;
-import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -129,18 +127,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
                 new SwerveModulePosition()
             };
     private SwerveDrivePoseEstimator poseEstimator =
-            new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
-
-    private Map<String, List<ZoneCircle>> zones;
-    private static class ZoneCircle {
-        public double center_x;
-        public double center_y;
-        public double radius;
-
-        public Translation2d getCenter() {
-            return new Translation2d(center_x, center_y);
-        }
-    }
+            new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());  
 
     public Drive(GyroIO gyroIO, ModuleIO flModuleIO, ModuleIO frModuleIO, ModuleIO blModuleIO, ModuleIO brModuleIO) {
         this.gyroIO = gyroIO;
@@ -178,23 +165,6 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
                 new SysIdRoutine.Config(
                         null, null, null, (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
                 new SysIdRoutine.Mechanism((voltage) -> runCharacterization(voltage.in(Volts)), null, this));
-        
-        ObjectMapper mapper = new ObjectMapper();
-        File jsonFile = new File("src/main/java/frc/robot/util/zones/zones.json");
-
-        try {
-            ZoneData zoneData = mapper.readValue(jsonFile, ZoneData.class);
-
-            this.zones = new java.util.HashMap<>();
-            for (Map.Entry<String, List<ZoneCircle>> entry : zoneData.zones.entrySet()) {
-                this.zones.put(entry.getKey(), entry.getValue());
-            }
-        } catch (IOException e) {
-        }
-    }
-
-    private static class ZoneData {
-        public Map<String, List<ZoneCircle>> zones;
     }
 
     @Override
@@ -367,27 +337,22 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     }
 
     /** Returns the current odometry field zone. */
-    //@AutoLogOutput(key = "Odometry/Current Field Zone")
-    public String getCurrentZone() {
+    @AutoLogOutput(key = "Odometry/Current Field Zone")
+    public Zones getCurrentZone() {
         Translation2d robotPosition = getPose().getTranslation();
-
-        for (Map.Entry<String, List<ZoneCircle>> entry : zones.entrySet()) {
-            String zoneName = entry.getKey();
-            List<ZoneCircle> zoneCircles = entry.getValue();
-
-            for (ZoneCircle circle : zoneCircles) {
-                Translation2d center = circle.getCenter();
-                double distance = robotPosition.getDistance(center);
-
-                if (distance <= circle.radius) {
-                    return zoneName;
-                }
+    
+        for (Circle2d circle : ZoneLocates.zones) {
+            Translation2d center = circle.getCenter();
+            double distance = robotPosition.getDistance(center);
+    
+            if (distance <= circle.getRadius()) {
+                return circle.getZone();
             }
         }
-
-        return "Is not in a zone";
+    
+        return Zones.NOT_ZONE;
     }
-
+    
     /** Resets the current odometry pose. */
     public void setPose(Pose2d pose) {
         poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);

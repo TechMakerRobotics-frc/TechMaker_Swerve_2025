@@ -21,6 +21,7 @@ import frc.robot.commands.leds.*;
 import frc.robot.commands.lockwheel.*;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.drive.DriveConstants.ZoneLocates.Zones;
 import frc.robot.subsystems.flywheel.*;
 import frc.robot.subsystems.intake.*;
 import frc.robot.subsystems.led.Led;
@@ -353,42 +354,42 @@ public class RobotContainer {
     public void updateState() {
         switch (currentState) {
             case NOT_ZONE:
-                new Trigger(() -> drive.getCurrentZone().equals("BlueLeftCoralStation"))
+                new Trigger(() -> drive.getCurrentZone() == Zones.BLUE_LEFT_STATION)
                     .onTrue(new InstantCommand(() -> currentState = RobotState.ON_BLUE_LEFT_STATION));
-                new Trigger(() -> drive.getCurrentZone().equals("BlueRightCoralStation"))
+                new Trigger(() -> drive.getCurrentZone() == Zones.BLUE_RIGHT_STATION)
                     .onTrue(new InstantCommand(() -> currentState = RobotState.ON_BLUE_RIGHT_STATION));
-                new Trigger(() -> drive.getCurrentZone().equals("RedLeftCoralStation"))
+                new Trigger(() -> drive.getCurrentZone() == Zones.RED_LEFT_STATION)
                     .onTrue(new InstantCommand(() -> currentState = RobotState.ON_RED_LEFT_STATION));
-                new Trigger(() -> drive.getCurrentZone().equals("RedRightCoralStation"))
+                new Trigger(() -> drive.getCurrentZone() == Zones.RED_RIGHT_STATION)
                     .onTrue(new InstantCommand(() -> currentState = RobotState.ON_RED_RIGHT_STATION));
-                new Trigger(() -> drive.getCurrentZone().equals("BlueProcessor"))
+                new Trigger(() -> drive.getCurrentZone() == Zones.BLUE_PROCESSOR)
                     .onTrue(new InstantCommand(() -> currentState = RobotState.ON_BLUE_PROCESSOR));
-                new Trigger(() -> drive.getCurrentZone().equals("RedProcessor"))
+                new Trigger(() -> drive.getCurrentZone() == Zones.RED_PROCESSOR)
                     .onTrue(new InstantCommand(() -> currentState = RobotState.ON_RED_PROCESSOR));
             break;
 
             case ON_BLUE_LEFT_STATION:
-                new Trigger(() -> drive.getCurrentZone().equals("Is not in a zone"))
+                new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
                     .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
             break;
             case ON_BLUE_RIGHT_STATION:
-                new Trigger(() -> drive.getCurrentZone().equals("Is not in a zone"))
+                new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
                     .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
             break;
             case ON_RED_LEFT_STATION:
-                new Trigger(() -> drive.getCurrentZone().equals("Is not in a zone"))
+                new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
                     .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
             break;
             case ON_RED_RIGHT_STATION:
-                new Trigger(() -> drive.getCurrentZone().equals("Is not in a zone"))
+                new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
                     .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
             break;
             case ON_BLUE_PROCESSOR:
-                new Trigger(() -> drive.getCurrentZone().equals("Is not in a zone"))
+                new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
                     .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
             break;
             case ON_RED_PROCESSOR:
-                new Trigger(() -> drive.getCurrentZone().equals("Is not in a zone"))
+                new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
                     .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
             break;
 
