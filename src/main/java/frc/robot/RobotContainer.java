@@ -360,7 +360,8 @@ public class RobotContainer {
                     .onTrue(new InstantCommand(() -> currentState = RobotState.ON_RED_RIGHT_STATION));
                 new Trigger(() -> drive.getCurrentZone() == Zones.BLUE_PROCESSOR)
                     .onTrue(new InstantCommand(() -> currentState = RobotState.ON_BLUE_PROCESSOR));
-                new Trigger(() -> drive.getCurrentZone() == Zones.RED_PROCESSOR);
+                new Trigger(() -> drive.getCurrentZone() == Zones.RED_PROCESSOR)
+                    .onTrue(new InstantCommand(() -> currentState = RobotState.ON_RED_PROCESSOR));
             break;
 
             case ON_BLUE_LEFT_STATION:
