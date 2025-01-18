@@ -1,11 +1,46 @@
 {
   "zones": {
-    "RedCoralStation": [
+    "BlueLeftCoralStation": [
       {
-        "center_x": 16.697198,
-        "center_y": 0.65532,
+        "center_x": 1.100,
+        "center_y": 4.918,
         "radius": 2.6
       }
-    ]
+    ],
+    "BlueRightCoralStation": [
+      {
+        "center_x": 1.100,
+        "center_y": 0.974,
+        "radius": 2.6
+      }
+    ],
+    "RedLeftCoralStation": [
+      {
+        "center_x": 16.697198,
+        "center_y": 0.974,
+        "radius": 2.6
+      }
+    ],
+    "RedRightCoralStation": [
+      {
+        "center_x": 16.411,
+        "center_y": 6.968,
+        "radius": 2.6
+      }
+    ],
+    "BlueProcessor": [
+      {
+        "center_x": 6.341,
+        "center_y": 0.471,
+        "radius": 2.6
+      }
+    ],
+    "RedProcessor": [
+    {
+      "center_x": 11.540,
+      "center_y": 7.651,
+      "radius": 2.6
+    }
+  ]
   }
 }
