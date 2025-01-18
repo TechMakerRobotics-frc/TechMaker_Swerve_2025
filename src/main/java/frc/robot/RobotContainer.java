@@ -74,7 +74,7 @@ public class RobotContainer {
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
-    private final LoggedDashboardChooser<Command> autoReefTest;
+    private final LoggedDashboardChooser<Command> pathfinderTest;
     private final LoggedDashboardChooser<Command> robotModeChooser;
 
     // tunable flywheel velocity
@@ -154,7 +154,7 @@ public class RobotContainer {
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-        autoReefTest = new LoggedDashboardChooser<>("Auto Reef Choices", AutoBuilder.buildAutoChooser());
+        pathfinderTest = new LoggedDashboardChooser<>("Auto Reef Choices", AutoBuilder.buildAutoChooser());
 
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -167,7 +167,7 @@ public class RobotContainer {
         autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         autoChooser.addOption("Align to 5 X, 5 Y", new AlignTo(drive, 5, 5, 5));
         autoChooser.addOption("Align to Tag 7", new AlignTo(drive, 7, 5));
-        autoChooser.addOption("Drive to 5 X, 5 Y", new DriveTo(5, 5, 90, 15));
+        autoChooser.addOption("Drive to 5 X, 5 Y", new DriveTo(drive, 5, 5, 9, 15));
         autoChooser.addOption("AutoChoreo", new ChoreoAuto("FirstAuto", 20));
 
         robotModeChooser = new LoggedDashboardChooser<>("Robot Mode", AutoBuilder.buildAutoChooser());
@@ -175,43 +175,50 @@ public class RobotContainer {
         robotModeChooser.addDefaultOption("Robot Mode Brake", new RobotModeTo("Brake", drive));
         robotModeChooser.addOption("Robot Mode Coast", new RobotModeTo("Coast", drive));
 
-        autoReefTest.addDefaultOption("None", Commands.none());
-        autoReefTest.addOption("A1 Blue", new DriveTo(ReefPoses.A1_BLUE, 20));
-        autoReefTest.addOption("B1 Blue", new DriveTo(ReefPoses.B1_BLUE, 20));
+        pathfinderTest.addDefaultOption("None", Commands.none());
+        pathfinderTest.addOption("A1 Blue", new DriveTo(drive, ReefPoses.A1_BLUE, 20));
+        pathfinderTest.addOption("B1 Blue", new DriveTo(drive, ReefPoses.B1_BLUE, 20));
 
-        autoReefTest.addOption("A2 Blue", new DriveTo(ReefPoses.A2_BLUE, 20));
-        autoReefTest.addOption("B2 Blue", new DriveTo(ReefPoses.B2_BLUE, 20));
+        pathfinderTest.addOption("A2 Blue", new DriveTo(drive, ReefPoses.A2_BLUE, 20));
+        pathfinderTest.addOption("B2 Blue", new DriveTo(drive, ReefPoses.B2_BLUE, 20));
 
-        autoReefTest.addOption("A3 Blue", new DriveTo(ReefPoses.A3_BLUE, 20));
-        autoReefTest.addOption("B3 Blue", new DriveTo(ReefPoses.B3_BLUE, 20));
+        pathfinderTest.addOption("A3 Blue", new DriveTo(drive, ReefPoses.A3_BLUE, 20));
+        pathfinderTest.addOption("B3 Blue", new DriveTo(drive, ReefPoses.B3_BLUE, 20));
 
-        autoReefTest.addOption("A4 Blue", new DriveTo(ReefPoses.A4_BLUE, 20));
-        autoReefTest.addOption("B4 Blue", new DriveTo(ReefPoses.B4_BLUE, 20));
+        pathfinderTest.addOption("A4 Blue", new DriveTo(drive, ReefPoses.A4_BLUE, 20));
+        pathfinderTest.addOption("B4 Blue", new DriveTo(drive, ReefPoses.B4_BLUE, 20));
 
-        autoReefTest.addOption("A5 Blue", new DriveTo(ReefPoses.A5_BLUE, 20));
-        autoReefTest.addOption("B5 Blue", new DriveTo(ReefPoses.B5_BLUE, 20));
+        pathfinderTest.addOption("A5 Blue", new DriveTo(drive, ReefPoses.A5_BLUE, 20));
+        pathfinderTest.addOption("B5 Blue", new DriveTo(drive, ReefPoses.B5_BLUE, 20));
 
-        autoReefTest.addOption("A6 Blue", new DriveTo(ReefPoses.A6_BLUE, 20));
-        autoReefTest.addOption("B6 Blue", new DriveTo(ReefPoses.B6_BLUE, 20));
+        pathfinderTest.addOption("A6 Blue", new DriveTo(drive, ReefPoses.A6_BLUE, 20));
+        pathfinderTest.addOption("B6 Blue", new DriveTo(drive, ReefPoses.B6_BLUE, 20));
 
-        autoReefTest.addOption("A1 Red", new DriveTo(ReefPoses.A1_RED, 20));
-        autoReefTest.addOption("B1 Red", new DriveTo(ReefPoses.B1_RED, 20));
+        pathfinderTest.addOption("A1 Red", new DriveTo(drive, ReefPoses.A1_RED, 20));
+        pathfinderTest.addOption("B1 Red", new DriveTo(drive, ReefPoses.B1_RED, 20));
 
-        autoReefTest.addOption("A2 Red", new DriveTo(ReefPoses.A2_RED, 20));
-        autoReefTest.addOption("B2 Red", new DriveTo(ReefPoses.B2_RED, 20));
+        pathfinderTest.addOption("A2 Red", new DriveTo(drive, ReefPoses.A2_RED, 20));
+        pathfinderTest.addOption("B2 Red", new DriveTo(drive, ReefPoses.B2_RED, 20));
 
-        autoReefTest.addOption("A3 Red", new DriveTo(ReefPoses.A3_RED, 20));
-        autoReefTest.addOption("B3 Red", new DriveTo(ReefPoses.B3_RED, 20));
+        pathfinderTest.addOption("A3 Red", new DriveTo(drive, ReefPoses.A3_RED, 20));
+        pathfinderTest.addOption("B3 Red", new DriveTo(drive, ReefPoses.B3_RED, 20));
 
-        autoReefTest.addOption("A4 Red", new DriveTo(ReefPoses.A4_RED, 20));
-        autoReefTest.addOption("B4 Red", new DriveTo(ReefPoses.B4_RED, 20));
+        pathfinderTest.addOption("A4 Red", new DriveTo(drive, ReefPoses.A4_RED, 20));
+        pathfinderTest.addOption("B4 Red", new DriveTo(drive, ReefPoses.B4_RED, 20));
 
-        autoReefTest.addOption("A5 Red", new DriveTo(ReefPoses.A5_RED, 20));
-        autoReefTest.addOption("B5 Red", new DriveTo(ReefPoses.B5_RED, 20));
+        pathfinderTest.addOption("A5 Red", new DriveTo(drive, ReefPoses.A5_RED, 20));
+        pathfinderTest.addOption("B5 Red", new DriveTo(drive, ReefPoses.B5_RED, 20));
 
-        autoReefTest.addOption("A6 Red", new DriveTo(ReefPoses.A6_RED, 20));
-        autoReefTest.addOption("B6 Red", new DriveTo(ReefPoses.B6_RED, 20));
+        pathfinderTest.addOption("A6 Red", new DriveTo(drive, ReefPoses.A6_RED, 20));
+        pathfinderTest.addOption("B6 Red", new DriveTo(drive, ReefPoses.B6_RED, 20));
 
+        pathfinderTest.addOption("Station Blue Left", new DriveTo(drive, CoralStationPoses.LEFT_BLUE, 20));
+        pathfinderTest.addOption("Station Blue Right", new DriveTo(drive, CoralStationPoses.RIGHT_BLUE, 20));
+        pathfinderTest.addOption("Station Red Left", new DriveTo(drive, CoralStationPoses.LEFT_RED, 20));
+        pathfinderTest.addOption("Station Red Right", new DriveTo(drive, CoralStationPoses.RIGHT_RED, 20));
+
+        pathfinderTest.addOption("Blue Processor", new DriveTo(drive, ProcessorPoses.BLUE, 20));
+        pathfinderTest.addOption("Red Processor", new DriveTo(drive, ProcessorPoses.RED, 20));
 
         ledCommands = new Command[] {
             new LedRed(leds),
@@ -246,27 +253,27 @@ public class RobotContainer {
         
         controller.a().whileTrue(drive.getDefaultCommand());
 
-        new Trigger(() -> currentState == RobotState.ON_BLUE_LEFT_STATION)
+        new Trigger(() -> (currentState == RobotState.ON_BLUE_LEFT_STATION) && (pathfinderTest.get().isFinished()))
         .whileTrue(DriveCommands.joystickDriveAimAtPoint(
         drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), CoralStationPoses.LEFT_BLUE));
         
-        new Trigger(() -> currentState == RobotState.ON_BLUE_RIGHT_STATION)
+        new Trigger(() -> (currentState == RobotState.ON_BLUE_RIGHT_STATION) && (pathfinderTest.get().isFinished()))
         .whileTrue(DriveCommands.joystickDriveAimAtPoint(
         drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), CoralStationPoses.RIGHT_BLUE));
         
-        new Trigger(() -> currentState == RobotState.ON_RED_LEFT_STATION)
+        new Trigger(() -> (currentState == RobotState.ON_RED_LEFT_STATION) && (pathfinderTest.get().isFinished()))
         .whileTrue(DriveCommands.joystickDriveTowardsAimAtPoint(
                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), 18.2, -1));
         
-        new Trigger(() -> currentState == RobotState.ON_RED_RIGHT_STATION)
+        new Trigger(() -> (currentState == RobotState.ON_RED_RIGHT_STATION) && (pathfinderTest.get().isFinished()))
         .whileTrue(DriveCommands.joystickDriveAimAtPoint(
         drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), CoralStationPoses.RIGHT_RED));
         
-        new Trigger(() -> currentState == RobotState.ON_BLUE_PROCESSOR)
+        new Trigger(() -> (currentState == RobotState.ON_BLUE_PROCESSOR) && (pathfinderTest.get().isFinished()))
         .whileTrue(DriveCommands.joystickDriveAimAtPoint(
         drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), ProcessorPoses.BLUE));
         
-        new Trigger(() -> currentState == RobotState.ON_RED_PROCESSOR)
+        new Trigger(() -> (currentState == RobotState.ON_RED_PROCESSOR) && (pathfinderTest.get().isFinished()))
         .whileTrue(DriveCommands.joystickDriveAimAtPoint(
         drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), ProcessorPoses.RED));
                                                                                                                 
@@ -276,8 +283,8 @@ public class RobotContainer {
         // Reset gyro / odometry
         controller.povRight().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
-        if (autoReefTest != null) {
-                controller.b().onTrue(new InstantCommand(() -> autoReefTest.get().schedule()));
+        if (pathfinderTest != null) {
+                controller.b().whileTrue(new InstantCommand(() -> pathfinderTest.get().schedule()));
         }
         // Operator commands
 
@@ -312,11 +319,8 @@ public class RobotContainer {
 
         // leds
         OperatorController.leftStick().onTrue(Commands.runOnce(() -> {
-            // Alterna o comando atual para o próximo na lista
             currentLedState = (currentLedState + 1) % ledCommands.length;
             Command nextCommand = ledCommands[currentLedState];
-
-            // Executa o próximo comando
             nextCommand.schedule();
         }));
     }
@@ -327,7 +331,7 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return autoReefTest.get();
+        return pathfinderTest.get();
     }
 
     public void resetSimulationField() {
