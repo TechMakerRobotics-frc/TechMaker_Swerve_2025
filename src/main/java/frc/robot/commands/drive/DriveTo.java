@@ -22,6 +22,7 @@ public class DriveTo extends Command {
     private Command pathfollower;
     private Timer time = new Timer();
     private boolean isFinished = false;
+    private final Drive drive;
 
     /**
      * Constructs a DriveTo command targeting a specific pose.
@@ -29,7 +30,8 @@ public class DriveTo extends Command {
      * @param goalPose the target pose to drive to.
      * @param timeOut the timeout for the command in seconds.
      */
-    public DriveTo(Pose2d goalPose, double timeOut) {
+    public DriveTo(Drive drive, Pose2d goalPose, double timeOut) {
+        this.drive = drive;
         this.timeOut = timeOut;
         this.goalPose = goalPose;
     }
@@ -40,7 +42,8 @@ public class DriveTo extends Command {
      * @param goalTranslation the target translation to drive to.
      * @param timeOut the timeout for the command in seconds.
      */
-    public DriveTo(Translation2d goalTranslation, double timeOut) {
+    public DriveTo(Drive drive, Translation2d goalTranslation, double timeOut) {
+        this.drive = drive;
         this.timeOut = timeOut;
         this.goalPose = new Pose2d(goalTranslation, new Rotation2d());
     }
@@ -52,7 +55,8 @@ public class DriveTo extends Command {
      * @param goalRotation the target rotation at the destination.
      * @param timeOut the timeout for the command in seconds.
      */
-    public DriveTo(Translation2d goalTranslation, Rotation2d goalRotation, double timeOut) {
+    public DriveTo(Drive drive, Translation2d goalTranslation, Rotation2d goalRotation, double timeOut) {
+        this.drive = drive;
         this.timeOut = timeOut;
         this.goalPose = new Pose2d(goalTranslation, goalRotation);
     }
@@ -64,7 +68,8 @@ public class DriveTo extends Command {
      * @param y the y-coordinate of the target position.
      * @param timeOut the timeout for the command in seconds.
      */
-    public DriveTo(double x, double y, double timeOut) {
+    public DriveTo(Drive drive, double x, double y, double timeOut) {
+        this.drive = drive;
         this.timeOut = timeOut;
         this.goalPose = new Pose2d(x, y, new Rotation2d());
     }
@@ -77,7 +82,8 @@ public class DriveTo extends Command {
      * @param heading the target heading at the destination (in degrees).
      * @param timeOut the timeout for the command in seconds.
      */
-    public DriveTo(double x, double y, double heading, double timeOut) {
+    public DriveTo(Drive drive, double x, double y, double heading, double timeOut) {
+        this.drive = drive;
         this.timeOut = timeOut;
         this.goalPose = new Pose2d(x, y, new Rotation2d(Units.degreesToRadians(heading)));
     }
@@ -90,6 +96,7 @@ public class DriveTo extends Command {
      * @param timeOut the timeout for the command in seconds.
      */
     public DriveTo(Drive drive, double x, double y, int tag, double timeOut) {
+        this.drive = drive;
         AprilTagFieldLayout fTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
         this.timeOut = timeOut;
 
@@ -103,6 +110,7 @@ public class DriveTo extends Command {
 
     @Override
     public void initialize() {
+        addRequirements(drive);
         time.reset();
         time.start();
         pathfollower = AutoBuilder.pathfindToPose(goalPose, constraints);
