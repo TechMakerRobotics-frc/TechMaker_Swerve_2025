@@ -37,4 +37,11 @@ public interface MotorIO {
     
     /** Sets encoder offset. */
     public default void setOffset(double offset) {}
+
+    public default MotorIOInputs getMotorIOInputs() {
+        
+        MotorIOInputs inputs = new MotorIOInputs();
+        updateInputs(inputs);
+        return inputs;
+    }
 }
