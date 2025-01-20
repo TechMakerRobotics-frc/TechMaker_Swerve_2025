@@ -7,7 +7,6 @@ import edu.wpi.first.math.util.Units;
 public final class DriveConstants {
 
   public static final class ModuleConstants {
-
     // Gear ratios for SDS MK4i L3, adjust as necessary
     public static final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (16.0 / 28.0) * (45.0 / 15.0);
     public static final double TURN_GEAR_RATIO = 150.0 / 7.0;
@@ -17,7 +16,7 @@ public final class DriveConstants {
     public static final int TALON_FL = 1;
     public static final int SPARK_FL = 2;
     public static final int CANCODER_FL = 3;
-    public static final double ENCODER_OFFSET_FL = Units.rotationsToRadians(-0.20864377915859222);
+    public static final double ENCODER_OFFSET_FL = Units.degreesToRadians(-0.20864377915859222);
     
     // Front Right
     public static final int TALON_FR = 4;

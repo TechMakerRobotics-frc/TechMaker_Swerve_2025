@@ -52,7 +52,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
         }
     }
 
-    @Override
+    @Override 
     public void setVoltage(double volts) {
         turnIO.setVoltage(volts);
     }
@@ -78,10 +78,10 @@ public class ModuleIOSparkTalon implements ModuleIO {
         inputs.turnAppliedVolts = motorIOInputs.appliedVolts;
         inputs.turnConnected = motorIOInputs.appliedVolts != 0.0;
         inputs.turnCurrentAmps = motorIOInputs.currentAmps[0];
-        inputs.turnPosition = new Rotation2d(motorIOInputs.positionRot);
+        inputs.turnPosition = new Rotation2d(Units.rotationsToRadians(motorIOInputs.positionRot));
         inputs.turnVelocityRadPerSec = motorIOInputs.velocityRadPerSec;
-        inputs.turnPositionRot = motorIOInputs.positionRot;
-        
+        inputs.turnPositionRot = Units.rotationsToRadians(motorIOInputs.positionRot);
+
         
     }
 }
