@@ -15,6 +15,8 @@ package frc.robot.subsystems.drive;
 
 import static frc.robot.subsystems.drive.DriveConstants.ModuleConstants.*;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -37,38 +39,51 @@ public class ModuleIOSparkTalon implements ModuleIO {
 
     private final MotorIO driveIO;
     private final MotorIO turnIO;
+    private CANcoder cancoder;
 
     public ModuleIOSparkTalon(int module) { 
+        double offset;
         switch (module) {
                 case 0:  
-                        driveIO = new MotorIOTalonFX(1, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
-                        turnIO = new MotorIOSparkMax(2, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
-                        turnIO.setOffset(Units.radiansToRotations(ENCODER_OFFSET_FL));
+                        driveIO = new MotorIOTalonFX(TALON_FL, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
+                        turnIO = new MotorIOSparkMax(SPARK_FL, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
+                        cancoder = new CANcoder(CANCODER_FL, CANBUS);
+                        offset = ENCODER_OFFSET_FL;
+                        
                 break;
 
                 case 1: 
-                        driveIO = new MotorIOTalonFX(4, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
-                        turnIO = new MotorIOSparkMax(5, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
-                        turnIO.setOffset(Units.radiansToRotations(ENCODER_OFFSET_FR));
+                        driveIO = new MotorIOTalonFX(TALON_FR, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
+                        turnIO = new MotorIOSparkMax(SPARK_FR, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
+                        cancoder = new CANcoder(CANCODER_FR, CANBUS);
+                        offset = ENCODER_OFFSET_FR;
                 break;
                 
                 case 2: 
-                        driveIO = new MotorIOTalonFX(7, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
-                        turnIO = new MotorIOSparkMax(8, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
-                        turnIO.setOffset(Units.radiansToRotations(ENCODER_OFFSET_BL));
+                        driveIO = new MotorIOTalonFX(TALON_BL, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
+                        turnIO = new MotorIOSparkMax(SPARK_BL, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
+                        cancoder = new CANcoder(CANCODER_BL, CANBUS);
+                        offset = ENCODER_OFFSET_BL;
                 break;
 
                 case 3: 
-                        driveIO = new MotorIOTalonFX(10, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
-                        turnIO = new MotorIOSparkMax(11, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
-                        turnIO.setOffset(Units.radiansToRotations(ENCODER_OFFSET_BR));
+                        driveIO = new MotorIOTalonFX(TALON_BR, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
+                        turnIO = new MotorIOSparkMax(SPARK_BR, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
+                        cancoder = new CANcoder(CANCODER_BR, CANBUS);
+                        offset = ENCODER_OFFSET_BR;
                 break;
 
                 default:
                         driveIO = new MotorIO() {}; 
                         turnIO = new MotorIO() {};
+                        offset = 0.0;
                 break;
         }
+        
+        cancoder.getConfigurator().apply(new CANcoderConfiguration());
+        turnIO.setOffset(cancoder.getAbsolutePosition().getValueAsDouble());
+        turnIO.setPosition(offset);
+
     }
 
     @Override 
@@ -109,6 +124,12 @@ public class ModuleIOSparkTalon implements ModuleIO {
         inputs.turnCurrentAmps = motorIOInputs.currentAmps[0];
         inputs.turnPosition = new Rotation2d(Units.rotationsToRadians(motorIOInputs.positionRot));
         inputs.turnVelocityRadPerSec = motorIOInputs.velocityRadPerSec;
-        inputs.turnPositionRot = Units.rotationsToRadians(motorIOInputs.positionRot);
+        inputs.turnPositionRot = cancoder.getAbsolutePosition().getValueAsDouble();
+        motorIOInputs = driveIO.getMotorIOInputs();
+        inputs.driveAppliedVolts = motorIOInputs.appliedVolts;
+        inputs.driveConnected = motorIOInputs.appliedVolts != 0.0;
+        inputs.driveCurrentAmps = motorIOInputs.currentAmps[0];
+        inputs.drivePositionRad = Units.rotationsToRadians(motorIOInputs.positionRot);
+        inputs.driveVelocityRadPerSec = motorIOInputs.velocityRadPerSec;
     }
 }

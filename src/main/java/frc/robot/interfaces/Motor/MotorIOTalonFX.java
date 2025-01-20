@@ -59,7 +59,13 @@ public class MotorIOTalonFX implements MotorIO {
         driveConfig.MotorOutput.Inverted = inverted;
         this.motorClosedLoopOutput = motorClosedLoopOutput;
         tryUntilOk(5, () -> motor.getConfigurator().apply(driveConfig, 0.25));
-        tryUntilOk(5, () -> motor.setPosition(0.0, 0.25));
+        motorPosition = motor.getPosition();
+        motorVelocity = motor.getVelocity();
+        motorAppliedVolts = motor.getMotorVoltage();
+        motorCurrent = motor.getStatorCurrent();
+        BaseStatusSignal.setUpdateFrequencyForAll(100.0,  motorPosition);
+        BaseStatusSignal.setUpdateFrequencyForAll(50.0, motorVelocity, motorAppliedVolts, motorCurrent);
+
     }
 
     /** @param inputs */
