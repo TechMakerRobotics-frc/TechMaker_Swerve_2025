@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drive;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -11,6 +13,9 @@ public final class DriveConstants {
     // Gear ratios for SDS MK4i L3, adjust as necessary
     public static final double DRIVE_GEAR_RATIO = (50.0 / 14.0) * (16.0 / 28.0) * (45.0 / 15.0);
     public static final double TURN_GEAR_RATIO = 150.0 / 7.0;
+
+    public static final Slot0Configs DRIVE_GAINS =
+            new Slot0Configs().withKP(0.03).withKI(0).withKD(0).withKS(0).withKV(0.124);
 
     // Modules:
     // Front Left
@@ -35,7 +40,7 @@ public final class DriveConstants {
     public static final int TALON_BR = 10;
     public static final int SPARK_BR = 11;
     public static final int CANCODER_BR = 12;
-    public static final double ENCODER_OFFSET_BR = Units.rotationsToRadians(0.03893614560365677);
+    public static final double ENCODER_OFFSET_BR = Units.rotationsToRadians(0.542);
 
     public static final String CANBUS = "CANivore";
 

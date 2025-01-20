@@ -41,23 +41,23 @@ public class MotorIOTalonFX implements MotorIO {
     protected StatusSignal<Voltage> motorAppliedVolts;
     protected StatusSignal<Current> motorCurrent;
 
-    private ClosedLoopOutputType DriveMotorClosedLoopOutput;
+    private ClosedLoopOutputType motorClosedLoopOutput;
 
     protected final TalonFXConfiguration driveConfig;
 
-    public MotorIOTalonFX(int id, String CANBusName, NeutralModeValue neutral, Slot0Configs DriveMotorGains, 
-                          double SlipCurrent, boolean StatorCurrentLimit, InvertedValue inverted,ClosedLoopOutputType DriveMotorClosedLoopOutput) {
+    public MotorIOTalonFX(int id, String CANBusName, NeutralModeValue neutral, Slot0Configs motorGains, 
+                          double SlipCurrent, boolean StatorCurrentLimit, InvertedValue inverted,ClosedLoopOutputType motorClosedLoopOutput) {
         motor = new TalonFX(id, CANBusName);
         // Configure drive motor
         driveConfig = new TalonFXConfiguration();
         driveConfig.MotorOutput.NeutralMode = neutral;
-        driveConfig.Slot0 = DriveMotorGains;
+        driveConfig.Slot0 = motorGains;
         driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = SlipCurrent;
         driveConfig.TorqueCurrent.PeakReverseTorqueCurrent = -SlipCurrent;
         driveConfig.CurrentLimits.StatorCurrentLimit = SlipCurrent;
         driveConfig.CurrentLimits.StatorCurrentLimitEnable = StatorCurrentLimit;
         driveConfig.MotorOutput.Inverted = inverted;
-        this.DriveMotorClosedLoopOutput = DriveMotorClosedLoopOutput;
+        this.motorClosedLoopOutput = motorClosedLoopOutput;
         tryUntilOk(5, () -> motor.getConfigurator().apply(driveConfig, 0.25));
         tryUntilOk(5, () -> motor.setPosition(0.0, 0.25));
     }
@@ -84,7 +84,7 @@ public class MotorIOTalonFX implements MotorIO {
         double motorVelocityRotPerSec =
                 Units.radiansToRotations(velocityRadPerSec);;
         motor.setControl(
-                switch (DriveMotorClosedLoopOutput) {
+                switch (motorClosedLoopOutput) {
                     case Voltage -> velocityVoltageRequest.withVelocity(motorVelocityRotPerSec);
                     case TorqueCurrentFOC -> velocityTorqueCurrentRequest.withVelocity(motorVelocityRotPerSec);
                 });
@@ -92,7 +92,7 @@ public class MotorIOTalonFX implements MotorIO {
     @Override
     public void setPosition(double position) {
         motor.setControl(
-                switch (DriveMotorClosedLoopOutput) {
+                switch (motorClosedLoopOutput) {
                     case Voltage -> voltageRequest.withOutput(position);
                     case TorqueCurrentFOC -> torqueCurrentRequest.withOutput(position);
                 });
