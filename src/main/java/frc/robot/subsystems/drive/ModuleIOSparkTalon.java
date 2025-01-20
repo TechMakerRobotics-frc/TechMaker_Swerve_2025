@@ -15,10 +15,18 @@ package frc.robot.subsystems.drive;
 
 import static frc.robot.subsystems.drive.DriveConstants.ModuleConstants.*;
 
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.generated.TunerConstants;
 import frc.robot.interfaces.Motor.MotorIO;
 import frc.robot.interfaces.Motor.MotorIO.MotorIOInputs;
+import frc.robot.interfaces.Motor.MotorIOSparkMax;
+import frc.robot.interfaces.Motor.MotorIOTalonFX;
 
 
 /**
@@ -27,27 +35,38 @@ import frc.robot.interfaces.Motor.MotorIO.MotorIOInputs;
  */
 public class ModuleIOSparkTalon implements ModuleIO {
 
+    private final MotorIO driveIO;
     private final MotorIO turnIO;
 
-    public ModuleIOSparkTalon(int module, MotorIO turnMotorIO) { 
+    public ModuleIOSparkTalon(int module) { 
         switch (module) {
-                case 0:  turnIO = turnMotorIO;
+                case 0:  
+                        driveIO = new MotorIOTalonFX(1, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
+                        turnIO = new MotorIOSparkMax(2, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
                         turnIO.setOffset(Units.radiansToRotations(ENCODER_OFFSET_FL));
                 break;
 
-                case 1: turnIO = turnMotorIO;
+                case 1: 
+                        driveIO = new MotorIOTalonFX(4, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
+                        turnIO = new MotorIOSparkMax(5, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
                         turnIO.setOffset(Units.radiansToRotations(ENCODER_OFFSET_FR));
                 break;
                 
-                case 2: turnIO = turnMotorIO;
+                case 2: 
+                        driveIO = new MotorIOTalonFX(7, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
+                        turnIO = new MotorIOSparkMax(8, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
                         turnIO.setOffset(Units.radiansToRotations(ENCODER_OFFSET_BL));
                 break;
 
-                case 3: turnIO = turnMotorIO;
+                case 3: 
+                        driveIO = new MotorIOTalonFX(10, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
+                        turnIO = new MotorIOSparkMax(11, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
                         turnIO.setOffset(Units.radiansToRotations(ENCODER_OFFSET_BR));
                 break;
 
-                default: turnIO = new MotorIO() {};
+                default:
+                        driveIO = new MotorIO() {}; 
+                        turnIO = new MotorIO() {};
                 break;
         }
     }
@@ -73,6 +92,16 @@ public class ModuleIOSparkTalon implements ModuleIO {
     }
 
     @Override
+    public void setDriveOpenLoop(double output) {
+        
+    }
+
+    @Override
+    public void setDriveVelocity(double velocityRadPerSec) {
+        driveIO.setVelocity(velocityRadPerSec);
+    }
+
+    @Override
     public void updateInputs(ModuleIOInputs inputs) {
         MotorIOInputs motorIOInputs = turnIO.getMotorIOInputs();
         inputs.turnAppliedVolts = motorIOInputs.appliedVolts;
@@ -81,7 +110,5 @@ public class ModuleIOSparkTalon implements ModuleIO {
         inputs.turnPosition = new Rotation2d(Units.rotationsToRadians(motorIOInputs.positionRot));
         inputs.turnVelocityRadPerSec = motorIOInputs.velocityRadPerSec;
         inputs.turnPositionRot = Units.rotationsToRadians(motorIOInputs.positionRot);
-
-        
     }
 }

@@ -30,7 +30,7 @@ import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 
 public class TunerConstants {
 
-    public static final double maxSpeedMetersPerSec = 4.8;
+    public static final double maxSpeedMetersPerSec = 54.8;
 
     // Turn motor configuration
     public static final boolean turnInverted = false;
@@ -122,6 +122,7 @@ public class TunerConstants {
     // The stator current at which the wheels start to slip;
     // This needs to be tuned to your individual robot
     public static final Current kSlipCurrent = Amps.of(120.0);
+    public static final Double kSlipCurrentDouble = 120.0;
 
     // Initial configs for the drive and steer motors and the CANcoder; these cannot
     // be null.

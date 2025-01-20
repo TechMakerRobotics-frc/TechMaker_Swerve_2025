@@ -2,35 +2,20 @@ package frc.robot;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants.RobotIdleMode;
 import frc.robot.commands.drive.*;
-import frc.robot.commands.leds.*;
 import frc.robot.generated.TunerConstants;
-import frc.robot.interfaces.Motor.MotorIOSparkMax;
 import frc.robot.subsystems.drive.*;
-import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.vision.*;
-import frc.robot.util.RobotModeTo;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -44,7 +29,7 @@ public class RobotContainer {
     //public final Leds leds;
 
     // control leds
-    private int currentLedState = 0;
+    //private int currentLedState = 0;
     //private final Command[] ledCommands;
 
     /*public final ZoneManager zones;
@@ -56,7 +41,7 @@ public class RobotContainer {
     private final CommandXboxController controller = new CommandXboxController(0);
 
     // Operator Controller
-    private final CommandXboxController OperatorController = new CommandXboxController(1);
+    //private final CommandXboxController OperatorController = new CommandXboxController(1);
 
     // Dashboard inputs
    // private final LoggedDashboardChooser<Command> autoChooser;
@@ -71,10 +56,10 @@ public class RobotContainer {
                 // Real robot, instantiate hardware IO implementations
                 drive = new Drive(
                         new GyroIOPigeon2(),
-                        new ModuleIOSparkTalon(0, new MotorIOSparkMax(2, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast)),
-                        new ModuleIOSparkTalon(1, new MotorIOSparkMax(5, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast)),
-                        new ModuleIOSparkTalon(2, new MotorIOSparkMax(8, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast)),
-                        new ModuleIOSparkTalon(3, new MotorIOSparkMax(11, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast)));
+                        new ModuleIOSparkTalon(0),
+                        new ModuleIOSparkTalon(1),
+                        new ModuleIOSparkTalon(2),
+                        new ModuleIOSparkTalon(3));
                // this.vision = new Vision(drive, new VisionIOPhotonVision(FL_CAM_NAME, ROBOT_TO_FL_CAM));
                 new VisionIOPhotonVision(FR_CAM_NAME, ROBOT_TO_FR_CAM);
                 new VisionIOPhotonVision(LIMELIGHT_NAME, ROBOT_TO_FR_CAM);
