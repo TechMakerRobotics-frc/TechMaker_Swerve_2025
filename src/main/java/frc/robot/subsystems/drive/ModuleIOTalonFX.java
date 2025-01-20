@@ -54,7 +54,6 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
     // Connection debouncers
     private final Debouncer driveConnectedDebounce = new Debouncer(0.5);
     private final Debouncer turnConnectedDebounce = new Debouncer(0.5);
-    private final Debouncer turnEncoderConnectedDebounce = new Debouncer(0.5);
 
     protected final TalonFXConfiguration driveConfig;
 
@@ -134,7 +133,6 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
         // Refresh all signals
         var driveStatus = BaseStatusSignal.refreshAll(drivePosition, driveVelocity, driveAppliedVolts, driveCurrent);
         var turnStatus = BaseStatusSignal.refreshAll(turnVelocity, turnAppliedVolts, turnCurrent);
-        var turnEncoderStatus = BaseStatusSignal.refreshAll(turnAbsolutePosition);
 
         // Update drive inputs
         inputs.driveConnected = driveConnectedDebounce.calculate(driveStatus.isOK());
