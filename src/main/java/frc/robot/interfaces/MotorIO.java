@@ -5,7 +5,7 @@ import org.littletonrobotics.junction.AutoLog;
 public interface MotorIO {
     @AutoLog
     public static class MotorIOInputs {
-        public double positionRad = 0.0;
+        public double positionRot = 0.0;
         public double velocityRadPerSec = 0.0;
         public double appliedVolts = 0.0;
         public double[] currentAmps = new double[] {};
@@ -34,6 +34,7 @@ public interface MotorIO {
 
     /** Reset encoder position. */
     public default void resetPosition() {}
+    
     /** Sets encoder offset. */
     public default void setOffset(double offset) {}
 }
