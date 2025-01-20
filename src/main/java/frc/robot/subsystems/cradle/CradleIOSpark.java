@@ -4,9 +4,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.util.Units;
-import frc.robot.interfaces.Motor.MotorIO;
-import frc.robot.interfaces.Motor.MotorIO.MotorIOInputs;
-import frc.robot.interfaces.Motor.MotorIOSparkMax;
+import frc.robot.interfaces.motor.MotorIO;
+import frc.robot.interfaces.motor.MotorIOSparkMax;
+import frc.robot.interfaces.motor.MotorIO.MotorIOInputs;
 
 public class CradleIOSpark implements CradleIO {
 
@@ -15,9 +15,9 @@ public class CradleIOSpark implements CradleIO {
     private final MotorIO gama;
     
     public CradleIOSpark() {
-        alfa = new MotorIOSparkMax(CradleConstants.ALFA_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
-        beta = new MotorIOSparkMax(CradleConstants.BETA_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
-        gama = new MotorIOSparkMax(CradleConstants.GAMA_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
+        alfa = new EncoderIOThroughBore(CradleConstants.ALFA_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
+        beta = new EncoderIOThroughBore(CradleConstants.BETA_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
+        gama = new EncoderIOThroughBore(CradleConstants.GAMA_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
     }
 
     @Override

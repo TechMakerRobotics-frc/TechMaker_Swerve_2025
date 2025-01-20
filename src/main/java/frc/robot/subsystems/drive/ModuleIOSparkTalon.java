@@ -23,10 +23,10 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.generated.TunerConstants;
-import frc.robot.interfaces.Motor.MotorIO;
-import frc.robot.interfaces.Motor.MotorIO.MotorIOInputs;
-import frc.robot.interfaces.Motor.MotorIOSparkMax;
-import frc.robot.interfaces.Motor.MotorIOTalonFX;
+import frc.robot.interfaces.motor.MotorIO;
+import frc.robot.interfaces.motor.MotorIOSparkMax;
+import frc.robot.interfaces.motor.MotorIOTalonFX;
+import frc.robot.interfaces.motor.MotorIO.MotorIOInputs;
 
 
 /**
@@ -42,25 +42,25 @@ public class ModuleIOSparkTalon implements ModuleIO {
         switch (module) {
                 case 0:  
                         driveIO = new MotorIOTalonFX(1, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
-                        turnIO = new MotorIOSparkMax(2, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
+                        turnIO = new EncoderIOThroughBore(2, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
                         turnIO.setOffset(Units.radiansToRotations(ENCODER_OFFSET_FL));
                 break;
 
                 case 1: 
                         driveIO = new MotorIOTalonFX(4, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
-                        turnIO = new MotorIOSparkMax(5, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
+                        turnIO = new EncoderIOThroughBore(5, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
                         turnIO.setOffset(Units.radiansToRotations(ENCODER_OFFSET_FR));
                 break;
                 
                 case 2: 
                         driveIO = new MotorIOTalonFX(7, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
-                        turnIO = new MotorIOSparkMax(8, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
+                        turnIO = new EncoderIOThroughBore(8, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
                         turnIO.setOffset(Units.radiansToRotations(ENCODER_OFFSET_BL));
                 break;
 
                 case 3: 
                         driveIO = new MotorIOTalonFX(10, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
-                        turnIO = new MotorIOSparkMax(11, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
+                        turnIO = new EncoderIOThroughBore(11, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
                         turnIO.setOffset(Units.radiansToRotations(ENCODER_OFFSET_BR));
                 break;
 

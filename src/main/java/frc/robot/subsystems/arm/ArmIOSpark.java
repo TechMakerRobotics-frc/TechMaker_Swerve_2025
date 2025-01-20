@@ -4,16 +4,16 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.util.Units;
-import frc.robot.interfaces.Motor.MotorIO;
-import frc.robot.interfaces.Motor.MotorIO.MotorIOInputs;
-import frc.robot.interfaces.Motor.MotorIOSparkMax;
+import frc.robot.interfaces.motor.MotorIO;
+import frc.robot.interfaces.motor.MotorIOSparkMax;
+import frc.robot.interfaces.motor.MotorIO.MotorIOInputs;
 
 public class ArmIOSpark implements ArmIO {
 
     private final MotorIO motor;
     
     public ArmIOSpark() {
-        motor = new MotorIOSparkMax(ArmConstants.motorID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
+        motor = new EncoderIOThroughBore(ArmConstants.motorID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
     }
 
     @Override

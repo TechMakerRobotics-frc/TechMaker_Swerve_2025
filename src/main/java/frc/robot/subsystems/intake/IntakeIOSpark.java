@@ -4,9 +4,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.util.Units;
-import frc.robot.interfaces.Motor.MotorIO;
-import frc.robot.interfaces.Motor.MotorIO.MotorIOInputs;
-import frc.robot.interfaces.Motor.MotorIOSparkMax;
+import frc.robot.interfaces.motor.MotorIO;
+import frc.robot.interfaces.motor.MotorIOSparkMax;
+import frc.robot.interfaces.motor.MotorIO.MotorIOInputs;
 
 public class IntakeIOSpark implements IntakeIO {
 
@@ -14,8 +14,8 @@ public class IntakeIOSpark implements IntakeIO {
     private final MotorIO rollerMotor;
     
     public IntakeIOSpark() {
-        intakeMotor = new MotorIOSparkMax(IntakeConstants.INTAKE_MOTOR_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
-        rollerMotor = new MotorIOSparkMax(IntakeConstants.ROLLER_MOTOR_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
+        intakeMotor = new EncoderIOThroughBore(IntakeConstants.INTAKE_MOTOR_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
+        rollerMotor = new EncoderIOThroughBore(IntakeConstants.ROLLER_MOTOR_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
     }
 
     @Override
