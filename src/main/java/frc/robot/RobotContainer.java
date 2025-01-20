@@ -20,8 +20,7 @@ import frc.robot.Constants.RobotIdleMode;
 import frc.robot.commands.drive.*;
 import frc.robot.commands.leds.*;
 import frc.robot.generated.TunerConstants;
-import frc.robot.interfaces.MotorIOSparkMax;
-import frc.robot.interfaces.motor;
+import frc.robot.interfaces.Motor.MotorIOSparkMax;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.leds.Leds;
 import frc.robot.subsystems.vision.*;
@@ -62,7 +61,6 @@ public class RobotContainer {
     //private final LoggedDashboardChooser<Command> robotModeChooser;
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
-    motor motorIO = new motor();
     public RobotContainer() {
 
         /*switch (Constants.currentMode) {
@@ -158,10 +156,7 @@ public class RobotContainer {
      * and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        controller.a().onTrue(new InstantCommand(()->motorIO.setPosition(0)));
-        controller.b().onTrue(new InstantCommand(()->motorIO.setPosition(0.25)));
-        controller.y().onTrue(new InstantCommand(()->motorIO.setPosition(0.5)));
-        controller.x().onTrue(new InstantCommand(()->motorIO.setPosition(0.75)));
+        
         /*final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM
                 ? () -> drive.setPose(
                         driveSimulation

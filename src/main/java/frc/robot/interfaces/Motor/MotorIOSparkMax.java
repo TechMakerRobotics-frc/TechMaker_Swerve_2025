@@ -1,4 +1,4 @@
-package frc.robot.interfaces;
+package frc.robot.interfaces.Motor;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase;

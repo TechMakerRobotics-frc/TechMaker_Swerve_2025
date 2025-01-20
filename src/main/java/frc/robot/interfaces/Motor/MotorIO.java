@@ -1,10 +1,10 @@
-package frc.robot.subsystems.lockwheel;
+package frc.robot.interfaces.Motor;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface LockwheelIO {
+public interface MotorIO {
     @AutoLog
-    public static class LockwheelIOInputs {
+    public static class MotorIOInputs {
         public double positionRad = 0.0;
         public double velocityRadPerSec = 0.0;
         public double appliedVolts = 0.0;
@@ -12,25 +12,28 @@ public interface LockwheelIO {
     }
 
     /** Updates the set of loggable inputs. */
-    public default void updateInputs(LockwheelIOInputs inputs) {}
+    public default void updateInputs(MotorIOInputs inputs) {}
 
     /** Run open loop at the specified voltage. */
     public default void setVoltage(double volts) {}
 
-    public default void setVoltageUpMotor(double volts) {}
-
-    public default void setVoltageDownMotor(double volts) {}
-
     /** Run closed loop at the specified velocity. */
     public default void setVelocity(double velocityRadPerSec) {}
 
-    public default void setVelocityUpMotor(double velocityRadPerSec) {}
-
-    public default void setVelocityDownMotor(double velocityRadPerSec) {}
+    /** Run closed loop position */
+    public default void setPosition(double positionRad) {}
 
     /** Stop in open loop. */
     public default void stop() {}
 
     /** Set velocity PID constants. */
     public default void configurePID(double kP, double kI, double kD) {}
+
+     /** Set velocity PIDF constants. */
+     public default void configurePIDF(double kP, double kI, double kD, double kF) {}
+
+    /** Reset encoder position. */
+    public default void resetPosition() {}
+    /** Sets encoder offset. */
+    public default void setOffset(double offset) {}
 }

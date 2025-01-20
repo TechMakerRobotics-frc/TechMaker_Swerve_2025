@@ -1,4 +1,4 @@
-package frc.robot.interfaces;
+package frc.robot.interfaces.Motor;
 
 import static frc.robot.util.subsystemUtils.PhoenixUtil.tryUntilOk;
 
