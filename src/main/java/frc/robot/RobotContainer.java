@@ -4,7 +4,9 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -37,8 +39,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
     // Subsystems
-    //private final Drive drive;
-    //public Vision vision;
+    private final Drive drive;
+    public Vision vision;
     //public final Leds leds;
 
     // control leds
@@ -61,17 +63,18 @@ public class RobotContainer {
     //private final LoggedDashboardChooser<Command> robotModeChooser;
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
+
     public RobotContainer() {
 
-        /*switch (Constants.currentMode) {
+        switch (Constants.currentMode) {
             case REAL:
                 // Real robot, instantiate hardware IO implementations
                 drive = new Drive(
                         new GyroIOPigeon2(),
-                        new ModuleIOSparkTalon(0),
-                        new ModuleIOSparkTalon(1),
-                        new ModuleIOSparkTalon(2),
-                        new ModuleIOSparkTalon(3));
+                        new ModuleIOSparkTalon(0, new MotorIOSparkMax(2, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast)),
+                        new ModuleIOSparkTalon(1, new MotorIOSparkMax(5, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast)),
+                        new ModuleIOSparkTalon(2, new MotorIOSparkMax(8, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast)),
+                        new ModuleIOSparkTalon(3, new MotorIOSparkMax(11, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast)));
                // this.vision = new Vision(drive, new VisionIOPhotonVision(FL_CAM_NAME, ROBOT_TO_FL_CAM));
                 new VisionIOPhotonVision(FR_CAM_NAME, ROBOT_TO_FR_CAM);
                 new VisionIOPhotonVision(LIMELIGHT_NAME, ROBOT_TO_FR_CAM);
@@ -108,7 +111,7 @@ public class RobotContainer {
                 vision = new Vision(drive, new VisionIO() {}, new VisionIO() {}, new VisionIO() {});
                 break;
         }
-        */
+
         /*zones = new ZoneManager(drive);
         stateMachine = new StateMachine(zones, drive);*/
         /*
@@ -156,8 +159,11 @@ public class RobotContainer {
      * and then passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
-        
-        /*final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM
+        /*controller.a().onTrue(new InstantCommand(()->motorIO.setPosition(0)));
+        controller.b().onTrue(new InstantCommand(()->motorIO.setPosition(0.25)));
+        controller.y().onTrue(new InstantCommand(()->motorIO.setPosition(0.5)));
+        controller.x().onTrue(new InstantCommand(()->motorIO.setPosition(0.75)));*/
+        final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM
                 ? () -> drive.setPose(
                         driveSimulation
                                 .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during simulation
@@ -178,13 +184,13 @@ public class RobotContainer {
                         drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), 0, 5.5));
 */
         // Switch to X pattern when X button is pressed
-       /* controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-        // Reset gyro / odometry
+        //Reset gyro / odometry
         controller.povRight().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
         // leds
-        OperatorController.leftStick().onTrue(Commands.runOnce(() -> {
+        /*OperatorController.leftStick().onTrue(Commands.runOnce(() -> {
             // Alterna o comando atual para o próximo na lista
             currentLedState = (currentLedState + 1) % ledCommands.length;
             Command nextCommand = ledCommands[currentLedState];

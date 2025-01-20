@@ -66,7 +66,7 @@ public class Module {
 
         // Apply setpoints
         io.setDriveVelocity(state.speedMetersPerSecond / TunerConstants.wheelRadiusMeters);
-        io.setTurnPosition(state.angle);
+        io.setPosition(state.angle.getRotations());
     }
 
     /** Runs the module with the specified output while controlling to zero degrees. */

@@ -17,25 +17,25 @@ public final class DriveConstants {
     public static final int TALON_FL = 1;
     public static final int SPARK_FL = 2;
     public static final int CANCODER_FL = 3;
-    public static final double ENCODER_OFFSET_FL = Units.rotationsToRadians(0.461426);
+    public static final double ENCODER_OFFSET_FL = Units.rotationsToRadians(-0.20864377915859222);
     
     // Front Right
     public static final int TALON_FR = 4;
     public static final int SPARK_FR = 5;
     public static final int CANCODER_FR = 6;
-    public static final double ENCODER_OFFSET_FR = Units.rotationsToRadians(0.089111);
+    public static final double ENCODER_OFFSET_FR = Units.rotationsToRadians(-0.13764628767967224);
 
     // Back Left
     public static final int TALON_BL = 7;
     public static final int SPARK_BL = 8;
     public static final int CANCODER_BL = 9;
-    public static final double ENCODER_OFFSET_BL = Units.rotationsToRadians(-0.448486);
+    public static final double ENCODER_OFFSET_BL = Units.rotationsToRadians(0.49029359221458435);
 
     // Back Right
     public static final int TALON_BR = 10;
     public static final int SPARK_BR = 11;
     public static final int CANCODER_BR = 12;
-    public static final double ENCODER_OFFSET_BR = Units.rotationsToRadians(-0.437256);
+    public static final double ENCODER_OFFSET_BR = Units.rotationsToRadians(0.03893614560365677);
 
     public static final String CANBUS = "CANivore";
 

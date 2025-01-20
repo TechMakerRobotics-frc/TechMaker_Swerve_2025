@@ -30,6 +30,7 @@ public interface ModuleIO {
         public double turnVelocityRadPerSec = 0.0;
         public double turnAppliedVolts = 0.0;
         public double turnCurrentAmps = 0.0;
+        public double turnPositionRot = 0.0;
 
         public double[] odometryTimestamps = new double[] {};
         public double[] odometryDrivePositionsRad = new double[] {};
@@ -44,10 +45,33 @@ public interface ModuleIO {
 
     /** Run the turn motor at the specified open loop value. */
     public default void setTurnOpenLoop(double output) {}
+    
+    /** Run open loop at the specified voltage. */
+    public default void setVoltage(double volts) {}
 
     /** Run the drive motor at the specified velocity. */
     public default void setDriveVelocity(double velocityRadPerSec) {}
 
     /** Run the turn motor to the specified rotation. */
     public default void setTurnPosition(Rotation2d rotation) {}
+
+    /** Run closed loop at the specified velocity. */
+    public default void setVelocity(double velocityRadPerSec) {}
+
+    /** Run closed loop position */
+    public default void setPosition(double positionRad) {}
+
+    /** Stop in open loop. */
+    public default void stop() {}
+
+    /** Set velocity PID constants. */
+    public default void configurePID(double kP, double kI, double kD) {}
+
+    /** Set velocity PIDF constants. */
+    public default void configurePIDF(double kP, double kI, double kD, double kF) {}
+
+    /** Reset encoder position. */
+    public default void resetPosition() {}
+    /** Sets encoder offset. */
+    public default void setOffset(double offset) {}
 }

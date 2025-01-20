@@ -62,7 +62,7 @@ public class MotorIOSparkMax implements MotorIO {
     /** @param inputs */
     @Override
     public void updateInputs(MotorIOInputs inputs) {
-        inputs.positionRad = encoder.getPosition() ;
+        inputs.positionRot = encoder.getPosition() ;
         inputs.velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity() );
         inputs.appliedVolts = motor.getAppliedOutput() * motor.getBusVoltage();
         inputs.currentAmps = new double[] {motor.getOutputCurrent()};
