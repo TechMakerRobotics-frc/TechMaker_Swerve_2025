@@ -83,7 +83,6 @@ public class ModuleIOSparkTalon implements ModuleIO {
         cancoder.getConfigurator().apply(new CANcoderConfiguration());
         turnIO.setOffset(cancoder.getAbsolutePosition().getValueAsDouble());
         turnIO.setPosition(offset);
-
     }
 
     @Override 
@@ -98,7 +97,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
     
     @Override
     public void setPosition(double positionRot) {
-        turnIO.setPosition(positionRot);
+       // turnIO.setPosition(positionRot);
     }
     
     @Override
@@ -124,7 +123,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
         inputs.turnCurrentAmps = motorIOInputs.currentAmps[0];
         inputs.turnPosition = new Rotation2d(Units.rotationsToRadians(motorIOInputs.positionRot));
         inputs.turnVelocityRadPerSec = motorIOInputs.velocityRadPerSec;
-        inputs.turnPositionRot = cancoder.getAbsolutePosition().getValueAsDouble();
+        inputs.turnPositionRot = Units.rotationsToRadians(cancoder.getAbsolutePosition().getValueAsDouble());
         motorIOInputs = driveIO.getMotorIOInputs();
         inputs.driveAppliedVolts = motorIOInputs.appliedVolts;
         inputs.driveConnected = motorIOInputs.appliedVolts != 0.0;

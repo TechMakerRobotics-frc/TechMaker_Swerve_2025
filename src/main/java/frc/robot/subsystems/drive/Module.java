@@ -39,11 +39,14 @@ public class Module {
         turnDisconnectedAlert =
                 new Alert("Disconnected turn motor on module " + Integer.toString(index) + ".", AlertType.kError);
     }
-
-    public void periodic() {
+    public void updateInputs() {
         io.updateInputs(inputs);
-        Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
-
+        Logger.processInputs("Drive/Module" + index, inputs);
+      }
+    
+    public void periodic() {
+       
+        
         // Calculate positions for odometry
         int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
         odometryPositions = new SwerveModulePosition[sampleCount];

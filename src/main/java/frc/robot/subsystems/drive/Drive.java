@@ -203,9 +203,12 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
         for (var module : modules) {
-            module.periodic();
+            module.updateInputs();
         }
         odometryLock.unlock();
+        for (var module : modules) {
+            module.periodic();
+        }
 
         // Stop moving when disabled
         if (DriverStation.isDisabled()) {
