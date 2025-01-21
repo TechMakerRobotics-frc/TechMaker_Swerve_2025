@@ -14,8 +14,8 @@ public class IntakeIOSpark implements IntakeIO {
     private final MotorIO rollerMotor;
     
     public IntakeIOSpark() {
-        intakeMotor = new EncoderIOThroughBore(IntakeConstants.INTAKE_MOTOR_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
-        rollerMotor = new EncoderIOThroughBore(IntakeConstants.ROLLER_MOTOR_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
+        intakeMotor = new MotorIOSparkMax(IntakeConstants.INTAKE_MOTOR_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
+        rollerMotor = new MotorIOSparkMax(IntakeConstants.ROLLER_MOTOR_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
     }
 
     @Override

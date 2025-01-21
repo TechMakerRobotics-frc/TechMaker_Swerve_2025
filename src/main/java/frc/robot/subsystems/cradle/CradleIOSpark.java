@@ -15,9 +15,9 @@ public class CradleIOSpark implements CradleIO {
     private final MotorIO gama;
     
     public CradleIOSpark() {
-        alfa = new EncoderIOThroughBore(CradleConstants.ALFA_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
-        beta = new EncoderIOThroughBore(CradleConstants.BETA_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
-        gama = new EncoderIOThroughBore(CradleConstants.GAMA_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
+        alfa = new MotorIOSparkMax(CradleConstants.ALFA_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
+        beta = new MotorIOSparkMax(CradleConstants.BETA_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
+        gama = new MotorIOSparkMax(CradleConstants.GAMA_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
     }
 
     @Override

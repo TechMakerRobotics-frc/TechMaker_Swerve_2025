@@ -13,7 +13,7 @@ public class ElevatorIOSpark implements ElevatorIO {
     private final MotorIO motor;
     
     public ElevatorIOSpark() {
-        motor = new EncoderIOThroughBore(ElevatorConstants.MOTOR_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
+        motor = new MotorIOSparkMax(ElevatorConstants.MOTOR_ID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
     }
 
     @Override

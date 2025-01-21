@@ -13,7 +13,7 @@ public class ArmIOSpark implements ArmIO {
     private final MotorIO motor;
     
     public ArmIOSpark() {
-        motor = new EncoderIOThroughBore(ArmConstants.motorID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
+        motor = new MotorIOSparkMax(ArmConstants.motorID, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
     }
 
     @Override
