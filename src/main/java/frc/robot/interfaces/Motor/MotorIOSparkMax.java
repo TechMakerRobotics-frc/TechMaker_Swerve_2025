@@ -41,16 +41,16 @@ public class MotorIOSparkMax implements MotorIO {
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 // Set PID values for position control. We don't need to pass a closed loop
                 // slot, as it will default to slot 0.
-                .p(10)
+                .p(5)
                 .i(0)
                 .d(0.1)
-                .outputRange(-1, 1);
+                .outputRange(-1, 1)
                 // Set PID values for velocity control in slot 1
-                //.p(0.0001, ClosedLoopSlot.kSlot1)
-                //.i(0, ClosedLoopSlot.kSlot1)
-                //.d(0, ClosedLoopSlot.kSlot1)
-                //.velocityFF(1.0 / 5767, ClosedLoopSlot.kSlot1)
-                //.outputRange(-1, 1, ClosedLoopSlot.kSlot1);
+                .p(0.01, ClosedLoopSlot.kSlot1)
+                .i(0, ClosedLoopSlot.kSlot1)
+                .d(0, ClosedLoopSlot.kSlot1)
+                .velocityFF(1.0 / 5767, ClosedLoopSlot.kSlot1)
+                .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
         
      
 
@@ -68,7 +68,10 @@ public class MotorIOSparkMax implements MotorIO {
         inputs.currentAmps = new double[] {motor.getOutputCurrent()};
         
     }
-
+    @Override
+    public void set(double power) {
+        motor.set(power);
+    }
     @Override
     public void setVoltage(double volts) {
         motor.setVoltage(volts);
@@ -76,7 +79,9 @@ public class MotorIOSparkMax implements MotorIO {
 
     @Override
     public void setVelocity(double velocityRadPerSec) {
-        motor.set(velocityRadPerSec);
+        double speed = Units.radiansPerSecondToRotationsPerMinute(velocityRadPerSec);
+        closedLoopController.setReference(speed, ControlType.kMAXMotionVelocityControl, ClosedLoopSlot.kSlot1);
+        
     }
     @Override
     public void setPosition(double position) {
@@ -105,5 +110,10 @@ public class MotorIOSparkMax implements MotorIO {
     @Override
     public void setOffset(double offset) {
         encoder.setPosition(offset);
+    }
+    @Override
+    public void resetOffset() {
+        encoder.setPosition(0);
+        setPosition(0);
     }
 }

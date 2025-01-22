@@ -81,12 +81,17 @@ public class MotorIOTalonFX implements MotorIO {
     }
 
     @Override
+    public void set(double power) {
+        motor.set(power);
+    }
+    @Override
     public void setVoltage(double volts) {
         motor.setVoltage(volts);
     }
 
     @Override
     public void setVelocity(double velocityRadPerSec) {
+        
         double motorVelocityRotPerSec =
                 Units.radiansToRotations(velocityRadPerSec);;
         motor.setControl(

@@ -14,6 +14,8 @@ public interface MotorIO {
     /** Updates the set of loggable inputs. */
     public default void updateInputs(MotorIOInputs inputs) {}
 
+    /** Run open loop at the specified power */
+    public default void set(double power) {}
     /** Run open loop at the specified voltage. */
     public default void setVoltage(double volts) {}
 
@@ -37,6 +39,8 @@ public interface MotorIO {
     
     /** Sets encoder offset. */
     public default void setOffset(double offset) {}
+
+    public default void resetOffset() {}
 
     public default MotorIOInputs getMotorIOInputs() {
         
