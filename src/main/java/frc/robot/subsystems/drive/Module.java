@@ -63,13 +63,16 @@ public class Module {
 
     /** Runs the module with the specified setpoint state. Mutates the state to optimize it. */
     public void runSetpoint(SwerveModuleState state) {
-        // Optimize velocity setpoint
-        state.optimize(getAngle());
-        state.cosineScale(inputs.turnPosition);
+        Logger.recordOutput("Rotation to optimize", getAngle());
 
-        // Apply setpoints
+        SwerveModuleState optimizedState = state;
+        optimizedState.optimize(getAngle());
+        optimizedState.cosineScale(inputs.turnPosition);
+
+        Logger.recordOutput("Rotation optimized", optimizedState.angle);
+    
         io.setDriveVelocity(state.speedMetersPerSecond / TunerConstants.wheelRadiusMeters);
-        io.setPosition(state.angle.getRotations());
+        io.setPosition(optimizedState.angle.getRotations());
     }
 
     /** Runs the module with the specified output while controlling to zero degrees. */

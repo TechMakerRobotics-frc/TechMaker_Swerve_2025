@@ -61,6 +61,8 @@ public interface ModuleIO {
     /** Run closed loop position */
     public default void setPosition(double positionRad) {}
 
+    public default void setRotation(Rotation2d rotation) {}
+
     /** Stop in open loop. */
     public default void stop() {}
 

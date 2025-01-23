@@ -10,9 +10,9 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.LimitSwitchConfig.Type;
-import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.math.util.Units;
 
 public class MotorIOSparkMax implements MotorIO {
@@ -100,24 +100,12 @@ public class MotorIOSparkMax implements MotorIO {
         closedLoopController.setReference(speed, ControlType.kMAXMotionVelocityControl, ClosedLoopSlot.kSlot1);
         
     }
+
     @Override
     public void setPosition(double position) {
-        /*position = Units.rotationsToDegrees(position);
-        if((position>150 && lastPosition<-150) || (position<-150 && lastPosition>150)){
-            lastPosition = position;
-            if(position>0)
-                position -=360;
-            else
-                position +=360;
-            
-        }
-        else{
-            lastPosition = position;
-        }
-        position =Units.degreesToRotations(position);*/
         closedLoopController.setReference(position, ControlType.kPosition, ClosedLoopSlot.kSlot0);
-
     }
+
     @Override
     public void stop() {
         motor.stopMotor();

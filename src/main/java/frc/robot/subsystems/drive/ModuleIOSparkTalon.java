@@ -22,6 +22,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.generated.TunerConstants;
@@ -115,8 +116,15 @@ public class ModuleIOSparkTalon implements ModuleIO {
     }
 
     @Override
+    public void setRotation(Rotation2d rotation) {
+        double setpoint =
+        MathUtil.inputModulus(
+            rotation.plus(Rotation2d.fromRotations(offset)).getRadians(), -180, 179);
+        turnIO.setPosition(Units.radiansToRotations(setpoint));
+    }
+
+    @Override
     public void updateInputs(ModuleIOInputs inputs) {
-        
         MotorIOInputs motorIOInputs = turnIO.getMotorIOInputs();
         inputs.turnOffset = Units.rotationsToRadians(offset);
         inputs.turnAppliedVolts = motorIOInputs.appliedVolts;
@@ -130,10 +138,6 @@ public class ModuleIOSparkTalon implements ModuleIO {
         inputs.driveConnected = motorIOInputs.appliedVolts != 0.0;
         inputs.driveCurrentAmps = motorIOInputs.currentAmps[0];
         inputs.drivePositionRad = Units.rotationsToRadians(motorIOInputs.positionRot);
-        inputs.driveVelocityRadPerSec = motorIOInputs.velocityRadPerSec;
-
-       
-        
-       
+        inputs.driveVelocityRadPerSec = motorIOInputs.velocityRadPerSec;   
     }
 }

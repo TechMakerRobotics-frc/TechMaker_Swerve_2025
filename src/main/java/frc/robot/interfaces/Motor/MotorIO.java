@@ -31,8 +31,8 @@ public interface MotorIO {
     /** Set velocity PID constants. */
     public default void configurePID(double kP, double kI, double kD) {}
 
-     /** Set velocity PIDF constants. */
-     public default void configurePIDF(double kP, double kI, double kD, double kF) {}
+    /** Set velocity PIDF constants. */
+    public default void configurePIDF(double kP, double kI, double kD, double kF) {}
 
     /** Reset encoder position. */
     public default void resetPosition() {}
