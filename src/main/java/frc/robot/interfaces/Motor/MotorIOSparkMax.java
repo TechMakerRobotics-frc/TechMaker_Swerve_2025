@@ -21,7 +21,7 @@ public class MotorIOSparkMax implements MotorIO {
     private final RelativeEncoder encoder;
     private SparkMaxConfig motorConfig = new SparkMaxConfig();
     private SparkClosedLoopController closedLoopController;
-
+    private double lastPosition = 0;
 
     public MotorIOSparkMax(int id, SparkBase.MotorType type, boolean inverted,int timeout, double voltageCompensation, int smartCurrentLimit, SparkBaseConfig.IdleMode idleMode) {
         motor = new SparkMax(id, type);
@@ -102,6 +102,19 @@ public class MotorIOSparkMax implements MotorIO {
     }
     @Override
     public void setPosition(double position) {
+        /*position = Units.rotationsToDegrees(position);
+        if((position>150 && lastPosition<-150) || (position<-150 && lastPosition>150)){
+            lastPosition = position;
+            if(position>0)
+                position -=360;
+            else
+                position +=360;
+            
+        }
+        else{
+            lastPosition = position;
+        }
+        position =Units.degreesToRotations(position);*/
         closedLoopController.setReference(position, ControlType.kPosition, ClosedLoopSlot.kSlot0);
 
     }
