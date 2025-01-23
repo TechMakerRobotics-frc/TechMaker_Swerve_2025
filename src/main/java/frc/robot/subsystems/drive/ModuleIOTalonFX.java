@@ -89,7 +89,8 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
         turnConfig.Feedback.FeedbackSensorSource = switch (constants.FeedbackSource) {
             case RemoteCANcoder -> FeedbackSensorSourceValue.RemoteCANcoder;
             case FusedCANcoder -> FeedbackSensorSourceValue.FusedCANcoder;
-            case SyncCANcoder -> FeedbackSensorSourceValue.SyncCANcoder;};
+            case SyncCANcoder -> FeedbackSensorSourceValue.SyncCANcoder;
+            default -> throw new IllegalStateException("Unexpected value: " + constants.FeedbackSource);};
         turnConfig.Feedback.RotorToSensorRatio = constants.SteerMotorGearRatio;
         turnConfig.MotionMagic.MotionMagicCruiseVelocity = 100.0 / constants.SteerMotorGearRatio;
         turnConfig.MotionMagic.MotionMagicAcceleration = turnConfig.MotionMagic.MotionMagicCruiseVelocity / 0.100;

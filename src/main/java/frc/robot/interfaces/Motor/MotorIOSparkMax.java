@@ -9,6 +9,8 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.LimitSwitchConfig.Type;
+import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.util.Units;
@@ -19,7 +21,7 @@ public class MotorIOSparkMax implements MotorIO {
     private final RelativeEncoder encoder;
     private SparkMaxConfig motorConfig = new SparkMaxConfig();
     private SparkClosedLoopController closedLoopController;
-
+    private double lastPosition = 0;
 
     public MotorIOSparkMax(int id, SparkBase.MotorType type, boolean inverted,int timeout, double voltageCompensation, int smartCurrentLimit, SparkBaseConfig.IdleMode idleMode) {
         motor = new SparkMax(id, type);
@@ -35,8 +37,21 @@ public class MotorIOSparkMax implements MotorIO {
                 .smartCurrentLimit(smartCurrentLimit)
                 .idleMode(idleMode);
         motorConfig.encoder
-                .positionConversionFactor(2.0/42.0)
+                .positionConversionFactor(7.0/150.0)
                 .velocityConversionFactor(1);
+         // Enable limit switches to stop the motor when they are closed
+        motorConfig.limitSwitch
+            .forwardLimitSwitchType(Type.kNormallyOpen)
+            .forwardLimitSwitchEnabled(false)
+            .reverseLimitSwitchType(Type.kNormallyOpen)
+            .reverseLimitSwitchEnabled(false);
+
+            // Set the soft limits to stop the motor at -50 and 50 rotations
+        motorConfig.softLimit
+            .forwardSoftLimit(50)
+            .forwardSoftLimitEnabled(false)
+            .reverseSoftLimit(-50)
+            .reverseSoftLimitEnabled(false);
         motorConfig.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 // Set PID values for position control. We don't need to pass a closed loop
@@ -45,13 +60,15 @@ public class MotorIOSparkMax implements MotorIO {
                 .i(0)
                 .d(0.1)
                 .outputRange(-1, 1)
+                .positionWrappingEnabled(true)
                 // Set PID values for velocity control in slot 1
                 .p(0.01, ClosedLoopSlot.kSlot1)
                 .i(0, ClosedLoopSlot.kSlot1)
                 .d(0, ClosedLoopSlot.kSlot1)
                 .velocityFF(1.0 / 5767, ClosedLoopSlot.kSlot1)
                 .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
-        
+       
+            
      
 
 
@@ -85,6 +102,19 @@ public class MotorIOSparkMax implements MotorIO {
     }
     @Override
     public void setPosition(double position) {
+        /*position = Units.rotationsToDegrees(position);
+        if((position>150 && lastPosition<-150) || (position<-150 && lastPosition>150)){
+            lastPosition = position;
+            if(position>0)
+                position -=360;
+            else
+                position +=360;
+            
+        }
+        else{
+            lastPosition = position;
+        }
+        position =Units.degreesToRotations(position);*/
         closedLoopController.setReference(position, ControlType.kPosition, ClosedLoopSlot.kSlot0);
 
     }
