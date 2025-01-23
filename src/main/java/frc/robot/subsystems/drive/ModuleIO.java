@@ -59,7 +59,7 @@ public interface ModuleIO {
     public default void setVelocity(double velocityRadPerSec) {}
 
     /** Run closed loop position */
-    public default void setPosition(double positionRad) {}
+    public default void setPosition(Rotation2d positionRad) {}
 
     public default void setRotation(Rotation2d rotation) {}
 

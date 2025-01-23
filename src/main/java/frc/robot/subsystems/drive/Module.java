@@ -72,7 +72,7 @@ public class Module {
         Logger.recordOutput("Rotation optimized", optimizedState.angle);
     
         io.setDriveVelocity(state.speedMetersPerSecond / TunerConstants.wheelRadiusMeters);
-        io.setPosition(optimizedState.angle.getRotations());
+        io.setPosition(optimizedState.angle);
     }
 
     /** Runs the module with the specified output while controlling to zero degrees. */

@@ -42,6 +42,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
     private final MotorIO turnIO;
     private CANcoder cancoder;
     private double offset;
+    private Rotation2d zeroRotation = Rotation2d.fromDegrees(0.0);
     public ModuleIOSparkTalon(int module) { 
         switch (module) {
                 case 0:  
@@ -79,7 +80,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
                         offset = 0.0;
                 break;
         }
-        
+        zeroRotation = Rotation2d.fromRotations(offset);
         cancoder.getConfigurator().apply(new CANcoderConfiguration());
         turnIO.setOffset(cancoder.getAbsolutePosition().getValueAsDouble()-offset);
         turnIO.setPosition(0);
@@ -96,8 +97,10 @@ public class ModuleIOSparkTalon implements ModuleIO {
     }
     
     @Override
-    public void setPosition(double positionRot) {
-        turnIO.setPosition(positionRot);
+    public void setPosition(Rotation2d positionRot) {
+        MathUtil.inputModulus(
+            positionRot.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput);
+        turnIO.setPosition(positionRot.getRotations());
     }
     
     @Override
