@@ -98,9 +98,9 @@ public class ModuleIOSparkTalon implements ModuleIO {
     
     @Override
     public void setPosition(Rotation2d positionRot) {
-        MathUtil.inputModulus(
-            positionRot.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput);
-        turnIO.setPosition(positionRot.getRotations());
+        double setpoint = Units.radiansToRotations( MathUtil.inputModulus(
+            positionRot.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput));
+        turnIO.setPosition(setpoint);
     }
     
     @Override
