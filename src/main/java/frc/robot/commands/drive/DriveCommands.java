@@ -273,200 +273,233 @@ public class DriveCommands {
                 }));
   }
 
-    public static Command joystickDriveAimAtPoint(
-        Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, Pose2d targetPose) {
+  public static Command joystickDriveAimAtPoint(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier,
+      Pose2d targetPose) {
 
-        // Criação do controlador PID para controle de rotação
-        ProfiledPIDController angleController = new ProfiledPIDController(
-                ANGLE_KP, 0.0, ANGLE_KD, new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-        angleController.enableContinuousInput(-Math.PI, Math.PI);
+    // Criação do controlador PID para controle de rotação
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(
+            ANGLE_KP,
+            0.0,
+            ANGLE_KD,
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
 
-        // Construção do comando
-        return Commands.run(
-                        () -> {
-                        // Obter velocidade linear a partir dos joysticks
-                        Translation2d linearVelocity =
-                                getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+    // Construção do comando
+    return Commands.run(
+            () -> {
+              // Obter velocidade linear a partir dos joysticks
+              Translation2d linearVelocity =
+                  getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
-                        // Pose atual do robô
-                        Pose2d currentPose = drive.getPose();
+              // Pose atual do robô
+              Pose2d currentPose = drive.getPose();
 
-                        // Calcula o ângulo desejado para o ponto (x, y)
-                        double desiredTheta = Math.PI + 
-                                (Math.atan2(targetPose.getY() - currentPose.getY(), targetPose.getX() - currentPose.getX()));
+              // Calcula o ângulo desejado para o ponto (x, y)
+              double desiredTheta =
+                  Math.PI
+                      + (Math.atan2(
+                          targetPose.getY() - currentPose.getY(),
+                          targetPose.getX() - currentPose.getX()));
 
-                        // Apply rotation deadband
-                        double omegaController = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+              // Apply rotation deadband
+              double omegaController =
+                  MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
 
-                        // Square rotation value for more precise control
-                        omegaController = Math.copySign(omegaController * omegaController, omegaController);
+              // Square rotation value for more precise control
+              omegaController = Math.copySign(omegaController * omegaController, omegaController);
 
-                        // Calcula a velocidade angular usando o controlador PID
-                        double omega = angleController.calculate(
-                                drive.getRotation().getRadians(), desiredTheta);
+              // Calcula a velocidade angular usando o controlador PID
+              double omega =
+                  angleController.calculate(drive.getRotation().getRadians(), desiredTheta);
 
-                        if (!(omegaController == 0)) {
-                            omega = omegaController * drive.getMaxAngularSpeedRadPerSec();
-                        }
+              if (!(omegaController == 0)) {
+                omega = omegaController * drive.getMaxAngularSpeedRadPerSec();
+              }
 
-                        // Converte as velocidades para referencia de campo e envia o comando
-                        ChassisSpeeds speeds = new ChassisSpeeds(
-                                linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                                linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                                omega);
-                        boolean isFlipped = DriverStation.getAlliance().isPresent()
-                                && DriverStation.getAlliance().get() == Alliance.Red;
-                        speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
-                                isFlipped
-                                        ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                                        : drive.getRotation());
-                        drive.runVelocity(speeds);
-                    },
-                    drive)
+              // Converte as velocidades para referencia de campo e envia o comando
+              ChassisSpeeds speeds =
+                  new ChassisSpeeds(
+                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                      omega);
+              boolean isFlipped =
+                  DriverStation.getAlliance().isPresent()
+                      && DriverStation.getAlliance().get() == Alliance.Red;
+              speeds =
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      speeds,
+                      isFlipped
+                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                          : drive.getRotation());
+              drive.runVelocity(speeds);
+            },
+            drive)
 
-            // Reseta o controlador PID quando o comando inicia
-            .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
-        }
+        // Reseta o controlador PID quando o comando inicia
+        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+  }
 
-    public static Command joystickDriveTowardsPoint(
-        Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, double targetX, double targetY) {
+  public static Command joystickDriveTowardsPoint(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier,
+      double targetX,
+      double targetY) {
 
     final double targetWeight = 0.3; // 30% para o alvo, 70% para os joysticks
 
     return Commands.run(
-            () -> {
-                double joystickX = xSupplier.getAsDouble();
-                double joystickY = ySupplier.getAsDouble();
+        () -> {
+          double joystickX = xSupplier.getAsDouble();
+          double joystickY = ySupplier.getAsDouble();
 
-                // Apply rotation deadband
-                double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+          // Apply rotation deadband
+          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
 
-                // Square rotation value for more precise control
-                omega = Math.copySign(omega * omega, omega);
+          // Square rotation value for more precise control
+          omega = Math.copySign(omega * omega, omega);
 
-                // Aplicar deadband
-                joystickX = MathUtil.applyDeadband(joystickX, DEADBAND);
-                joystickY = MathUtil.applyDeadband(joystickY, DEADBAND);
+          // Aplicar deadband
+          joystickX = MathUtil.applyDeadband(joystickX, DEADBAND);
+          joystickY = MathUtil.applyDeadband(joystickY, DEADBAND);
 
-                // Posição atual do robô
-                Pose2d currentPose = drive.getPose();
-                double currentX = currentPose.getX();
-                double currentY = currentPose.getY();
+          // Posição atual do robô
+          Pose2d currentPose = drive.getPose();
+          double currentX = currentPose.getX();
+          double currentY = currentPose.getY();
 
-                // Calcular vetor para o ponto alvo
-                double targetVectorX = targetX - currentX;
-                double targetVectorY = targetY - currentY;
+          // Calcular vetor para o ponto alvo
+          double targetVectorX = targetX - currentX;
+          double targetVectorY = targetY - currentY;
 
-                // Normalizar o vetor do alvo
-                double targetMagnitude = Math.hypot(targetVectorX, targetVectorY);
-                if (targetMagnitude > 0.01) {
-                    targetVectorX /= targetMagnitude;
-                    targetVectorY /= targetMagnitude;
-                }
+          // Normalizar o vetor do alvo
+          double targetMagnitude = Math.hypot(targetVectorX, targetVectorY);
+          if (targetMagnitude > 0.01) {
+            targetVectorX /= targetMagnitude;
+            targetVectorY /= targetMagnitude;
+          }
 
-                // Combinar vetores (joystick e direção ao alvo)
-                double blendedX = (1 - targetWeight) * joystickX + targetWeight * targetVectorX;
-                double blendedY = (1 - targetWeight) * joystickY + targetWeight * targetVectorY;
+          // Combinar vetores (joystick e direção ao alvo)
+          double blendedX = (1 - targetWeight) * joystickX + targetWeight * targetVectorX;
+          double blendedY = (1 - targetWeight) * joystickY + targetWeight * targetVectorY;
 
-                // Normalizar o vetor combinado (opcional, se necessário)
-                double blendedMagnitude = Math.hypot(blendedX, blendedY);
-                if (blendedMagnitude > 1.0) {
-                    blendedX /= blendedMagnitude;
-                    blendedY /= blendedMagnitude;
-                }
+          // Normalizar o vetor combinado (opcional, se necessário)
+          double blendedMagnitude = Math.hypot(blendedX, blendedY);
+          if (blendedMagnitude > 1.0) {
+            blendedX /= blendedMagnitude;
+            blendedY /= blendedMagnitude;
+          }
 
-                // Ajuste para aliança (inversão para aliança vermelha)
-                boolean isFlipped = DriverStation.getAlliance().isPresent()
-                            && DriverStation.getAlliance().get() == Alliance.Red;
+          // Ajuste para aliança (inversão para aliança vermelha)
+          boolean isFlipped =
+              DriverStation.getAlliance().isPresent()
+                  && DriverStation.getAlliance().get() == Alliance.Red;
 
-                // Se os joysticks estão parados, não realiza movimento
-                if (joystickX == 0.0 && joystickY == 0.0) {
-                        blendedX = 0;
-                        blendedY = 0;
-                }
-                // Transformar velocidades para referência de campo
-                ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                        blendedX * drive.getMaxLinearSpeedMetersPerSec(),
-                        blendedY * drive.getMaxLinearSpeedMetersPerSec(),
-                        omega * drive.getMaxAngularSpeedRadPerSec(), // Sem rotação
-                        isFlipped
-                                ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                                : drive.getRotation());
-                drive.runVelocity(speeds);
-            },
-            drive);
-        }
+          // Se os joysticks estão parados, não realiza movimento
+          if (joystickX == 0.0 && joystickY == 0.0) {
+            blendedX = 0;
+            blendedY = 0;
+          }
+          // Transformar velocidades para referência de campo
+          ChassisSpeeds speeds =
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  blendedX * drive.getMaxLinearSpeedMetersPerSec(),
+                  blendedY * drive.getMaxLinearSpeedMetersPerSec(),
+                  omega * drive.getMaxAngularSpeedRadPerSec(), // Sem rotação
+                  isFlipped
+                      ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                      : drive.getRotation());
+          drive.runVelocity(speeds);
+        },
+        drive);
+  }
 
-        public static Command joystickDriveTowardsAimAtPoint(
-                Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier, double targetX, double targetY) {
-        
-            final double targetWeight = 0.5;
+  public static Command joystickDriveTowardsAimAtPoint(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier,
+      double targetX,
+      double targetY) {
 
-            final ProfiledPIDController angleController = new ProfiledPIDController(
-                ANGLE_KP, 0.0, ANGLE_KD, new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-            angleController.enableContinuousInput(-Math.PI, Math.PI);
-        
-            return Commands.run(
-                    () -> {
-                        double joystickX = -xSupplier.getAsDouble();
-                        double joystickY = -ySupplier.getAsDouble();
-        
-                        joystickX = MathUtil.applyDeadband(joystickX, DEADBAND);
-                        joystickY = MathUtil.applyDeadband(joystickY, DEADBAND);
-        
-                        Pose2d currentPose = drive.getPose();
-                        double currentX = currentPose.getX();
-                        double currentY = currentPose.getY();
-        
-                        double targetVectorX = targetX - currentX;
-                        double targetVectorY = targetY - currentY;
-        
-                        double targetMagnitude = Math.hypot(targetVectorX, targetVectorY);
-                        if (targetMagnitude > 0.01) {
-                            targetVectorX /= targetMagnitude;
-                            targetVectorY /= targetMagnitude;
-                        }
-        
-                        double blendedX = (1 - targetWeight) * joystickX + targetWeight * targetVectorX;
-                        double blendedY = (1 - targetWeight) * joystickY + targetWeight * targetVectorY;
-        
-                        double blendedMagnitude = Math.hypot(blendedX, blendedY);
-                        if (blendedMagnitude > 1.0) {
-                            blendedX /= blendedMagnitude;
-                            blendedY /= blendedMagnitude;
-                        }
-        
-                        boolean isFlipped = DriverStation.getAlliance().isPresent()
-                                    && DriverStation.getAlliance().get() == Alliance.Blue;
-        
-                        if (joystickX == 0.0 && joystickY == 0.0) {
-                                blendedX = 0;
-                                blendedY = 0;
-                        }
+    final double targetWeight = 0.5;
 
-                        double desiredTheta = Math.PI + 
-                                (Math.atan2(targetY - currentPose.getY(), targetX - currentPose.getX()));
+    final ProfiledPIDController angleController =
+        new ProfiledPIDController(
+            ANGLE_KP,
+            0.0,
+            ANGLE_KD,
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
 
-                        double omegaController = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+    return Commands.run(
+        () -> {
+          double joystickX = -xSupplier.getAsDouble();
+          double joystickY = -ySupplier.getAsDouble();
 
-                        omegaController = Math.copySign(omegaController * omegaController, omegaController);
+          joystickX = MathUtil.applyDeadband(joystickX, DEADBAND);
+          joystickY = MathUtil.applyDeadband(joystickY, DEADBAND);
 
-                        double omega = angleController.calculate(
-                                drive.getRotation().getRadians(), desiredTheta);
+          Pose2d currentPose = drive.getPose();
+          double currentX = currentPose.getX();
+          double currentY = currentPose.getY();
 
-                        if (!(omegaController == 0)) {
-                            omega = omegaController * drive.getMaxAngularSpeedRadPerSec();
-                        }
+          double targetVectorX = targetX - currentX;
+          double targetVectorY = targetY - currentY;
 
-                        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                                blendedX * drive.getMaxLinearSpeedMetersPerSec(),
-                                blendedY * drive.getMaxLinearSpeedMetersPerSec(),
-                                omega,
-                                isFlipped
-                                        ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                                        : drive.getRotation());
-                        drive.runVelocity(speeds);
-                    },
-                    drive);
-            }
+          double targetMagnitude = Math.hypot(targetVectorX, targetVectorY);
+          if (targetMagnitude > 0.01) {
+            targetVectorX /= targetMagnitude;
+            targetVectorY /= targetMagnitude;
+          }
+
+          double blendedX = (1 - targetWeight) * joystickX + targetWeight * targetVectorX;
+          double blendedY = (1 - targetWeight) * joystickY + targetWeight * targetVectorY;
+
+          double blendedMagnitude = Math.hypot(blendedX, blendedY);
+          if (blendedMagnitude > 1.0) {
+            blendedX /= blendedMagnitude;
+            blendedY /= blendedMagnitude;
+          }
+
+          boolean isFlipped =
+              DriverStation.getAlliance().isPresent()
+                  && DriverStation.getAlliance().get() == Alliance.Blue;
+
+          if (joystickX == 0.0 && joystickY == 0.0) {
+            blendedX = 0;
+            blendedY = 0;
+          }
+
+          double desiredTheta =
+              Math.PI + (Math.atan2(targetY - currentPose.getY(), targetX - currentPose.getX()));
+
+          double omegaController = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+
+          omegaController = Math.copySign(omegaController * omegaController, omegaController);
+
+          double omega = angleController.calculate(drive.getRotation().getRadians(), desiredTheta);
+
+          if (!(omegaController == 0)) {
+            omega = omegaController * drive.getMaxAngularSpeedRadPerSec();
+          }
+
+          ChassisSpeeds speeds =
+              ChassisSpeeds.fromFieldRelativeSpeeds(
+                  blendedX * drive.getMaxLinearSpeedMetersPerSec(),
+                  blendedY * drive.getMaxLinearSpeedMetersPerSec(),
+                  omega,
+                  isFlipped
+                      ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                      : drive.getRotation());
+          drive.runVelocity(speeds);
+        },
+        drive);
+  }
 }

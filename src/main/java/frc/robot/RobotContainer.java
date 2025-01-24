@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -29,8 +30,6 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -53,7 +52,7 @@ public class RobotContainer {
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
 
-    // Dashboard inputs
+  // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
   private final LoggedDashboardChooser<Command> autoReefTest;
 
@@ -72,95 +71,108 @@ public class RobotContainer {
                 new ModuleIOSparkTalon(3));
         leds = new Led(new LedIOReal());
         break;
-            case SIM:
-                // Sim robot, instantiate physics sim IO implementations
+      case SIM:
+        // Sim robot, instantiate physics sim IO implementations
 
-                driveSimulation = new SwerveDriveSimulation(Drive.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
-                SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
-                drive = new Drive(
-                        new GyroIOSim(driveSimulation.getGyroSimulation()),
-                        new ModuleIOTalonFXSim(
-                                TunerConstants.FrontLeftSIM, driveSimulation.getModules()[0]),
-                        new ModuleIOTalonFXSim(
-                                TunerConstants.FrontRightSIM, driveSimulation.getModules()[1]),
-                        new ModuleIOTalonFXSim(
-                                TunerConstants.BackLeftSIM, driveSimulation.getModules()[2]),
-                        new ModuleIOTalonFXSim(
-                                TunerConstants.BackRightSIM, driveSimulation.getModules()[3]));
-                leds = new Led(new LedIOSim());
-                break;
+        driveSimulation =
+            new SwerveDriveSimulation(Drive.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
+        SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
+        drive =
+            new Drive(
+                new GyroIOSim(driveSimulation.getGyroSimulation()),
+                new ModuleIOTalonFXSim(
+                    TunerConstants.FrontLeftSIM, driveSimulation.getModules()[0]),
+                new ModuleIOTalonFXSim(
+                    TunerConstants.FrontRightSIM, driveSimulation.getModules()[1]),
+                new ModuleIOTalonFXSim(TunerConstants.BackLeftSIM, driveSimulation.getModules()[2]),
+                new ModuleIOTalonFXSim(
+                    TunerConstants.BackRightSIM, driveSimulation.getModules()[3]));
+        leds = new Led(new LedIOSim());
+        break;
 
-            default:
-                // Replayed robot, disable IO implementations
-                drive = new Drive(
-                        new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {});
-                leds = new Led(new LedIO() {});
-                break;
-        }
+      default:
+        // Replayed robot, disable IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {});
+        leds = new Led(new LedIO() {});
+        break;
+    }
 
-        // Set up auto routines
-        autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-        autoReefTest = new LoggedDashboardChooser<>("Auto Reef Choices", AutoBuilder.buildAutoChooser());
+    // Set up auto routines
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    autoReefTest =
+        new LoggedDashboardChooser<>("Auto Reef Choices", AutoBuilder.buildAutoChooser());
 
-        // Set up SysId routines
-        autoChooser.addOption("Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-        autoChooser.addOption(
-                "Drive SysId (Quasistatic Forward)", drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-        autoChooser.addOption(
-                "Drive SysId (Quasistatic Reverse)", drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-        autoChooser.addOption("Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-        autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-        autoChooser.addOption("Align to 5 X, 5 Y", new AlignTo(drive, 5, 5, 5));
-        autoChooser.addOption("Align to Tag 7", new AlignTo(drive, 7, 5));
-        autoChooser.addOption("Drive to 5 X, 5 Y", new DriveTo(5, 5, 90, 15));
-        autoChooser.addOption("AutoChoreo", new ChoreoAuto("FirstAuto", 20));
+    // Set up SysId routines
+    autoChooser.addOption(
+        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Forward)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Reverse)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption("Align to 5 X, 5 Y", new AlignTo(drive, 5, 5, 5));
+    autoChooser.addOption("Align to Tag 7", new AlignTo(drive, 7, 5));
+    autoChooser.addOption("Drive to 5 X, 5 Y", new DriveTo(5, 5, 90, 15));
+    autoChooser.addOption("AutoChoreo", new ChoreoAuto("FirstAuto", 20));
 
-        autoReefTest.addDefaultOption("None", Commands.none());
-        autoReefTest.addOption("A1 Blue", new DriveTo(ReefPoses.A1_BLUE, 20));
-        autoReefTest.addOption("B1 Blue", new DriveTo(ReefPoses.B1_BLUE, 20));
+    autoReefTest.addDefaultOption("None", Commands.none());
+    autoReefTest.addOption("A1 Blue", new DriveTo(ReefPoses.A1_BLUE, 20));
+    autoReefTest.addOption("B1 Blue", new DriveTo(ReefPoses.B1_BLUE, 20));
 
-        autoReefTest.addOption("A2 Blue", new DriveTo(ReefPoses.A2_BLUE, 20));
-        autoReefTest.addOption("B2 Blue", new DriveTo(ReefPoses.B2_BLUE, 20));
+    autoReefTest.addOption("A2 Blue", new DriveTo(ReefPoses.A2_BLUE, 20));
+    autoReefTest.addOption("B2 Blue", new DriveTo(ReefPoses.B2_BLUE, 20));
 
-        autoReefTest.addOption("A3 Blue", new DriveTo(ReefPoses.A3_BLUE, 20));
-        autoReefTest.addOption("B3 Blue", new DriveTo(ReefPoses.B3_BLUE, 20));
+    autoReefTest.addOption("A3 Blue", new DriveTo(ReefPoses.A3_BLUE, 20));
+    autoReefTest.addOption("B3 Blue", new DriveTo(ReefPoses.B3_BLUE, 20));
 
-        autoReefTest.addOption("A4 Blue", new DriveTo(ReefPoses.A4_BLUE, 20));
-        autoReefTest.addOption("B4 Blue", new DriveTo(ReefPoses.B4_BLUE, 20));
+    autoReefTest.addOption("A4 Blue", new DriveTo(ReefPoses.A4_BLUE, 20));
+    autoReefTest.addOption("B4 Blue", new DriveTo(ReefPoses.B4_BLUE, 20));
 
-        autoReefTest.addOption("A5 Blue", new DriveTo(ReefPoses.A5_BLUE, 20));
-        autoReefTest.addOption("B5 Blue", new DriveTo(ReefPoses.B5_BLUE, 20));
+    autoReefTest.addOption("A5 Blue", new DriveTo(ReefPoses.A5_BLUE, 20));
+    autoReefTest.addOption("B5 Blue", new DriveTo(ReefPoses.B5_BLUE, 20));
 
-        autoReefTest.addOption("A6 Blue", new DriveTo(ReefPoses.A6_BLUE, 20));
-        autoReefTest.addOption("B6 Blue", new DriveTo(ReefPoses.B6_BLUE, 20));
+    autoReefTest.addOption("A6 Blue", new DriveTo(ReefPoses.A6_BLUE, 20));
+    autoReefTest.addOption("B6 Blue", new DriveTo(ReefPoses.B6_BLUE, 20));
 
-        autoReefTest.addOption("A1 Red", new DriveTo(ReefPoses.A1_RED, 20));
-        autoReefTest.addOption("B1 Red", new DriveTo(ReefPoses.B1_RED, 20));
+    autoReefTest.addOption("A1 Red", new DriveTo(ReefPoses.A1_RED, 20));
+    autoReefTest.addOption("B1 Red", new DriveTo(ReefPoses.B1_RED, 20));
 
-        autoReefTest.addOption("A2 Red", new DriveTo(ReefPoses.A2_RED, 20));
-        autoReefTest.addOption("B2 Red", new DriveTo(ReefPoses.B2_RED, 20));
+    autoReefTest.addOption("A2 Red", new DriveTo(ReefPoses.A2_RED, 20));
+    autoReefTest.addOption("B2 Red", new DriveTo(ReefPoses.B2_RED, 20));
 
-        autoReefTest.addOption("A3 Red", new DriveTo(ReefPoses.A3_RED, 20));
-        autoReefTest.addOption("B3 Red", new DriveTo(ReefPoses.B3_RED, 20));
+    autoReefTest.addOption("A3 Red", new DriveTo(ReefPoses.A3_RED, 20));
+    autoReefTest.addOption("B3 Red", new DriveTo(ReefPoses.B3_RED, 20));
 
-        autoReefTest.addOption("A4 Red", new DriveTo(ReefPoses.A4_RED, 20));
-        autoReefTest.addOption("B4 Red", new DriveTo(ReefPoses.B4_RED, 20));
+    autoReefTest.addOption("A4 Red", new DriveTo(ReefPoses.A4_RED, 20));
+    autoReefTest.addOption("B4 Red", new DriveTo(ReefPoses.B4_RED, 20));
 
-        autoReefTest.addOption("A5 Red", new DriveTo(ReefPoses.A5_RED, 20));
-        autoReefTest.addOption("B5 Red", new DriveTo(ReefPoses.B5_RED, 20));
+    autoReefTest.addOption("A5 Red", new DriveTo(ReefPoses.A5_RED, 20));
+    autoReefTest.addOption("B5 Red", new DriveTo(ReefPoses.B5_RED, 20));
 
-        autoReefTest.addOption("A6 Red", new DriveTo(ReefPoses.A6_RED, 20));
-        autoReefTest.addOption("B6 Red", new DriveTo(ReefPoses.B6_RED, 20));
+    autoReefTest.addOption("A6 Red", new DriveTo(ReefPoses.A6_RED, 20));
+    autoReefTest.addOption("B6 Red", new DriveTo(ReefPoses.B6_RED, 20));
 
-        ledCommands = new Command[] {
-            new LedRed(leds),
-            new LedGreen(leds),
-            new LedBlue(leds),
-            new LedOff(leds),
-            new LedWhite(leds),
-            new LedYellow(leds),
-            new LedCian(leds),
-            new LedRainbow(leds)
+    ledCommands =
+        new Command[] {
+          new LedRed(leds),
+          new LedGreen(leds),
+          new LedBlue(leds),
+          new LedOff(leds),
+          new LedWhite(leds),
+          new LedYellow(leds),
+          new LedCian(leds),
+          new LedRainbow(leds)
         };
     // Configure the button bindings
     configureButtonBindings();
@@ -188,7 +200,7 @@ public class RobotContainer {
                 drive.setPose(
                     new Pose2d(drive.getPose().getTranslation(), new Rotation2d())); // zero gyro
 
-        // Default command, normal field-relative drive
+    // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
@@ -210,50 +222,89 @@ public class RobotContainer {
     controller.povRight().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
     // Default command, normal field-relative drive
-    drive.setDefaultCommand(DriveCommands.joystickDrive(
-            drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
-    
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
+            () -> -controller.getRightX()));
+
     controller.a().whileTrue(drive.getDefaultCommand());
 
     new Trigger(() -> currentState == RobotState.ON_BLUE_LEFT_STATION)
-    .whileTrue(DriveCommands.joystickDriveAimAtPoint(
-    drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), CoralStationPoses.LEFT_BLUE));
-    
+        .whileTrue(
+            DriveCommands.joystickDriveAimAtPoint(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> -controller.getRightX(),
+                CoralStationPoses.LEFT_BLUE));
+
     new Trigger(() -> currentState == RobotState.ON_BLUE_RIGHT_STATION)
-    .whileTrue(DriveCommands.joystickDriveAimAtPoint(
-    drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), CoralStationPoses.RIGHT_BLUE));
-    
+        .whileTrue(
+            DriveCommands.joystickDriveAimAtPoint(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> -controller.getRightX(),
+                CoralStationPoses.RIGHT_BLUE));
+
     new Trigger(() -> currentState == RobotState.ON_RED_LEFT_STATION)
-    .whileTrue(DriveCommands.joystickDriveTowardsAimAtPoint(
-            drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), 18.2, -1));
-    
+        .whileTrue(
+            DriveCommands.joystickDriveTowardsAimAtPoint(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> -controller.getRightX(),
+                18.2,
+                -1));
+
     new Trigger(() -> currentState == RobotState.ON_RED_RIGHT_STATION)
-    .whileTrue(DriveCommands.joystickDriveAimAtPoint(
-    drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), CoralStationPoses.RIGHT_RED));
-    
+        .whileTrue(
+            DriveCommands.joystickDriveAimAtPoint(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> -controller.getRightX(),
+                CoralStationPoses.RIGHT_RED));
+
     new Trigger(() -> currentState == RobotState.ON_BLUE_PROCESSOR)
-    .whileTrue(DriveCommands.joystickDriveAimAtPoint(
-    drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), ProcessorPoses.BLUE));
+        .whileTrue(
+            DriveCommands.joystickDriveAimAtPoint(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> -controller.getRightX(),
+                ProcessorPoses.BLUE));
 
     new Trigger(() -> currentState == RobotState.ON_RED_PROCESSOR)
-    .whileTrue(DriveCommands.joystickDriveAimAtPoint(
-    drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX(), ProcessorPoses.RED));
-                              
+        .whileTrue(
+            DriveCommands.joystickDriveAimAtPoint(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> -controller.getRightX(),
+                ProcessorPoses.RED));
+
     if (autoReefTest != null) {
-        controller.b().onTrue(new InstantCommand(() -> autoReefTest.get().schedule()));
+      controller.b().onTrue(new InstantCommand(() -> autoReefTest.get().schedule()));
     }
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    controller.leftStick().onTrue(Commands.runOnce(() -> {
-        // Alterna o comando atual para o próximo na lista
-        currentLedState = (currentLedState + 1) % ledCommands.length;
-        Command nextCommand = ledCommands[currentLedState];
+    controller
+        .leftStick()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  // Alterna o comando atual para o próximo na lista
+                  currentLedState = (currentLedState + 1) % ledCommands.length;
+                  Command nextCommand = ledCommands[currentLedState];
 
-        // Executa o próximo comando
-        nextCommand.schedule();
-    }));
+                  // Executa o próximo comando
+                  nextCommand.schedule();
+                }));
   }
 
   public void resetSimulationField() {
@@ -263,79 +314,81 @@ public class RobotContainer {
     SimulatedArena.getInstance().resetFieldForAuto();
   }
 
-    public void displaySimFieldToAdvantageScope() {
-        if (Constants.currentMode != Constants.Mode.SIM) return;
+  public void displaySimFieldToAdvantageScope() {
+    if (Constants.currentMode != Constants.Mode.SIM) return;
 
-        Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
-        Logger.recordOutput(
-                "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-        Logger.recordOutput("FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+    Logger.recordOutput(
+        "FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
+    Logger.recordOutput(
+        "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+    Logger.recordOutput(
+        "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+  }
+
+  // State Machine Configurations
+  public void updateState() {
+    switch (currentState) {
+      case NOT_ZONE:
+        new Trigger(() -> drive.getCurrentZone() == Zones.BLUE_LEFT_STATION)
+            .onTrue(new InstantCommand(() -> currentState = RobotState.ON_BLUE_LEFT_STATION));
+        new Trigger(() -> drive.getCurrentZone() == Zones.BLUE_RIGHT_STATION)
+            .onTrue(new InstantCommand(() -> currentState = RobotState.ON_BLUE_RIGHT_STATION));
+        new Trigger(() -> drive.getCurrentZone() == Zones.RED_LEFT_STATION)
+            .onTrue(new InstantCommand(() -> currentState = RobotState.ON_RED_LEFT_STATION));
+        new Trigger(() -> drive.getCurrentZone() == Zones.RED_RIGHT_STATION)
+            .onTrue(new InstantCommand(() -> currentState = RobotState.ON_RED_RIGHT_STATION));
+        new Trigger(() -> drive.getCurrentZone() == Zones.BLUE_PROCESSOR)
+            .onTrue(new InstantCommand(() -> currentState = RobotState.ON_BLUE_PROCESSOR));
+        new Trigger(() -> drive.getCurrentZone() == Zones.RED_PROCESSOR)
+            .onTrue(new InstantCommand(() -> currentState = RobotState.ON_RED_PROCESSOR));
+        break;
+
+      case ON_BLUE_LEFT_STATION:
+        new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
+            .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
+        break;
+      case ON_BLUE_RIGHT_STATION:
+        new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
+            .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
+        break;
+      case ON_RED_LEFT_STATION:
+        new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
+            .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
+        break;
+      case ON_RED_RIGHT_STATION:
+        new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
+            .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
+        break;
+      case ON_BLUE_PROCESSOR:
+        new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
+            .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
+        break;
+      case ON_RED_PROCESSOR:
+        new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
+            .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
+        break;
+
+      default:
+        throw new IllegalStateException("Estado desconhecido: " + currentState);
     }
+  }
 
-    //State Machine Configurations
-    public void updateState() {
-        switch (currentState) {
-            case NOT_ZONE:
-                new Trigger(() -> drive.getCurrentZone() == Zones.BLUE_LEFT_STATION)
-                    .onTrue(new InstantCommand(() -> currentState = RobotState.ON_BLUE_LEFT_STATION));
-                new Trigger(() -> drive.getCurrentZone() == Zones.BLUE_RIGHT_STATION)
-                    .onTrue(new InstantCommand(() -> currentState = RobotState.ON_BLUE_RIGHT_STATION));
-                new Trigger(() -> drive.getCurrentZone() == Zones.RED_LEFT_STATION)
-                    .onTrue(new InstantCommand(() -> currentState = RobotState.ON_RED_LEFT_STATION));
-                new Trigger(() -> drive.getCurrentZone() == Zones.RED_RIGHT_STATION)
-                    .onTrue(new InstantCommand(() -> currentState = RobotState.ON_RED_RIGHT_STATION));
-                new Trigger(() -> drive.getCurrentZone() == Zones.BLUE_PROCESSOR)
-                    .onTrue(new InstantCommand(() -> currentState = RobotState.ON_BLUE_PROCESSOR));
-                new Trigger(() -> drive.getCurrentZone() == Zones.RED_PROCESSOR)
-                    .onTrue(new InstantCommand(() -> currentState = RobotState.ON_RED_PROCESSOR));
-            break;
+  @AutoLogOutput(key = "StateMachine/CurrentState")
+  public RobotState getCurrentState() {
+    return currentState;
+  }
 
-            case ON_BLUE_LEFT_STATION:
-                new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
-                    .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
-            break;
-            case ON_BLUE_RIGHT_STATION:
-                new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
-                    .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
-            break;
-            case ON_RED_LEFT_STATION:
-                new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
-                    .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
-            break;
-            case ON_RED_RIGHT_STATION:
-                new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
-                    .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
-            break;
-            case ON_BLUE_PROCESSOR:
-                new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
-                    .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
-            break;
-            case ON_RED_PROCESSOR:
-                new Trigger(() -> drive.getCurrentZone() == Zones.NOT_ZONE)
-                    .onTrue(new InstantCommand(() -> currentState = RobotState.NOT_ZONE));
-            break;
+  public void performAction() {
+    /*switch (currentState) {
+    }*/
+  }
 
-            default:
-                throw new IllegalStateException("Estado desconhecido: " + currentState);
-        }
-    }
-
-    @AutoLogOutput(key = "StateMachine/CurrentState")
-    public RobotState getCurrentState() {
-        return currentState;
-    }
-
-    public void performAction() {
-        /*switch (currentState) {
-        }*/
-    }
-
-       /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
-    public Command getAutonomousCommand() {
-        return autoReefTest.get();
-    }
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  public Command getAutonomousCommand() {
+    return autoReefTest.get();
+  }
 }

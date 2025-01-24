@@ -56,7 +56,6 @@ import frc.robot.util.Circle2d;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
@@ -125,14 +124,14 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Rotation2d rawGyroRotation = new Rotation2d();
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
-          new SwerveModulePosition[] {
-              new SwerveModulePosition(),
-              new SwerveModulePosition(),
-              new SwerveModulePosition(),
-              new SwerveModulePosition()
-          };
+      new SwerveModulePosition[] {
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition()
+      };
   private SwerveDrivePoseEstimator poseEstimator =
-          new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());  
+      new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
   public Drive(
       GyroIO gyroIO,
@@ -184,7 +183,6 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
-
   }
 
   @Override
@@ -320,97 +318,99 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     };
   }
 
-    /**
-     * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will return to their
-     * normal orientations the next time a nonzero velocity is requested.
-     */
-    public void stopWithX() {
-        Rotation2d[] headings = new Rotation2d[4];
-        for (int i = 0; i < 4; i++) {
-            headings[i] = getModuleTranslations()[i].getAngle();
-        }
-        kinematics.resetHeadings(headings);
-        stop();
+  /**
+   * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will
+   * return to their normal orientations the next time a nonzero velocity is requested.
+   */
+  public void stopWithX() {
+    Rotation2d[] headings = new Rotation2d[4];
+    for (int i = 0; i < 4; i++) {
+      headings[i] = getModuleTranslations()[i].getAngle();
+    }
+    kinematics.resetHeadings(headings);
+    stop();
+  }
+
+  /** Returns a command to run a quasistatic test in the specified direction. */
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return run(() -> runCharacterization(0.0))
+        .withTimeout(1.0)
+        .andThen(sysId.quasistatic(direction));
+  }
+
+  /** Returns a command to run a dynamic test in the specified direction. */
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return run(() -> runCharacterization(0.0)).withTimeout(1.0).andThen(sysId.dynamic(direction));
+  }
+
+  /** Returns the module states (turn angles and drive velocities) for all of the modules. */
+  @AutoLogOutput(key = "SwerveStates/Measured")
+  private SwerveModuleState[] getModuleStates() {
+    SwerveModuleState[] states = new SwerveModuleState[4];
+    for (int i = 0; i < 4; i++) {
+      states[i] = modules[i].getState();
+    }
+    return states;
+  }
+
+  /** Returns the module positions (turn angles and drive positions) for all of the modules. */
+  private SwerveModulePosition[] getModulePositions() {
+    SwerveModulePosition[] states = new SwerveModulePosition[4];
+    for (int i = 0; i < 4; i++) {
+      states[i] = modules[i].getPosition();
+    }
+    return states;
+  }
+
+  /** Returns the measured chassis speeds of the robot. */
+  @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
+  private ChassisSpeeds getChassisSpeeds() {
+    return kinematics.toChassisSpeeds(getModuleStates());
+  }
+
+  /** Returns the position of each module in radians. */
+  public double[] getWheelRadiusCharacterizationPositions() {
+    double[] values = new double[4];
+    for (int i = 0; i < 4; i++) {
+      values[i] = modules[i].getWheelRadiusCharacterizationPosition();
+    }
+    return values;
+  }
+
+  /** Returns the average velocity of the modules in rotations/sec (Phoenix native units). */
+  public double getFFCharacterizationVelocity() {
+    double output = 0.0;
+    for (int i = 0; i < 4; i++) {
+      output += modules[i].getFFCharacterizationVelocity() / 4.0;
+    }
+    return output;
+  }
+
+  /** Returns the current odometry pose. */
+  @AutoLogOutput(key = "Odometry/Robot")
+  public Pose2d getPose() {
+    return poseEstimator.getEstimatedPosition();
+  }
+
+  /** Returns the current odometry rotation. */
+  public Rotation2d getRotation() {
+    return getPose().getRotation();
+  }
+
+  /** Returns the current odometry field zone. */
+  @AutoLogOutput(key = "Odometry/Current Field Zone")
+  public Zones getCurrentZone() {
+    Translation2d robotPosition = getPose().getTranslation();
+
+    for (Circle2d circle : ZoneLocates.zones) {
+      Translation2d center = circle.getCenter();
+      double distance = robotPosition.getDistance(center);
+
+      if (distance <= circle.getRadius()) {
+        return circle.getZone();
+      }
     }
 
-    /** Returns a command to run a quasistatic test in the specified direction. */
-    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-        return run(() -> runCharacterization(0.0)).withTimeout(1.0).andThen(sysId.quasistatic(direction));
-    }
-
-    /** Returns a command to run a dynamic test in the specified direction. */
-    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-        return run(() -> runCharacterization(0.0)).withTimeout(1.0).andThen(sysId.dynamic(direction));
-    }
-
-    /** Returns the module states (turn angles and drive velocities) for all of the modules. */
-    @AutoLogOutput(key = "SwerveStates/Measured")
-    private SwerveModuleState[] getModuleStates() {
-        SwerveModuleState[] states = new SwerveModuleState[4];
-        for (int i = 0; i < 4; i++) {
-            states[i] = modules[i].getState();
-        }
-        return states;
-    }
-
-    /** Returns the module positions (turn angles and drive positions) for all of the modules. */
-    private SwerveModulePosition[] getModulePositions() {
-        SwerveModulePosition[] states = new SwerveModulePosition[4];
-        for (int i = 0; i < 4; i++) {
-            states[i] = modules[i].getPosition();
-        }
-        return states;
-    }
-
-    /** Returns the measured chassis speeds of the robot. */
-    @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
-    private ChassisSpeeds getChassisSpeeds() {
-        return kinematics.toChassisSpeeds(getModuleStates());
-    }
-
-    /** Returns the position of each module in radians. */
-    public double[] getWheelRadiusCharacterizationPositions() {
-        double[] values = new double[4];
-        for (int i = 0; i < 4; i++) {
-            values[i] = modules[i].getWheelRadiusCharacterizationPosition();
-        }
-        return values;
-    }
-
-    /** Returns the average velocity of the modules in rotations/sec (Phoenix native units). */
-    public double getFFCharacterizationVelocity() {
-        double output = 0.0;
-        for (int i = 0; i < 4; i++) {
-            output += modules[i].getFFCharacterizationVelocity() / 4.0;
-        }
-        return output;
-    }
-
-    /** Returns the current odometry pose. */
-    @AutoLogOutput(key = "Odometry/Robot")
-    public Pose2d getPose() {
-        return poseEstimator.getEstimatedPosition();
-    }
-
-    /** Returns the current odometry rotation. */
-    public Rotation2d getRotation() {
-        return getPose().getRotation();
-    }
-
-    /** Returns the current odometry field zone. */
-    @AutoLogOutput(key = "Odometry/Current Field Zone")
-    public Zones getCurrentZone() {
-        Translation2d robotPosition = getPose().getTranslation();
-    
-        for (Circle2d circle : ZoneLocates.zones) {
-            Translation2d center = circle.getCenter();
-            double distance = robotPosition.getDistance(center);
-    
-            if (distance <= circle.getRadius()) {
-                return circle.getZone();
-            }
-        }
-    
-        return Zones.NOT_ZONE;
-    }
+    return Zones.NOT_ZONE;
+  }
 }

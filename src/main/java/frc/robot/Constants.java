@@ -30,22 +30,21 @@ public final class Constants {
 
     /** Running a physics simulator. */
     SIM,
-    
+
     /** Replaying from a log file. */
     REPLAY
   }
 
   // State Machine
   public static enum RobotState {
-      NOT_ZONE,
-      ON_BLUE_LEFT_STATION,
-      ON_BLUE_RIGHT_STATION,
-      ON_RED_LEFT_STATION,
-      ON_RED_RIGHT_STATION,
-      ON_BLUE_PROCESSOR,
-      ON_RED_PROCESSOR,
+    NOT_ZONE,
+    ON_BLUE_LEFT_STATION,
+    ON_BLUE_RIGHT_STATION,
+    ON_RED_LEFT_STATION,
+    ON_RED_RIGHT_STATION,
+    ON_BLUE_PROCESSOR,
+    ON_RED_PROCESSOR,
   }
-
 
   public static enum RobotIdleMode {
     COAST,
