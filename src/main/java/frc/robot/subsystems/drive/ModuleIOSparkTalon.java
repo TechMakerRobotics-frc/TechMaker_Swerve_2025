@@ -15,15 +15,12 @@ package frc.robot.subsystems.drive;
 
 import static frc.robot.subsystems.drive.DriveConstants.ModuleConstants.*;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.generated.TunerConstants;
@@ -31,6 +28,8 @@ import frc.robot.interfaces.Motor.MotorIO;
 import frc.robot.interfaces.Motor.MotorIO.MotorIOInputs;
 import frc.robot.interfaces.Motor.MotorIOSparkMax;
 import frc.robot.interfaces.Motor.MotorIOTalonFX;
+import java.util.Queue;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Module IO implementation for Spark Flex drive motor controller, Spark Max turn motor controller,
@@ -43,6 +42,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
   private CANcoder cancoder;
   private double offset;
   private Rotation2d zeroRotation = Rotation2d.fromDegrees(0.0);
+  private final Queue<Double> timestampQueue;
 
   public ModuleIOSparkTalon(int module) {
     switch (module) {
@@ -125,6 +125,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
         offset = 0.0;
         break;
     }
+    timestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
     zeroRotation = Rotation2d.fromRotations(offset);
     cancoder.getConfigurator().apply(new CANcoderConfiguration());
     turnIO.setOffset(cancoder.getAbsolutePosition().getValueAsDouble() - offset);
@@ -148,6 +149,21 @@ public class ModuleIOSparkTalon implements ModuleIO {
     inputs.driveCurrentAmps = motorIOInputs.currentAmps[0];
     inputs.drivePositionRad = Units.rotationsToRadians(motorIOInputs.positionRot);
     inputs.driveVelocityRadPerSec = motorIOInputs.velocityRadPerSec;
+
+    inputs.odometryTimestamps =
+        timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
+
+    inputs.odometryDrivePositionsRad =
+        driveIO.getMotorQueue().stream().mapToDouble((Double value) -> value).toArray();
+
+    inputs.odometryTurnPositions =
+        turnIO.getMotorQueue().stream()
+            .map((Double value) -> new Rotation2d(value).minus(zeroRotation))
+            .toArray(Rotation2d[]::new);
+
+    timestampQueue.clear();
+    driveIO.clearQueue();
+    turnIO.clearQueue();
   }
 
   @Override

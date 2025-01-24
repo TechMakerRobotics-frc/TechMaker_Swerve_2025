@@ -13,6 +13,8 @@ import com.revrobotics.spark.config.LimitSwitchConfig.Type;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.util.Units;
+import frc.robot.subsystems.drive.SparkOdometryThread;
+import java.util.Queue;
 
 public class MotorIOSparkMax implements MotorIO {
 
@@ -20,6 +22,7 @@ public class MotorIOSparkMax implements MotorIO {
   private final RelativeEncoder encoder;
   private SparkMaxConfig motorConfig = new SparkMaxConfig();
   private SparkClosedLoopController closedLoopController;
+  private final Queue<Double> motorQueue;
 
   public MotorIOSparkMax(
       int id,
@@ -75,6 +78,8 @@ public class MotorIOSparkMax implements MotorIO {
 
     motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     closedLoopController = motor.getClosedLoopController();
+
+    motorQueue = SparkOdometryThread.getInstance().registerSignal(motor, encoder::getPosition);
   }
 
   /**
@@ -86,6 +91,16 @@ public class MotorIOSparkMax implements MotorIO {
     inputs.velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
     inputs.appliedVolts = motor.getAppliedOutput() * motor.getBusVoltage();
     inputs.currentAmps = new double[] {motor.getOutputCurrent()};
+  }
+
+  @Override
+  public Queue<Double> getMotorQueue() {
+    return motorQueue;
+  }
+
+  @Override
+  public void clearQueue() {
+    motorQueue.clear();
   }
 
   @Override

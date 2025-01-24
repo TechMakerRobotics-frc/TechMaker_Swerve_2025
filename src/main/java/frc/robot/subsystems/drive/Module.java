@@ -82,9 +82,8 @@ public class Module {
 
   private double normalizeAngle(double targetRotations, double currentRotations) {
     double error = targetRotations - currentRotations;
-    return currentRotations + MathUtil.inputModulus(error, -0.5, 0.5); 
-}
-
+    return currentRotations + MathUtil.inputModulus(error, -0.5, 0.5);
+  }
 
   /** Runs the module with the specified output while controlling to zero degrees. */
   public void runCharacterization(double output) {

@@ -21,6 +21,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.subsystems.drive.PhoenixOdometryThread;
+import java.util.Queue;
 
 public class MotorIOTalonFX implements MotorIO {
 
@@ -36,11 +38,13 @@ public class MotorIOTalonFX implements MotorIO {
   protected final VelocityTorqueCurrentFOC velocityTorqueCurrentRequest =
       new VelocityTorqueCurrentFOC(0.0);
 
-  // Inputs from drive motor
+  // Inputs from motor
   protected StatusSignal<Angle> motorPosition;
   protected StatusSignal<AngularVelocity> motorVelocity;
   protected StatusSignal<Voltage> motorAppliedVolts;
   protected StatusSignal<Current> motorCurrent;
+
+  private final Queue<Double> motorQueue;
 
   private ClosedLoopOutputType motorClosedLoopOutput;
 
@@ -73,6 +77,7 @@ public class MotorIOTalonFX implements MotorIO {
     motorCurrent = motor.getStatorCurrent();
     BaseStatusSignal.setUpdateFrequencyForAll(100.0, motorPosition);
     BaseStatusSignal.setUpdateFrequencyForAll(50.0, motorVelocity, motorAppliedVolts, motorCurrent);
+    motorQueue = PhoenixOdometryThread.getInstance().registerSignal(motor.getPosition());
   }
 
   /**
@@ -89,6 +94,16 @@ public class MotorIOTalonFX implements MotorIO {
   }
 
   @Override
+  public Queue<Double> getMotorQueue() {
+    return motorQueue;
+  }
+
+  @Override
+  public void clearQueue() {
+    motorQueue.clear();
+  }
+
+  @Override
   public void set(double power) {
     motor.set(power);
   }
@@ -102,7 +117,7 @@ public class MotorIOTalonFX implements MotorIO {
   public void setVelocity(double velocityRadPerSec) {
 
     double motorVelocityRotPerSec = Units.radiansToRotations(velocityRadPerSec);
-    ;
+
     motor.setControl(
         switch (motorClosedLoopOutput) {
           case Voltage -> velocityVoltageRequest.withVelocity(motorVelocityRotPerSec);

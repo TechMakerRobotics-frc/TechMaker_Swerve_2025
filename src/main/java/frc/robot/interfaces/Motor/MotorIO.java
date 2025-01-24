@@ -1,5 +1,8 @@
 package frc.robot.interfaces.Motor;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface MotorIO {
@@ -9,6 +12,9 @@ public interface MotorIO {
     public double velocityRadPerSec = 0.0;
     public double appliedVolts = 0.0;
     public double[] currentAmps = new double[] {};
+
+    public double[] odometryDrivePositionsRad = new double[] {};
+    public Rotation2d[] odometryTurnPositions = new Rotation2d[] {};
   }
 
   /** Updates the set of loggable inputs. */
@@ -43,9 +49,14 @@ public interface MotorIO {
   public default void resetOffset() {}
 
   public default MotorIOInputs getMotorIOInputs() {
-
     MotorIOInputs inputs = new MotorIOInputs();
     updateInputs(inputs);
     return inputs;
   }
+
+  public default Queue<Double> getMotorQueue() {
+    return new ArrayBlockingQueue<>(20);
+  }
+
+  public default void clearQueue() {}
 }

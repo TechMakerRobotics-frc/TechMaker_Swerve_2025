@@ -6,12 +6,12 @@ import frc.robot.subsystems.drive.Drive;
 
 public class RobotModeTo extends InstantCommand {
 
-  //private final Drive drive;
-  //private final RobotIdleMode mode;
+  // private final Drive drive;
+  // private final RobotIdleMode mode;
 
   public RobotModeTo(RobotIdleMode mode, Drive drive) {
-    //this.mode = mode;
-    //this.drive = drive;
+    // this.mode = mode;
+    // this.drive = drive;
   }
 
   @Override
