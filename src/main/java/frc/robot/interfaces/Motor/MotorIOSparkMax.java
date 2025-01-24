@@ -20,7 +20,6 @@ public class MotorIOSparkMax implements MotorIO {
   private final RelativeEncoder encoder;
   private SparkMaxConfig motorConfig = new SparkMaxConfig();
   private SparkClosedLoopController closedLoopController;
-  private double lastPosition = 0;
 
   public MotorIOSparkMax(
       int id,
