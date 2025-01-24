@@ -125,7 +125,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
         offset = 0.0;
         break;
     }
-    timestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
+    timestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
     zeroRotation = Rotation2d.fromRotations(offset);
     cancoder.getConfigurator().apply(new CANcoderConfiguration());
     turnIO.setOffset(cancoder.getAbsolutePosition().getValueAsDouble() - offset);
