@@ -5,7 +5,7 @@ import frc.robot.subsystems.leds.Leds;
 
 public class LedRGB extends InstantCommand {
 
-    public LedRGB(Leds leds, int r, int g, int b) {
-        super(() -> leds.setAllColorRGB(r, g, b), leds);
-    }
+  public LedRGB(Leds leds, int r, int g, int b) {
+    super(() -> leds.setAllColorRGB(r, g, b), leds);
+  }
 }

@@ -16,80 +16,85 @@ import frc.robot.util.GeomUtil;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class AlignTo extends Command {
-    private final Drive drive;
-    private final Pose2d targetPose;
-    private PIDController thetaController;
-    private final Timer time = new Timer();
-    private final double timeOut;
-    private LoggedNetworkNumber tP = new LoggedNetworkNumber("/Tuning/P", 1);
-    private LoggedNetworkNumber tI = new LoggedNetworkNumber("/Tuning/I", 0);
-    private LoggedNetworkNumber tD = new LoggedNetworkNumber("/Tuning/D", 0);
+  private final Drive drive;
+  private final Pose2d targetPose;
+  private PIDController thetaController;
+  private final Timer time = new Timer();
+  private final double timeOut;
+  private LoggedNetworkNumber tP = new LoggedNetworkNumber("/Tuning/P", 1);
+  private LoggedNetworkNumber tI = new LoggedNetworkNumber("/Tuning/I", 0);
+  private LoggedNetworkNumber tD = new LoggedNetworkNumber("/Tuning/D", 0);
 
-    public AlignTo(Drive drive, double x, double y, double timeOut) {
-        this.drive = drive;
-        this.targetPose = new Pose2d(x, y, new Rotation2d());
-        this.timeOut = timeOut;
-        addRequirements(drive);
-    }
+  public AlignTo(Drive drive, double x, double y, double timeOut) {
+    this.drive = drive;
+    this.targetPose = new Pose2d(x, y, new Rotation2d());
+    this.timeOut = timeOut;
+    addRequirements(drive);
+  }
 
-    public AlignTo(Drive drive, Pose2d pose, double timeOut) {
-        this.drive = drive;
-        this.targetPose = pose;
-        this.timeOut = timeOut;
-        addRequirements(drive);
-    }
+  public AlignTo(Drive drive, Pose2d pose, double timeOut) {
+    this.drive = drive;
+    this.targetPose = pose;
+    this.timeOut = timeOut;
+    addRequirements(drive);
+  }
 
-    public AlignTo(Drive drive, Translation2d translation, double timeOut) {
-        this.drive = drive;
-        this.targetPose = new Pose2d(translation, new Rotation2d());
-        this.timeOut = timeOut;
-        addRequirements(drive);
-    }
+  public AlignTo(Drive drive, Translation2d translation, double timeOut) {
+    this.drive = drive;
+    this.targetPose = new Pose2d(translation, new Rotation2d());
+    this.timeOut = timeOut;
+    addRequirements(drive);
+  }
 
-    public AlignTo(Drive drive, int tag, double timeOut) {
-        this.drive = drive;
-        AprilTagFieldLayout fTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
+  public AlignTo(Drive drive, int tag, double timeOut) {
+    this.drive = drive;
+    AprilTagFieldLayout fTagFieldLayout =
+        AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
 
-        this.targetPose = fTagFieldLayout.getTagPose(tag).get().toPose2d();
-        this.timeOut = timeOut;
-        addRequirements(drive);
-    }
+    this.targetPose = fTagFieldLayout.getTagPose(tag).get().toPose2d();
+    this.timeOut = timeOut;
+    addRequirements(drive);
+  }
 
-    @Override
-    public void initialize() {
-        thetaController = new PIDController(tP.get(), tI.get(), tD.get());
-        thetaController.reset();
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);
-        thetaController.setTolerance(0.05);
-        time.reset();
-        time.start();
-    }
+  @Override
+  public void initialize() {
+    thetaController = new PIDController(tP.get(), tI.get(), tD.get());
+    thetaController.reset();
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    thetaController.setTolerance(0.05);
+    time.reset();
+    time.start();
+  }
 
-    @Override
-    public void execute() {
-        Pose2d currentPose = drive.getPose();
-        Rotation2d currentRotation = currentPose.getRotation();
+  @Override
+  public void execute() {
+    Pose2d currentPose = drive.getPose();
+    Rotation2d currentRotation = currentPose.getRotation();
 
-        double rotationSpeed = thetaController.calculate(
-                currentRotation.getRadians(), GeomUtil.thetaToTarget(currentPose, targetPose));
+    double rotationSpeed =
+        thetaController.calculate(
+            currentRotation.getRadians(), GeomUtil.thetaToTarget(currentPose, targetPose));
 
-        ChassisSpeeds speeds = new ChassisSpeeds(0, 0, rotationSpeed);
+    ChassisSpeeds speeds = new ChassisSpeeds(0, 0, rotationSpeed);
 
-        boolean isFlipped = DriverStation.getAlliance().isPresent()
-                && DriverStation.getAlliance().get() == Alliance.Red;
-        speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, 
-                isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation());
+    boolean isFlipped =
+        DriverStation.getAlliance().isPresent()
+            && DriverStation.getAlliance().get() == Alliance.Red;
+    speeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            speeds,
+            isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation());
 
-        drive.runVelocity(speeds);
-    }
+    drive.runVelocity(speeds);
+  }
 
-    @Override
-    public void end(boolean interrupted) {
-        drive.stop();
-    }
+  @Override
+  public void end(boolean interrupted) {
+    drive.stop();
+  }
 
-    @Override
-    public boolean isFinished() {
-        return thetaController.atSetpoint() || time.hasElapsed(timeOut);
-    }
+  @Override
+  public boolean isFinished() {
+    return thetaController.atSetpoint() || time.hasElapsed(timeOut);
+  }
 }

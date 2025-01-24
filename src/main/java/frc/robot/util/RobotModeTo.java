@@ -6,23 +6,23 @@ import frc.robot.subsystems.drive.Drive;
 
 public class RobotModeTo extends InstantCommand {
 
-    private final Drive drive;
-    private final RobotIdleMode mode;
+  private final Drive drive;
+  private final RobotIdleMode mode;
 
-    public RobotModeTo(RobotIdleMode mode, Drive drive) {
-        this.mode = mode;
-        this.drive = drive;
-    }
+  public RobotModeTo(RobotIdleMode mode, Drive drive) {
+    this.mode = mode;
+    this.drive = drive;
+  }
 
-    @Override
-    public void initialize() {
-        /*switch (mode) {
-            case COAST:
-            drive.setBrakeMode(false);
-                break;
-            default:
-                drive.setBrakeMode(true);
-                break;
-        }*/
-    }
+  @Override
+  public void initialize() {
+    /*switch (mode) {
+        case COAST:
+        drive.setBrakeMode(false);
+            break;
+        default:
+            drive.setBrakeMode(true);
+            break;
+    }*/
+  }
 }

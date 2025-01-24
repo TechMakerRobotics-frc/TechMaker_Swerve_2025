@@ -1,7 +1,6 @@
 package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 
@@ -13,7 +12,7 @@ public final class DriveConstants {
     public static final double TURN_GEAR_RATIO = 150.0 / 7.0;
 
     public static final Slot0Configs DRIVE_GAINS =
-            new Slot0Configs().withKP(0.03).withKI(0).withKD(0).withKS(0).withKV(0.124);
+        new Slot0Configs().withKP(0.03).withKI(0).withKD(0).withKS(0).withKV(0.124);
 
     // Modules:
     // Front Left
@@ -21,18 +20,18 @@ public final class DriveConstants {
     public static final int SPARK_FL = 2;
     public static final int CANCODER_FL = 3;
     public static final double ENCODER_OFFSET_FL = (-0.3876953125);
-    
+
     // Front Right
     public static final int TALON_FR = 4;
     public static final int SPARK_FR = 5;
     public static final int CANCODER_FR = 6;
-    public static final double ENCODER_OFFSET_FR = (0.3359375	);
+    public static final double ENCODER_OFFSET_FR = (0.3359375);
 
     // Back Left
     public static final int TALON_BL = 7;
     public static final int SPARK_BL = 8;
     public static final int CANCODER_BL = 9;
-    public static final double ENCODER_OFFSET_BL = (0.3828125	);
+    public static final double ENCODER_OFFSET_BL = (0.3828125);
 
     // Back Right
     public static final int TALON_BR = 10;
@@ -63,7 +62,6 @@ public final class DriveConstants {
     public static final Rotation2d backLeftZeroRotation = new Rotation2d(ENCODER_OFFSET_BL);
     public static final Rotation2d backRightZeroRotation = new Rotation2d(ENCODER_OFFSET_BR);
 
-    
     // Turn motor configuration
     public static final boolean turnInverted = false;
     public static final int turnMotorCurrentLimit = 20;

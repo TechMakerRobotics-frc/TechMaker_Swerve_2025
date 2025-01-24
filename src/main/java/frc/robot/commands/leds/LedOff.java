@@ -5,7 +5,7 @@ import frc.robot.subsystems.leds.Leds;
 
 public class LedOff extends InstantCommand {
 
-    public LedOff(Leds leds) {
-        super(() -> leds.setAllColorRGB(0, 0, 0), leds);
-    }
+  public LedOff(Leds leds) {
+    super(() -> leds.setAllColorRGB(0, 0, 0), leds);
+  }
 }

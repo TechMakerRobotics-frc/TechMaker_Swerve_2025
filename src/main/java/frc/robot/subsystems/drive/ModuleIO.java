@@ -17,63 +17,52 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ModuleIO {
-    @AutoLog
-    public static class ModuleIOInputs {
-        public boolean driveConnected = false;
-        public double drivePositionRad = 0.0;
-        public double driveVelocityRadPerSec = 0.0;
-        public double driveAppliedVolts = 0.0;
-        public double driveCurrentAmps = 0.0;
+  @AutoLog
+  public static class ModuleIOInputs {
+    public boolean driveConnected = false;
+    public double drivePositionRad = 0.0;
+    public double driveVelocityRadPerSec = 0.0;
+    public double driveAppliedVolts = 0.0;
+    public double driveCurrentAmps = 0.0;
 
-        public boolean turnConnected = false;
-        public Rotation2d turnPosition = new Rotation2d();
-        public double turnVelocityRadPerSec = 0.0;
-        public double turnAppliedVolts = 0.0;
-        public double turnCurrentAmps = 0.0;
-        public double turnPositionRot = 0.0;
-        public double turnOffset = 0.0;
-        public double[] odometryTimestamps = new double[] {};
-        public double[] odometryDrivePositionsRad = new double[] {};
-        public Rotation2d[] odometryTurnPositions = new Rotation2d[] {};
-    }
+    public boolean turnConnected = false;
+    public Rotation2d turnPosition = new Rotation2d();
+    public double turnVelocityRadPerSec = 0.0;
+    public double turnAppliedVolts = 0.0;
+    public double turnCurrentAmps = 0.0;
+    public double turnPositionRot = 0.0;
+    public double turnOffset = 0.0;
+    public double[] odometryTimestamps = new double[] {};
+    public double[] odometryDrivePositionsRad = new double[] {};
+    public Rotation2d[] odometryTurnPositions = new Rotation2d[] {};
+  }
 
-    /** Updates the set of loggable inputs. */
-    public default void updateInputs(ModuleIOInputs inputs) {}
+  /** Updates the set of loggable inputs. */
+  public default void updateInputs(ModuleIOInputs inputs) {}
 
-    /** Run the drive motor at the specified open loop value. */
-    public default void setDriveOpenLoop(double output) {}
+  /** Run the drive motor at the specified open loop value. */
+  public default void runDriveOpenLoop(double output) {}
 
-    /** Run the turn motor at the specified open loop value. */
-    public default void setTurnOpenLoop(double output) {}
-    
-    /** Run open loop at the specified voltage. */
-    public default void setVoltage(double volts) {}
+  /** Run the turn motor at the specified open loop value. */
+  public default void runTurnOpenLoop(double output) {}
 
-    /** Run the drive motor at the specified velocity. */
-    public default void setDriveVelocity(double velocityRadPerSec) {}
+  /** Run the drive motor at the specified velocity. */
+  public default void runDriveVelocity(double velocityRadPerSec) {}
 
-    /** Run the turn motor to the specified rotation. */
-    public default void setTurnPosition(Rotation2d rotation) {}
+  /** Run the turn motor to the specified rotation. */
+  public default void runTurnPosition(Rotation2d rotation) {}
 
-    /** Run closed loop at the specified velocity. */
-    public default void setVelocity(double velocityRadPerSec) {}
+  /** Stop in open loop. */
+  public default void stop() {}
 
-    /** Run closed loop position */
-    public default void setPosition(Rotation2d positionRad) {}
+  /** Set velocity PID constants. */
+  public default void configurePID(double kP, double kI, double kD) {}
 
-    public default void setRotation(Rotation2d rotation) {}
+  /** Set velocity PIDF constants. */
+  public default void configurePIDF(double kP, double kI, double kD, double kF) {}
 
-    /** Stop in open loop. */
-    public default void stop() {}
-
-    /** Set velocity PID constants. */
-    public default void configurePID(double kP, double kI, double kD) {}
-
-    /** Set velocity PIDF constants. */
-    public default void configurePIDF(double kP, double kI, double kD, double kF) {}
-
-    /** Reset encoder position. */
-    public default void resetPosition() {}
-    /** Sets encoder offset. */
-    public default void setOffset(double offset) {}
+  /** Reset encoder position. */
+  public default void resetPosition() {}
+  /** Sets encoder offset. */
+  public default void setOffset(double offset) {}
 }

@@ -21,7 +21,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -31,121 +30,150 @@ import frc.robot.interfaces.Motor.MotorIO.MotorIOInputs;
 import frc.robot.interfaces.Motor.MotorIOSparkMax;
 import frc.robot.interfaces.Motor.MotorIOTalonFX;
 
-
 /**
- * Module IO implementation for Spark Flex drive motor controller, Spark Max turn motor controller, and duty cycle
- * absolute encoder.
+ * Module IO implementation for Spark Flex drive motor controller, Spark Max turn motor controller,
+ * and duty cycle absolute encoder.
  */
 public class ModuleIOSparkTalon implements ModuleIO {
 
-    private final MotorIO driveIO;
-    private final MotorIO turnIO;
-    private CANcoder cancoder;
-    private double offset;
-    private Rotation2d zeroRotation = Rotation2d.fromDegrees(0.0);
-    public ModuleIOSparkTalon(int module) { 
-        switch (module) {
-                case 0:  
-                        driveIO = new MotorIOTalonFX(TALON_FL, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
-                        turnIO = new MotorIOSparkMax(SPARK_FL, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
-                        cancoder = new CANcoder(CANCODER_FL, CANBUS);
-                        offset = ENCODER_OFFSET_FL;
-                        
-                break;
+  private final MotorIO driveIO;
+  private final MotorIO turnIO;
+  private CANcoder cancoder;
+  private double offset;
+  private Rotation2d zeroRotation = Rotation2d.fromDegrees(0.0);
 
-                case 1: 
-                        driveIO = new MotorIOTalonFX(TALON_FR, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
-                        turnIO = new MotorIOSparkMax(SPARK_FR, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
-                        cancoder = new CANcoder(CANCODER_FR, CANBUS);
-                        offset = ENCODER_OFFSET_FR;
-                break;
-                
-                case 2: 
-                        driveIO = new MotorIOTalonFX(TALON_BL, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
-                        turnIO = new MotorIOSparkMax(SPARK_BL, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
-                        cancoder = new CANcoder(CANCODER_BL, CANBUS);
-                        offset = ENCODER_OFFSET_BL;
-                break;
+  public ModuleIOSparkTalon(int module) {
+    switch (module) {
+      case 0:
+        driveIO =
+            new MotorIOTalonFX(
+                TALON_FL,
+                CANBUS,
+                NeutralModeValue.Coast,
+                DRIVE_GAINS,
+                TunerConstants.kSlipCurrentDouble,
+                SUPPLY_CURRENT_LIMIT_ENABLE,
+                InvertedValue.CounterClockwise_Positive,
+                TunerConstants.kDriveClosedLoopOutput);
+        turnIO =
+            new MotorIOSparkMax(
+                SPARK_FL, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
+        cancoder = new CANcoder(CANCODER_FL, CANBUS);
+        offset = ENCODER_OFFSET_FL;
 
-                case 3: 
-                        driveIO = new MotorIOTalonFX(TALON_BR, CANBUS, NeutralModeValue.Coast, DRIVE_GAINS, TunerConstants.kSlipCurrentDouble, SUPPLY_CURRENT_LIMIT_ENABLE, InvertedValue.CounterClockwise_Positive, TunerConstants.kDriveClosedLoopOutput);
-                        turnIO = new MotorIOSparkMax(SPARK_BR, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
-                        cancoder = new CANcoder(CANCODER_BR, CANBUS);
-                        offset = ENCODER_OFFSET_BR;
-                break;
+        break;
 
-                default:
-                        driveIO = new MotorIO() {}; 
-                        turnIO = new MotorIO() {};
-                        offset = 0.0;
-                break;
-        }
-        zeroRotation = Rotation2d.fromRotations(offset);
-        cancoder.getConfigurator().apply(new CANcoderConfiguration());
-        turnIO.setOffset(cancoder.getAbsolutePosition().getValueAsDouble()-offset);
-        turnIO.setPosition(0);
-    }
+      case 1:
+        driveIO =
+            new MotorIOTalonFX(
+                TALON_FR,
+                CANBUS,
+                NeutralModeValue.Coast,
+                DRIVE_GAINS,
+                TunerConstants.kSlipCurrentDouble,
+                SUPPLY_CURRENT_LIMIT_ENABLE,
+                InvertedValue.CounterClockwise_Positive,
+                TunerConstants.kDriveClosedLoopOutput);
+        turnIO =
+            new MotorIOSparkMax(
+                SPARK_FR, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
+        cancoder = new CANcoder(CANCODER_FR, CANBUS);
+        offset = ENCODER_OFFSET_FR;
+        break;
 
-    @Override 
-    public void setVoltage(double volts) {
-        turnIO.setVoltage(volts);
-    }
+      case 2:
+        driveIO =
+            new MotorIOTalonFX(
+                TALON_BL,
+                CANBUS,
+                NeutralModeValue.Coast,
+                DRIVE_GAINS,
+                TunerConstants.kSlipCurrentDouble,
+                SUPPLY_CURRENT_LIMIT_ENABLE,
+                InvertedValue.CounterClockwise_Positive,
+                TunerConstants.kDriveClosedLoopOutput);
+        turnIO =
+            new MotorIOSparkMax(
+                SPARK_BL, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
+        cancoder = new CANcoder(CANCODER_BL, CANBUS);
+        offset = ENCODER_OFFSET_BL;
+        break;
 
-    @Override
-    public void setVelocity(double velocityRadPerSec) {
-        turnIO.setVelocity(velocityRadPerSec);
-    }
-    
-    @Override
-    public void setPosition(Rotation2d positionRot) {
-        double setpoint = Units.radiansToRotations( MathUtil.inputModulus(
-            positionRot.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput));
-        turnIO.setPosition(setpoint);
-    }
-    @Override
-    public void setTurnPosition(Rotation2d positionRot) {
-        double setpoint = Units.radiansToRotations( MathUtil.inputModulus(
-            positionRot.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput));
-        turnIO.setPosition(setpoint);
-    }
-    @Override
-    public void stop() {
-        turnIO.stop();
-    }
+      case 3:
+        driveIO =
+            new MotorIOTalonFX(
+                TALON_BR,
+                CANBUS,
+                NeutralModeValue.Coast,
+                DRIVE_GAINS,
+                TunerConstants.kSlipCurrentDouble,
+                SUPPLY_CURRENT_LIMIT_ENABLE,
+                InvertedValue.CounterClockwise_Positive,
+                TunerConstants.kDriveClosedLoopOutput);
+        turnIO =
+            new MotorIOSparkMax(
+                SPARK_BR, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
+        cancoder = new CANcoder(CANCODER_BR, CANBUS);
+        offset = ENCODER_OFFSET_BR;
+        break;
 
-    @Override
-    public void setDriveOpenLoop(double output) {
-        //driveIO.set(output);
+      default:
+        driveIO = new MotorIO() {};
+        turnIO = new MotorIO() {};
+        offset = 0.0;
+        break;
     }
+    zeroRotation = Rotation2d.fromRotations(offset);
+    cancoder.getConfigurator().apply(new CANcoderConfiguration());
+    turnIO.setOffset(cancoder.getAbsolutePosition().getValueAsDouble() - offset);
+    turnIO.setPosition(0);
+  }
 
-    @Override
-    public void setDriveVelocity(double velocityRadPerSec) {
-        //driveIO.setVelocity(velocityRadPerSec);
-    }
+  @Override
+  public void updateInputs(ModuleIOInputs inputs) {
+    MotorIOInputs motorIOInputs = turnIO.getMotorIOInputs();
+    inputs.turnOffset = Units.rotationsToRadians(offset);
+    inputs.turnAppliedVolts = motorIOInputs.appliedVolts;
+    inputs.turnConnected = motorIOInputs.appliedVolts != 0.0;
+    inputs.turnCurrentAmps = motorIOInputs.currentAmps[0];
+    inputs.turnPosition = new Rotation2d(Units.rotationsToRadians(motorIOInputs.positionRot));
+    inputs.turnVelocityRadPerSec = motorIOInputs.velocityRadPerSec;
+    inputs.turnPositionRot =
+        Units.rotationsToRadians(cancoder.getAbsolutePosition().getValueAsDouble());
+    motorIOInputs = driveIO.getMotorIOInputs();
+    inputs.driveAppliedVolts = motorIOInputs.appliedVolts;
+    inputs.driveConnected = motorIOInputs.appliedVolts != 0.0;
+    inputs.driveCurrentAmps = motorIOInputs.currentAmps[0];
+    inputs.drivePositionRad = Units.rotationsToRadians(motorIOInputs.positionRot);
+    inputs.driveVelocityRadPerSec = motorIOInputs.velocityRadPerSec;
+  }
 
-    @Override
-    public void setRotation(Rotation2d rotation) {
-        double setpoint =
-        MathUtil.inputModulus(
-            rotation.plus(Rotation2d.fromRotations(offset)).getRadians(), -180, 179);
-        turnIO.setPosition(Units.radiansToRotations(setpoint));
-    }
+  @Override
+  public void runDriveVelocity(double velocityRadPerSec) {
+    turnIO.setVelocity(velocityRadPerSec);
+  }
 
-    @Override
-    public void updateInputs(ModuleIOInputs inputs) {
-        MotorIOInputs motorIOInputs = turnIO.getMotorIOInputs();
-        inputs.turnOffset = Units.rotationsToRadians(offset);
-        inputs.turnAppliedVolts = motorIOInputs.appliedVolts;
-        inputs.turnConnected = motorIOInputs.appliedVolts != 0.0;
-        inputs.turnCurrentAmps = motorIOInputs.currentAmps[0];
-        inputs.turnPosition = new Rotation2d(Units.rotationsToRadians(motorIOInputs.positionRot));
-        inputs.turnVelocityRadPerSec = motorIOInputs.velocityRadPerSec;
-        inputs.turnPositionRot = Units.rotationsToRadians(cancoder.getAbsolutePosition().getValueAsDouble());
-        motorIOInputs = driveIO.getMotorIOInputs();
-        inputs.driveAppliedVolts = motorIOInputs.appliedVolts;
-        inputs.driveConnected = motorIOInputs.appliedVolts != 0.0;
-        inputs.driveCurrentAmps = motorIOInputs.currentAmps[0];
-        inputs.drivePositionRad = Units.rotationsToRadians(motorIOInputs.positionRot);
-        inputs.driveVelocityRadPerSec = motorIOInputs.velocityRadPerSec;   
-    }
+  @Override
+  public void runTurnPosition(Rotation2d positionRot) {
+    double setpoint =
+        Units.radiansToRotations(
+            MathUtil.inputModulus(
+                positionRot.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput));
+    turnIO.setPosition(setpoint);
+  }
+
+  @Override
+  public void runDriveOpenLoop(double output) {
+    driveIO.setVelocity(output);
+  }
+
+  @Override
+  public void runTurnOpenLoop(double output) {
+    turnIO.setVelocity(output);
+  }
+
+  @Override
+  public void stop() {
+    turnIO.stop();
+  }
 }
