@@ -5,7 +5,7 @@ import frc.robot.subsystems.led.Led;
 
 public class LedCian extends InstantCommand {
 
-    public LedCian(Led leds) {
-        super(() -> leds.setAllColorRGB(0, 255, 255), leds);
-    }
+  public LedCian(Led leds) {
+      super(() -> leds.setAllColorRGB(0, 255, 255), leds);
+  }
 }

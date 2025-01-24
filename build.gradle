@@ -1,6 +1,7 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2025.1.1"
+    id "edu.wpi.first.GradleRIO" version "2025.2.1"
+    id 'com.diffplug.spotless' version '6.21.0'
 }
 
 java {
@@ -73,8 +74,6 @@ dependencies {
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
 
-    implementation 'org.apache.commons:commons-math3:3.+'
-
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
     roborioDebug wpi.java.vendor.jniDebug(wpi.platforms.roborio)
 
@@ -124,3 +123,11 @@ wpi.java.configureTestTasks(test)
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 }
+
+spotless {
+    java {
+        googleJavaFormat('1.15.0')
+        target '**/*.java'
+    }
+}
+tasks.build.dependsOn(tasks.spotlessApply)

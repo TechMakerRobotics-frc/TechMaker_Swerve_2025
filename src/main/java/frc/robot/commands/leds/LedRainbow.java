@@ -14,10 +14,10 @@ public class LedRainbow extends Command {
         rainbowFirstPixelHue = 0;
     }
 
-    @Override
-    public void initialize() {
-        addRequirements(leds);
-    }
+  @Override
+  public void initialize() {
+    addRequirements(leds);
+  }
 
     @Override
     public void execute() {
@@ -28,5 +28,5 @@ public class LedRainbow extends Command {
         }
         rainbowFirstPixelHue += 3;
         rainbowFirstPixelHue %= 180;
-    }
+  }
 }

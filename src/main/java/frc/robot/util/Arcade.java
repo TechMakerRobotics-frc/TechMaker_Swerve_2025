@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
+<<<<<<< HEAD
  * A utility class for interacting with an arcade-style joystick.
  * This class maps the buttons of the joystick to `Trigger` objects
  * and provides access to each button through methods and an array.
