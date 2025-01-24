@@ -123,7 +123,7 @@ public class DriveCommands {
             new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
     angleController.enableContinuousInput(-Math.PI, Math.PI);
 
-    // Construct command
+    // Construct command'''
     return Commands.run(
             () -> {
               // Get linear velocity
@@ -145,7 +145,7 @@ public class DriveCommands {
                   DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red;
               speeds =
-                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                  ChassisSpeeds.fromRobotRelativeSpeeds(
                       speeds,
                       isFlipped
                           ? drive.getRotation().plus(new Rotation2d(Math.PI))

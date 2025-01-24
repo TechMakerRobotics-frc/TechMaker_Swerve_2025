@@ -133,7 +133,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
         new SwerveModulePosition()
       };
   private SwerveDrivePoseEstimator poseEstimator =
-      new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
+      new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d(2,2, new Rotation2d()));
 
   private Map<String, List<ZoneCircle>> zones;
 

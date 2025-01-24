@@ -13,6 +13,7 @@
 
 package frc.robot.subsystems.drive;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -68,15 +69,22 @@ public class Module {
   public void runSetpoint(SwerveModuleState state) {
     Logger.recordOutput("Rotation to optimize", getAngle());
 
-    SwerveModuleState optimizedState = state;
-    optimizedState.optimize(getAngle());
-    optimizedState.cosineScale(inputs.turnPosition);
+    state.optimize(getAngle());
+    state.cosineScale(getAngle());
 
-    Logger.recordOutput("Rotation optimized", optimizedState.angle);
+    Logger.recordOutput("Rotation optimized", state.angle);
 
     io.runDriveVelocity(state.speedMetersPerSecond / TunerConstants.wheelRadiusMeters);
-    io.runTurnPosition(optimizedState.angle);
+    double setpoint = normalizeAngle(state.angle.getRotations(), getAngle().getRotations());
+
+    io.runTurnPosition(Rotation2d.fromRotations(setpoint));
   }
+
+  private double normalizeAngle(double targetRotations, double currentRotations) {
+    double error = targetRotations - currentRotations;
+    return currentRotations + MathUtil.inputModulus(error, -0.5, 0.5); 
+}
+
 
   /** Runs the module with the specified output while controlling to zero degrees. */
   public void runCharacterization(double output) {

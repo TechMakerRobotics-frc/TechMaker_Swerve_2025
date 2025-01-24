@@ -15,6 +15,8 @@ package frc.robot.subsystems.drive;
 
 import static frc.robot.subsystems.drive.DriveConstants.ModuleConstants.*;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -53,7 +55,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
                 DRIVE_GAINS,
                 TunerConstants.kSlipCurrentDouble,
                 SUPPLY_CURRENT_LIMIT_ENABLE,
-                InvertedValue.CounterClockwise_Positive,
+                InvertedValue.Clockwise_Positive,
                 TunerConstants.kDriveClosedLoopOutput);
         turnIO =
             new MotorIOSparkMax(
@@ -90,7 +92,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
                 DRIVE_GAINS,
                 TunerConstants.kSlipCurrentDouble,
                 SUPPLY_CURRENT_LIMIT_ENABLE,
-                InvertedValue.CounterClockwise_Positive,
+                InvertedValue.Clockwise_Positive,
                 TunerConstants.kDriveClosedLoopOutput);
         turnIO =
             new MotorIOSparkMax(
@@ -150,15 +152,16 @@ public class ModuleIOSparkTalon implements ModuleIO {
 
   @Override
   public void runDriveVelocity(double velocityRadPerSec) {
-    turnIO.setVelocity(velocityRadPerSec);
+    driveIO.setVelocity(velocityRadPerSec);
   }
 
   @Override
   public void runTurnPosition(Rotation2d positionRot) {
-    double setpoint =
-        Units.radiansToRotations(
-            MathUtil.inputModulus(
-                positionRot.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput));
+    Logger.recordOutput("runTurnPosition - positionRot", positionRot);
+    double setpoint = positionRot.getRotations();
+
+    Logger.recordOutput("runTurnPosition - setpoint", setpoint);
+
     turnIO.setPosition(setpoint);
   }
 

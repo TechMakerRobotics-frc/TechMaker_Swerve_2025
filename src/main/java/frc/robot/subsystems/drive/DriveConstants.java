@@ -19,25 +19,25 @@ public final class DriveConstants {
     public static final int TALON_FL = 1;
     public static final int SPARK_FL = 2;
     public static final int CANCODER_FL = 3;
-    public static final double ENCODER_OFFSET_FL = (-0.3876953125);
+    public static final double ENCODER_OFFSET_FL = (-0.408203);
 
     // Front Right
     public static final int TALON_FR = 4;
     public static final int SPARK_FR = 5;
     public static final int CANCODER_FR = 6;
-    public static final double ENCODER_OFFSET_FR = (0.3359375);
+    public static final double ENCODER_OFFSET_FR = (0.325195);
 
     // Back Left
     public static final int TALON_BL = 7;
     public static final int SPARK_BL = 8;
     public static final int CANCODER_BL = 9;
-    public static final double ENCODER_OFFSET_BL = (0.3828125);
+    public static final double ENCODER_OFFSET_BL = (0.389404);
 
     // Back Right
     public static final int TALON_BR = 10;
     public static final int SPARK_BR = 11;
     public static final int CANCODER_BR = 12;
-    public static final double ENCODER_OFFSET_BR = (0.374755859375);
+    public static final double ENCODER_OFFSET_BR = (0.374023);
 
     public static final String CANBUS = "CANivore";
 
