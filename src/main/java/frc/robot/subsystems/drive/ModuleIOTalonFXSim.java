@@ -16,6 +16,7 @@ package frc.robot.subsystems.drive;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 
+import com.ctre.phoenix6.configs.ParentConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import frc.robot.util.subsystemUtils.PhoenixUtil;
 import java.util.Arrays;
@@ -28,7 +29,7 @@ import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 public class ModuleIOTalonFXSim extends ModuleIOTalonFX {
     private final SwerveModuleSimulation simulation;
 
-    public ModuleIOTalonFXSim(SwerveModuleConstants constants, SwerveModuleSimulation simulation) {
+    public ModuleIOTalonFXSim(SwerveModuleConstants<ParentConfiguration, ParentConfiguration, ParentConfiguration> constants, SwerveModuleSimulation simulation) {
         super(constants);
 
         this.simulation = simulation;
@@ -39,8 +40,8 @@ public class ModuleIOTalonFXSim extends ModuleIOTalonFX {
                 turnTalon,
                 constants.SteerMotorInverted,
                 cancoder,
-                constants.CANcoderInverted,
-                Rotations.of(constants.CANcoderOffset)));
+                constants.EncoderInverted,
+                Rotations.of(constants.EncoderOffset)));
     }
 
     @Override

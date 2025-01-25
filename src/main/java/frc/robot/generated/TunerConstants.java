@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.ParentConfiguration;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -12,7 +13,9 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.ClosedLoopOutputType;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerFeedbackType;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
@@ -192,6 +195,12 @@ public class TunerConstants {
     // Wheel
     // Rad/Sec
 
+    private static final DriveMotorArrangement kDriveMotorType =
+      DriveMotorArrangement.TalonFX_Integrated;
+  // The type of motor used for the drive motor
+  private static final SteerMotorArrangement kSteerMotorType =
+      SteerMotorArrangement.TalonFX_Integrated;
+
     // Turn PID configuration
     public static final double turnKp = 2.0;
     public static final double turnKd = 0.0;
@@ -237,63 +246,157 @@ public class TunerConstants {
             .withPigeon2Id(kPigeonId)
             .withPigeon2Configs(pigeonConfigs);
 
-    private static final SwerveModuleConstantsFactory ConstantCreator = new SwerveModuleConstantsFactory()
-            .withDriveMotorGearRatio(kDriveGearRatio)
-            .withSteerMotorGearRatio(kSteerGearRatio)
-            .withCouplingGearRatio(kCoupleRatio)
-            .withWheelRadius(kWheelRadius)
-            .withSteerMotorGains(steerGains)
-            .withDriveMotorGains(driveGains)
-            .withSteerMotorClosedLoopOutput(kSteerClosedLoopOutput)
-            .withDriveMotorClosedLoopOutput(kDriveClosedLoopOutput)
-            .withSlipCurrent(kSlipCurrent)
-            .withSpeedAt12Volts(kSpeedAt12Volts)
-            .withFeedbackSource(kSteerFeedbackType)
-            .withDriveMotorInitialConfigs(driveInitialConfigs)
-            .withSteerMotorInitialConfigs(steerInitialConfigs)
-            .withCANcoderInitialConfigs(cancoderInitialConfigs)
-            .withSteerInertia(kSteerInertia)
-            .withDriveInertia(kDriveInertia)
-            .withSteerFrictionVoltage(kSteerFrictionVoltage)
-            .withDriveFrictionVoltage(kDriveFrictionVoltage);
-    public static final SwerveModuleConstants FrontLeft = ConstantCreator.createModuleConstants(
-            kFrontLeftSteerMotorId,
-            kFrontLeftDriveMotorId,
-            kFrontLeftEncoderId,
-            kFrontLeftEncoderOffset,
-            kFrontLeftXPos,
-            kFrontLeftYPos,
-            kInvertLeftSide,
-            kFrontLeftSteerMotorInverted,
-            kFrontLeftCANcoderInverted);
-    public static final SwerveModuleConstants FrontRight = ConstantCreator.createModuleConstants(
-            kFrontRightSteerMotorId,
-            kFrontRightDriveMotorId,
-            kFrontRightEncoderId,
-            kFrontRightEncoderOffset,
-            kFrontRightXPos,
-            kFrontRightYPos,
-            kInvertRightSide,
-            kFrontRightSteerMotorInverted,
-            kFrontRightCANcoderInverted);
-    public static final SwerveModuleConstants BackLeft = ConstantCreator.createModuleConstants(
-            kBackLeftSteerMotorId,
-            kBackLeftDriveMotorId,
-            kBackLeftEncoderId,
-            kBackLeftEncoderOffset,
-            kBackLeftXPos,
-            kBackLeftYPos,
-            kInvertLeftSide,
-            kBackLeftSteerMotorInverted,
-            kBackLeftCANcoderInverted);
-    public static final SwerveModuleConstants BackRight = ConstantCreator.createModuleConstants(
-            kBackRightSteerMotorId,
-            kBackRightDriveMotorId,
-            kBackRightEncoderId,
-            kBackRightEncoderOffset,
-            kBackRightXPos,
-            kBackRightYPos,
-            kInvertRightSide,
-            kBackRightSteerMotorInverted,
-            kBackRightCANcoderInverted);
+            private static final SwerveModuleConstantsFactory<
+            TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+        ConstantCreator =
+            new SwerveModuleConstantsFactory<
+                    TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>()
+                .withDriveMotorGearRatio(kDriveGearRatio)
+                .withSteerMotorGearRatio(kSteerGearRatio)
+                .withCouplingGearRatio(kCoupleRatio)
+                .withWheelRadius(kWheelRadius)
+                .withSteerMotorGains(steerGains)
+                .withDriveMotorGains(driveGains)
+                .withSteerMotorClosedLoopOutput(kSteerClosedLoopOutput)
+                .withDriveMotorClosedLoopOutput(kDriveClosedLoopOutput)
+                .withSlipCurrent(kSlipCurrent)
+                .withSpeedAt12Volts(kSpeedAt12Volts)
+                .withDriveMotorType(kDriveMotorType)
+                .withSteerMotorType(kSteerMotorType)
+                .withFeedbackSource(kSteerFeedbackType)
+                .withDriveMotorInitialConfigs(driveInitialConfigs)
+                .withSteerMotorInitialConfigs(steerInitialConfigs)
+                .withEncoderInitialConfigs(cancoderInitialConfigs)
+                .withSteerInertia(kSteerInertia)
+                .withDriveInertia(kDriveInertia)
+                .withSteerFrictionVoltage(kSteerFrictionVoltage)
+                .withDriveFrictionVoltage(kDriveFrictionVoltage);
+  
+    public static final SwerveModuleConstants<
+            TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+        FrontLeft =
+            ConstantCreator.createModuleConstants(
+                kFrontLeftSteerMotorId,
+                kFrontLeftDriveMotorId,
+                kFrontLeftEncoderId,
+                kFrontLeftEncoderOffset,
+                kFrontLeftXPos,
+                kFrontLeftYPos,
+                kInvertLeftSide,
+                kFrontLeftSteerMotorInverted,
+                kFrontLeftCANcoderInverted);
+    public static final SwerveModuleConstants<
+            TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+        FrontRight =
+            ConstantCreator.createModuleConstants(
+                kFrontRightSteerMotorId,
+                kFrontRightDriveMotorId,
+                kFrontRightEncoderId,
+                kFrontRightEncoderOffset,
+                kFrontRightXPos,
+                kFrontRightYPos,
+                kInvertRightSide,
+                kFrontRightSteerMotorInverted,
+                kFrontRightCANcoderInverted);
+    public static final SwerveModuleConstants<
+            TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+        BackLeft =
+            ConstantCreator.createModuleConstants(
+                kBackLeftSteerMotorId,
+                kBackLeftDriveMotorId,
+                kBackLeftEncoderId,
+                kBackLeftEncoderOffset,
+                kBackLeftXPos,
+                kBackLeftYPos,
+                kInvertLeftSide,
+                kBackLeftSteerMotorInverted,
+                kBackLeftCANcoderInverted);
+    public static final SwerveModuleConstants<
+            TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+        BackRight =
+            ConstantCreator.createModuleConstants(
+                kBackRightSteerMotorId,
+                kBackRightDriveMotorId,
+                kBackRightEncoderId,
+                kBackRightEncoderOffset,
+                kBackRightXPos,
+                kBackRightYPos,
+                kInvertRightSide,
+                kBackRightSteerMotorInverted,
+                kBackRightCANcoderInverted);
+
+    private static final SwerveModuleConstantsFactory<
+          ParentConfiguration, ParentConfiguration, ParentConfiguration>
+      ConstantCreatorSIM =
+          new SwerveModuleConstantsFactory<>()
+              .withDriveMotorGearRatio(kDriveGearRatio)
+              .withSteerMotorGearRatio(kSteerGearRatio)
+              .withCouplingGearRatio(kCoupleRatio)
+              .withWheelRadius(kWheelRadius)
+              .withSteerMotorGains(steerGains)
+              .withDriveMotorGains(driveGains)
+              .withSteerMotorClosedLoopOutput(kSteerClosedLoopOutput)
+              .withDriveMotorClosedLoopOutput(kDriveClosedLoopOutput)
+              .withSlipCurrent(kSlipCurrent)
+              .withSpeedAt12Volts(kSpeedAt12Volts)
+              .withFeedbackSource(kSteerFeedbackType)
+              .withDriveMotorInitialConfigs(driveInitialConfigs)
+              .withSteerMotorInitialConfigs(steerInitialConfigs)
+              .withEncoderInitialConfigs(cancoderInitialConfigs)
+              .withSteerInertia(kSteerInertia)
+              .withDriveInertia(kDriveInertia)
+              .withSteerFrictionVoltage(kSteerFrictionVoltage)
+              .withDriveFrictionVoltage(kDriveFrictionVoltage);
+  public static final SwerveModuleConstants<
+          ParentConfiguration, ParentConfiguration, ParentConfiguration>
+      FrontLeftSIM =
+          ConstantCreatorSIM.createModuleConstants(
+              kFrontLeftSteerMotorId,
+              kFrontLeftDriveMotorId,
+              kFrontLeftEncoderId,
+              kFrontLeftEncoderOffset,
+              kFrontLeftXPos,
+              kFrontLeftYPos,
+              kInvertLeftSide,
+              kFrontLeftSteerMotorInverted,
+              kFrontLeftCANcoderInverted);
+  public static final SwerveModuleConstants<
+          ParentConfiguration, ParentConfiguration, ParentConfiguration>
+      FrontRightSIM =
+          ConstantCreatorSIM.createModuleConstants(
+              kFrontRightSteerMotorId,
+              kFrontRightDriveMotorId,
+              kFrontRightEncoderId,
+              kFrontRightEncoderOffset,
+              kFrontRightXPos,
+              kFrontRightYPos,
+              kInvertRightSide,
+              kFrontRightSteerMotorInverted,
+              kFrontRightCANcoderInverted);
+  public static final SwerveModuleConstants<
+          ParentConfiguration, ParentConfiguration, ParentConfiguration>
+      BackLeftSIM =
+          ConstantCreatorSIM.createModuleConstants(
+              kBackLeftSteerMotorId,
+              kBackLeftDriveMotorId,
+              kBackLeftEncoderId,
+              kBackLeftEncoderOffset,
+              kBackLeftXPos,
+              kBackLeftYPos,
+              kInvertLeftSide,
+              kBackLeftSteerMotorInverted,
+              kBackLeftCANcoderInverted);
+  public static final SwerveModuleConstants<
+          ParentConfiguration, ParentConfiguration, ParentConfiguration>
+      BackRightSIM =
+          ConstantCreatorSIM.createModuleConstants(
+              kBackRightSteerMotorId,
+              kBackRightDriveMotorId,
+              kBackRightEncoderId,
+              kBackRightEncoderOffset,
+              kBackRightXPos,
+              kBackRightYPos,
+              kInvertRightSide,
+              kBackRightSteerMotorInverted,
+              kBackRightCANcoderInverted);
 }
