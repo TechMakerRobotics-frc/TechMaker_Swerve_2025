@@ -21,6 +21,7 @@ import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.drive.DriveConstants.ZoneLocates.Zones;
 import frc.robot.subsystems.led.Led;
 import frc.robot.subsystems.led.LedIO;
+import frc.robot.subsystems.led.LedIOReal;
 import frc.robot.subsystems.led.LedIOSim;
 import frc.robot.subsystems.vision.*;
 import frc.robot.util.RobotModeTo;
@@ -65,6 +66,21 @@ public class RobotContainer {
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         switch (Constants.currentMode) {
+                case REAL:
+                // Real robot, instantiate hardware IO implementations
+                drive =
+                        new Drive(
+                        new GyroIOPigeon2(),
+                        new ModuleIOSparkTalon(0),
+                        new ModuleIOSparkTalon(1),
+                        new ModuleIOSparkTalon(2),
+                        new ModuleIOSparkTalon(3));
+                vision = new Vision(drive, new VisionIOPhotonVision(FL_CAM_NAME, ROBOT_TO_FL_CAM),
+                new VisionIOPhotonVision(FR_CAM_NAME, ROBOT_TO_FR_CAM),
+                new VisionIOPhotonVision(LIMELIGHT_NAME, ROBOT_TO_FR_CAM));
+
+                leds = new Led(new LedIOReal());
+                break;
 
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations

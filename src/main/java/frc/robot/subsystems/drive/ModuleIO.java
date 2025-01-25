@@ -31,6 +31,9 @@ public interface ModuleIO {
         public double turnVelocityRadPerSec = 0.0;
         public double turnAppliedVolts = 0.0;
         public double turnCurrentAmps = 0.0;
+        public double turnPositionRot = 0.0;
+        public double turnOffset = 0.0;
+
 
         public double[] odometryTimestamps = new double[] {};
         public double[] odometryDrivePositionsRad = new double[] {};
@@ -41,20 +44,35 @@ public interface ModuleIO {
     default void updateInputs(ModuleIOInputs inputs) {}
 
     /** Run the drive motor at the specified open loop value. */
-    default void setDriveOpenLoop(double output) {}
+    default void runDriveOpenLoop(double output) {}
 
     /** Run the turn motor at the specified open loop value. */
-    default void setTurnOpenLoop(double output) {}
+    default void runTurnOpenLoop(double output) {}
 
     /** Run the drive motor at the specified velocity. */
-    default void setDriveVelocity(double velocityRadPerSec) {}
+    default void runDriveVelocity(double velocityRadPerSec) {}
 
     /** Run the turn motor to the specified rotation. */
-    default void setTurnPosition(Rotation2d rotation) {}
+    default void runTurnPosition(Rotation2d rotation) {}
+
+    /** Stop in open loop. */
+    public default void stop() {}
+
+    /** Set velocity PID constants. */
+    public default void configurePID(double kP, double kI, double kD) {}
+
+    /** Set velocity PIDF constants. */
+    public default void configurePIDF(double kP, double kI, double kD, double kF) {}
+
+    /** Reset encoder position. */
+    public default void resetPosition() {}
+    
+    /** Sets encoder offset. */
+    public default void setOffset(double offset) {}
 
     /** Enable or disable brake mode on the drive motor. */
-    public default void setDriveBrakeMode(boolean enable) {}
+    public default void runDriveBrakeMode(boolean enable) {}
 
     /** Enable or disable brake mode on the turn motor. */
-    public default void setTurnBrakeMode(boolean enable) {}
+    public default void runTurnBrakeMode(boolean enable) {}
 }

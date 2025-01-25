@@ -158,7 +158,7 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
     }
 
     @Override
-    public void setDriveOpenLoop(double output) {
+    public void runDriveOpenLoop(double output) {
         driveTalon.setControl(
                 switch (constants.DriveMotorClosedLoopOutput) {
                     case Voltage -> voltageRequest.withOutput(output);
@@ -167,7 +167,7 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
     }
 
     @Override
-    public void setTurnOpenLoop(double output) {
+    public void runTurnOpenLoop(double output) {
         turnTalon.setControl(
                 switch (constants.SteerMotorClosedLoopOutput) {
                     case Voltage -> voltageRequest.withOutput(output);
@@ -176,7 +176,16 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
     }
 
     @Override
-    public void setDriveVelocity(double wheelVelocityRadPerSec) {
+    public void stop() {
+        turnTalon.setControl(
+                switch (constants.SteerMotorClosedLoopOutput) {
+                    case Voltage -> voltageRequest.withOutput(0);
+                    case TorqueCurrentFOC -> torqueCurrentRequest.withOutput(0);
+                });
+    }
+
+    @Override
+    public void runDriveVelocity(double wheelVelocityRadPerSec) {
         double motorVelocityRotPerSec =
                 Units.radiansToRotations(wheelVelocityRadPerSec) * constants.DriveMotorGearRatio;
         driveTalon.setControl(
@@ -187,7 +196,7 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
     }
 
     @Override
-    public void setTurnPosition(Rotation2d rotation) {
+    public void runTurnPosition(Rotation2d rotation) {
         turnTalon.setControl(
                 switch (constants.SteerMotorClosedLoopOutput) {
                     case Voltage -> positionVoltageRequest.withPosition(rotation.getRotations());
