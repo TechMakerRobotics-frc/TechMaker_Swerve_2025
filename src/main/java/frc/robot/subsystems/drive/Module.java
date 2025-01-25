@@ -26,8 +26,6 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 
-import java.io.Console;
-
 import org.littletonrobotics.junction.Logger;
 
 public class Module {
