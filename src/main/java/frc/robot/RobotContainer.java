@@ -65,7 +65,7 @@ public class RobotContainer {
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         switch (Constants.currentMode) {
-                
+
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
 
@@ -199,8 +199,8 @@ public class RobotContainer {
         // Default command, normal field-relative drive
         drive.setDefaultCommand(DriveCommands.joystickDrive(
                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> -controller.getRightX()));
-
-        controller.a().whileTrue(drive.getDefaultCommand());
+        
+        controller.leftStick().whileTrue(drive.getDefaultCommand());
 
         new Trigger(() -> (currentState == RobotState.ON_BLUE_LEFT_STATION) && (pathfinderTest.get().isFinished()))
         .whileTrue(DriveCommands.joystickDriveAimAtPoint(
@@ -237,7 +237,7 @@ public class RobotContainer {
         }
 
         // leds
-        controller.leftStick().onTrue(Commands.runOnce(() -> {
+        controller.rightStick().onTrue(Commands.runOnce(() -> {
             currentLedState = (currentLedState + 1) % ledCommands.length;
             Command nextCommand = ledCommands[currentLedState];
             nextCommand.schedule();
