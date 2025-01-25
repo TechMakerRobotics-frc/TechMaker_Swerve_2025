@@ -49,7 +49,7 @@ public class AlignTo extends Command {
   public AlignTo(Drive drive, int tag, double timeOut) {
     this.drive = drive;
     AprilTagFieldLayout fTagFieldLayout =
-        AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
+        AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
     this.targetPose = fTagFieldLayout.getTagPose(tag).get().toPose2d();
     this.timeOut = timeOut;

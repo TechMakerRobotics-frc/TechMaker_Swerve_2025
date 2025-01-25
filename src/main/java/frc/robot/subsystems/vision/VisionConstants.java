@@ -23,7 +23,7 @@ import edu.wpi.first.math.util.Units;
 public class VisionConstants {
   // AprilTag layout
   public static AprilTagFieldLayout aprilTagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;

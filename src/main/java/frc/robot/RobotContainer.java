@@ -84,7 +84,8 @@ public class RobotContainer {
                     TunerConstants.FrontLeftSIM, driveSimulation.getModules()[0]),
                 new ModuleIOTalonFXSim(
                     TunerConstants.FrontRightSIM, driveSimulation.getModules()[1]),
-                new ModuleIOTalonFXSim(TunerConstants.BackLeftSIM, driveSimulation.getModules()[2]),
+                new ModuleIOTalonFXSim(
+                    TunerConstants.BackLeftSIM, driveSimulation.getModules()[2]),
                 new ModuleIOTalonFXSim(
                     TunerConstants.BackRightSIM, driveSimulation.getModules()[3]));
         leds = new Led(new LedIOSim());
@@ -185,10 +186,6 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    /*controller.a().onTrue(new InstantCommand(()->motorIO.setPosition(0)));
-    controller.b().onTrue(new InstantCommand(()->motorIO.setPosition(0.25)));
-    controller.y().onTrue(new InstantCommand(()->motorIO.setPosition(0.5)));
-    controller.x().onTrue(new InstantCommand(()->motorIO.setPosition(0.75)));*/
     final Runnable resetGyro =
         Constants.currentMode == Constants.Mode.SIM
             ? () ->
@@ -211,12 +208,7 @@ public class RobotContainer {
     // Lock to 0° when A button is held
     controller
         .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
+        .whileTrue(drive.getDefaultCommand());
 
     // Reset gyro / odometry
     controller.povRight().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
