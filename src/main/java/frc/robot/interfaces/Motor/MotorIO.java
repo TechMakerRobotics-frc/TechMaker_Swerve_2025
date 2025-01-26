@@ -11,7 +11,7 @@ public interface MotorIO {
     public double positionRot = 0.0;
     public double velocityRadPerSec = 0.0;
     public double appliedVolts = 0.0;
-    public double[] currentAmps = new double[] {};
+    public double currentAmps = 0.0;
 
     public double[] odometryDrivePositionsRad = new double[] {};
     public Rotation2d[] odometryTurnPositions = new Rotation2d[] {};
@@ -59,4 +59,8 @@ public interface MotorIO {
   }
 
   public default void clearQueue() {}
+
+  public default boolean isConnected() {
+    return false;
+  }
 }

@@ -1,5 +1,7 @@
 package frc.robot.interfaces.Motor;
 
+import static frc.robot.util.subsystemUtils.SparkUtil.*;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
@@ -12,17 +14,26 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.LimitSwitchConfig.Type;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.drive.PhoenixOdometryThread;
 import java.util.Queue;
+import java.util.function.DoubleSupplier;
 
 public class MotorIOSparkMax implements MotorIO {
 
   private final SparkMax motor;
+  
   private final RelativeEncoder encoder;
-  private SparkMaxConfig motorConfig = new SparkMaxConfig();
-  private SparkClosedLoopController closedLoopController;
+
   private final Queue<Double> motorQueue;
+
+  private final Debouncer connectedDebounce = new Debouncer(0.5);
+  
+  private SparkMaxConfig motorConfig = new SparkMaxConfig();
+  
+  private SparkClosedLoopController closedLoopController;
 
   public MotorIOSparkMax(
       int id,
@@ -76,8 +87,14 @@ public class MotorIOSparkMax implements MotorIO {
         .velocityFF(1.0 / 5767, ClosedLoopSlot.kSlot1)
         .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
 
-    motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    closedLoopController = motor.getClosedLoopController();
+        tryUntilOk(
+        motor,
+        5,
+        () ->
+            motor.configure(
+                motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+
+                closedLoopController = motor.getClosedLoopController();
 
     motorQueue = PhoenixOdometryThread.getInstance().registerSignal(encoder::getPosition);
   }
@@ -87,10 +104,14 @@ public class MotorIOSparkMax implements MotorIO {
    */
   @Override
   public void updateInputs(MotorIOInputs inputs) {
-    inputs.positionRot = encoder.getPosition();
-    inputs.velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity());
-    inputs.appliedVolts = motor.getAppliedOutput() * motor.getBusVoltage();
-    inputs.currentAmps = new double[] {motor.getOutputCurrent()};
+    sparkStickyFault = false;
+    ifOk(motor, encoder::getPosition, (value) -> inputs.positionRot = value);
+    ifOk(motor, encoder::getVelocity, (value) -> inputs.velocityRadPerSec = value);
+    ifOk(
+      motor,
+      new DoubleSupplier[] {motor::getAppliedOutput, motor::getBusVoltage},
+      (values) -> inputs.appliedVolts = values[0] * values[1]);
+    ifOk(motor, motor::getOutputCurrent, (value) -> inputs.currentAmps = value);
   }
 
   @Override
@@ -149,12 +170,17 @@ public class MotorIOSparkMax implements MotorIO {
 
   @Override
   public void setOffset(double offset) {
-    encoder.setPosition(offset);
+    tryUntilOk(motor, 5, () -> encoder.setPosition(offset));
   }
 
   @Override
   public void resetOffset() {
     encoder.setPosition(0);
     setPosition(0);
+  }
+
+  @Override
+  public boolean isConnected() {
+    return connectedDebounce.calculate(!sparkStickyFault);
   }
 }

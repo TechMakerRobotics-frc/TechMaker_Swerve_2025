@@ -134,21 +134,23 @@ public class ModuleIOSparkTalon implements ModuleIO {
 
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
-    MotorIOInputs motorIOInputs = turnIO.getMotorIOInputs();
+    MotorIOInputs motorIOInputs = driveIO.getMotorIOInputs();
+    inputs.driveAppliedVolts = motorIOInputs.appliedVolts;
+    inputs.driveConnected = motorIOInputs.appliedVolts != 0.0;
+    inputs.driveCurrentAmps = motorIOInputs.currentAmps;
+    inputs.drivePositionRad = Units.rotationsToRadians(motorIOInputs.positionRot);
+    inputs.driveVelocityRadPerSec = motorIOInputs.velocityRadPerSec;
+    inputs.driveConnected = driveIO.isConnected(); 
+    motorIOInputs = turnIO.getMotorIOInputs();
     inputs.turnOffset = Units.rotationsToRadians(offset);
     inputs.turnAppliedVolts = motorIOInputs.appliedVolts;
     inputs.turnConnected = motorIOInputs.appliedVolts != 0.0;
-    inputs.turnCurrentAmps = motorIOInputs.currentAmps[0];
+    inputs.turnCurrentAmps = motorIOInputs.currentAmps;
     inputs.turnAbsolutePosition = new Rotation2d(Units.rotationsToRadians(motorIOInputs.positionRot));
     inputs.turnVelocityRadPerSec = motorIOInputs.velocityRadPerSec;
     inputs.turnPositionRot =
         Units.rotationsToRadians(cancoder.getAbsolutePosition().getValueAsDouble());
-    motorIOInputs = driveIO.getMotorIOInputs();
-    inputs.driveAppliedVolts = motorIOInputs.appliedVolts;
-    inputs.driveConnected = motorIOInputs.appliedVolts != 0.0;
-    inputs.driveCurrentAmps = motorIOInputs.currentAmps[0];
-    inputs.drivePositionRad = Units.rotationsToRadians(motorIOInputs.positionRot);
-    inputs.driveVelocityRadPerSec = motorIOInputs.velocityRadPerSec;
+    inputs.turnConnected = turnIO.isConnected();
 
     inputs.odometryTimestamps =
         timestampQueue.stream().mapToDouble((Double value) -> value).toArray();

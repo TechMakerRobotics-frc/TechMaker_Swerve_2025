@@ -1,6 +1,6 @@
 package frc.robot.interfaces.Motor;
 
-import static frc.robot.util.subsystemUtils.PhoenixUtil.tryUntilOk;
+import static frc.robot.util.subsystemUtils.PhoenixUtil.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -16,6 +16,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.ClosedLoopOutputType;
+
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -49,6 +51,9 @@ public class MotorIOTalonFX implements MotorIO {
   private ClosedLoopOutputType motorClosedLoopOutput;
 
   protected final TalonFXConfiguration driveConfig;
+
+  private final Debouncer connectedDebounce = new Debouncer(0.5);
+
 
   public MotorIOTalonFX(
       int id,
@@ -85,12 +90,10 @@ public class MotorIOTalonFX implements MotorIO {
    */
   @Override
   public void updateInputs(MotorIOInputs inputs) {
-    BaseStatusSignal.refreshAll(motorPosition, motorVelocity, motorAppliedVolts, motorCurrent);
-
     inputs.positionRot = Units.rotationsToRadians(motorPosition.getValueAsDouble());
     inputs.velocityRadPerSec = Units.rotationsToRadians(motorVelocity.getValueAsDouble());
     inputs.appliedVolts = motorAppliedVolts.getValueAsDouble();
-    inputs.currentAmps = new double[] {motorCurrent.getValueAsDouble()};
+    inputs.currentAmps = motorCurrent.getValueAsDouble();
   }
 
   @Override
@@ -162,5 +165,11 @@ public class MotorIOTalonFX implements MotorIO {
   @Override
   public void setOffset(double offset) {
     motor.setPosition(offset);
+  }
+
+  @Override
+  public boolean isConnected() {
+    var motorStatus = BaseStatusSignal.refreshAll(motorPosition, motorVelocity, motorAppliedVolts, motorCurrent);
+    return connectedDebounce.calculate(motorStatus.isOK());
   }
 }
