@@ -115,7 +115,8 @@ public class Module {
 
     /** Disables all outputs to motors. */
     public void stop() {
-        io.stop();
+        io.runDriveOpenLoop(0.0);
+        io.runTurnOpenLoop(0.0);
     }
 
     /** Returns the current turn angle of the module. */

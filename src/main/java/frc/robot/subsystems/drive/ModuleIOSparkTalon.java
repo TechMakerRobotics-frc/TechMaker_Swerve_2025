@@ -185,16 +185,17 @@ public class ModuleIOSparkTalon implements ModuleIO {
 
   @Override
   public void runDriveOpenLoop(double output) {
-    driveIO.setVelocity(output);
+    driveIO.setVoltage(output);
   }
 
   @Override
   public void runTurnOpenLoop(double output) {
-    turnIO.setVelocity(output);
+    turnIO.setVoltage(output);
   }
 
   @Override
   public void stop() {
+    driveIO.stop();
     turnIO.stop();
   }
 }
