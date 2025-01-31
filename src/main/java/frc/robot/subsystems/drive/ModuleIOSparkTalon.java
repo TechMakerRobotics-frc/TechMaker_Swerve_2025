@@ -141,8 +141,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
     inputs.turnCurrentAmps = motorIOInputs.currentAmps[0];
     inputs.turnPosition = new Rotation2d(Units.rotationsToRadians(motorIOInputs.positionRot));
     inputs.turnVelocityRadPerSec = motorIOInputs.velocityRadPerSec;
-    inputs.turnPositionRot =
-        Units.rotationsToRadians(cancoder.getAbsolutePosition().getValueAsDouble());
+    inputs.turnPositionRot = motorIOInputs.positionRot;
     motorIOInputs = driveIO.getMotorIOInputs();
     inputs.driveAppliedVolts = motorIOInputs.appliedVolts;
     inputs.driveConnected = motorIOInputs.appliedVolts != 0.0;
@@ -183,16 +182,17 @@ public class ModuleIOSparkTalon implements ModuleIO {
 
   @Override
   public void runDriveOpenLoop(double output) {
-    driveIO.setVelocity(output);
+    driveIO.setVoltage(output);
   }
 
   @Override
   public void runTurnOpenLoop(double output) {
-    turnIO.setVelocity(output);
+    turnIO.setVoltage(output);
   }
 
   @Override
   public void stop() {
+    driveIO.stop();
     turnIO.stop();
   }
 }
