@@ -79,8 +79,7 @@ public class RobotContainer {
                     TunerConstants.FrontLeftSIM, driveSimulation.getModules()[0]),
                 new ModuleIOTalonFXSim(
                     TunerConstants.FrontRightSIM, driveSimulation.getModules()[1]),
-                new ModuleIOTalonFXSim(
-                    TunerConstants.BackLeftSIM, driveSimulation.getModules()[2]),
+                new ModuleIOTalonFXSim(TunerConstants.BackLeftSIM, driveSimulation.getModules()[2]),
                 new ModuleIOTalonFXSim(
                     TunerConstants.BackRightSIM, driveSimulation.getModules()[3]));
         vision =
@@ -168,9 +167,7 @@ public class RobotContainer {
                     driveSimulation
                         .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during
             // simulation
-            : () ->
-                drive.setPose(
-                    new Pose2d(new Translation2d(), new Rotation2d())); // zero gyro
+            : () -> drive.setPose(new Pose2d(new Translation2d(), new Rotation2d())); // zero gyro
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(

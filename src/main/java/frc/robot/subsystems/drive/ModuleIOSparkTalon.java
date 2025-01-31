@@ -153,7 +153,9 @@ public class ModuleIOSparkTalon implements ModuleIO {
         timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
 
     inputs.odometryDrivePositionsRad =
-        driveIO.getMotorQueue().stream().mapToDouble((Double value) -> Units.rotationsToRadians(value)).toArray();
+        driveIO.getMotorQueue().stream()
+            .mapToDouble((Double value) -> Units.rotationsToRadians(value))
+            .toArray();
 
     inputs.odometryTurnPositions =
         turnIO.getMotorQueue().stream()
