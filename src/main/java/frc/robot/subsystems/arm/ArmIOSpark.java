@@ -1,5 +1,7 @@
 package frc.robot.subsystems.arm;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -39,5 +41,11 @@ public class ArmIOSpark implements ArmIO {
     @Override
     public void stop() {
         motor.stop();
+    }
+
+    @AutoLogOutput
+    @Override
+    public double getAbsoluteEncoderRot() {
+        return motor.getAbsoluteEncoderRot();
     }
 }

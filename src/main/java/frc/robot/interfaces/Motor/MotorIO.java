@@ -2,6 +2,8 @@ package frc.robot.interfaces.motor;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import com.revrobotics.AbsoluteEncoder;
+
 public interface MotorIO {
     @AutoLog
     public static class MotorIOInputs {
@@ -39,9 +41,12 @@ public interface MotorIO {
     public default void setOffset(double offset) {}
 
     public default MotorIOInputs getMotorIOInputs() {
-        
         MotorIOInputs inputs = new MotorIOInputs();
         updateInputs(inputs);
         return inputs;
+    }
+
+    public default double getAbsoluteEncoderRot() {
+        return 0.0;
     }
 }

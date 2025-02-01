@@ -21,4 +21,7 @@ public interface ArmIO {
 
     public default void configurePID(double kP, double kI, double kD) {}
 
+    public default double getAbsoluteEncoderRot() {
+        return 0.0;
+    }
 }

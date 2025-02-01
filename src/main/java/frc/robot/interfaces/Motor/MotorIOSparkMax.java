@@ -1,5 +1,6 @@
 package frc.robot.interfaces.motor;
 
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -17,6 +18,7 @@ public class MotorIOSparkMax implements MotorIO {
 
     private final SparkMax motor;
     private final RelativeEncoder encoder;
+    private final SparkAbsoluteEncoder absoluteEncoder;
     private SparkMaxConfig motorConfig = new SparkMaxConfig();
     private SparkClosedLoopController closedLoopController;
 
@@ -27,6 +29,7 @@ public class MotorIOSparkMax implements MotorIO {
         motor.setCANTimeout(timeout);
 
         encoder = motor.getEncoder();
+        absoluteEncoder = motor.getAbsoluteEncoder();
         
 
         motorConfig
@@ -105,5 +108,10 @@ public class MotorIOSparkMax implements MotorIO {
     @Override
     public void setOffset(double offset) {
         encoder.setPosition(offset);
+    }
+
+    @Override
+    public double getAbsoluteEncoderRot() {
+      return absoluteEncoder.getPosition();
     }
 }
