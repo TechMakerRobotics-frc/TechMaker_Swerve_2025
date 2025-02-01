@@ -30,7 +30,7 @@ import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 
 public class TunerConstants {
 
-  public static final double maxSpeedMetersPerSec = 58.8;
+  public static final double maxSpeedMetersPerSec = 50.8;
 
   // Turn motor configuration
   public static final boolean turnInverted = false;

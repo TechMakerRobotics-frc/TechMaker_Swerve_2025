@@ -28,7 +28,6 @@ import frc.robot.interfaces.motor.MotorIO;
 import frc.robot.interfaces.motor.MotorIO.MotorIOInputs;
 import frc.robot.interfaces.motor.MotorIOSparkMax;
 import frc.robot.interfaces.motor.MotorIOTalonFX;
-
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -142,7 +141,8 @@ public class ModuleIOSparkTalon implements ModuleIO {
     inputs.driveAppliedVolts = motorIOInputs.appliedVolts;
     inputs.driveConnected = motorIOInputs.appliedVolts != 0.0;
     inputs.driveCurrentAmps = motorIOInputs.currentAmps[0];
-    inputs.drivePositionRad = Units.rotationsToRadians(motorIOInputs.positionRot) / DRIVE_GEAR_RATIO;
+    inputs.drivePositionRad =
+        Units.rotationsToRadians(motorIOInputs.positionRot) / DRIVE_GEAR_RATIO;
     inputs.driveVelocityRadPerSec = motorIOInputs.velocityRadPerSec / DRIVE_GEAR_RATIO;
   }
 

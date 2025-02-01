@@ -71,8 +71,8 @@ public class MotorIOTalonFX implements MotorIO {
     motorVelocity = motor.getVelocity();
     motorAppliedVolts = motor.getMotorVoltage();
     motorCurrent = motor.getStatorCurrent();
-    BaseStatusSignal.setUpdateFrequencyForAll(100.0, motorPosition);
-    BaseStatusSignal.setUpdateFrequencyForAll(50.0, motorVelocity, motorAppliedVolts, motorCurrent);
+    BaseStatusSignal.setUpdateFrequencyForAll(50.0, motorPosition,motorVelocity);
+    BaseStatusSignal.setUpdateFrequencyForAll(10.0, motorAppliedVolts, motorCurrent);
   }
 
   /**
@@ -82,7 +82,7 @@ public class MotorIOTalonFX implements MotorIO {
   public void updateInputs(MotorIOInputs inputs) {
     BaseStatusSignal.refreshAll(motorPosition, motorVelocity, motorAppliedVolts, motorCurrent);
 
-    inputs.positionRot = Units.rotationsToRadians(motorPosition.getValueAsDouble());
+    inputs.positionRot = motorPosition.getValueAsDouble();
     inputs.velocityRadPerSec = Units.rotationsToRadians(motorVelocity.getValueAsDouble());
     inputs.appliedVolts = motorAppliedVolts.getValueAsDouble();
     inputs.currentAmps = new double[] {motorCurrent.getValueAsDouble()};

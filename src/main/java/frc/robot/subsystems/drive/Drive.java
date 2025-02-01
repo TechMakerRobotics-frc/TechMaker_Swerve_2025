@@ -256,23 +256,23 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
         lastModulePositions[moduleIndex] = modulePositions[moduleIndex];
       }
 
-        // Update gyro angle
-        if (gyroInputs.connected) {
-          // Use the real gyro angle
-          rawGyroRotation = gyroInputs.yawPosition;
-        } else {
-          // Use the angle delta from the kinematics and module deltas
-          Twist2d twist = kinematics.toTwist2d(moduleDeltas);
-          rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
-        }
-
-        // Apply update
-        poseEstimator.update(rawGyroRotation, modulePositions);
-        
-        // Update gyro alert
-        gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+      // Update gyro angle
+      if (gyroInputs.connected) {
+        // Use the real gyro angle
+        rawGyroRotation = gyroInputs.yawPosition;
+      } else {
+        // Use the angle delta from the kinematics and module deltas
+        Twist2d twist = kinematics.toTwist2d(moduleDeltas);
+        rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
       }
+
+      // Apply update
+      poseEstimator.update(rawGyroRotation, modulePositions);
+
+      // Update gyro alert
+      gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
     }
+  }
 
   /**
    * Runs the drive at the desired velocity.
