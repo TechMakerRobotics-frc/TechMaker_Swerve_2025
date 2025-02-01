@@ -1,4 +1,4 @@
-package frc.robot.interfaces.Motor;
+package frc.robot.interfaces.motor;
 
 import static frc.robot.util.subsystemUtils.PhoenixUtil.tryUntilOk;
 
@@ -21,8 +21,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.subsystems.drive.PhoenixOdometryThread;
-import java.util.Queue;
 
 public class MotorIOTalonFX implements MotorIO {
 
@@ -43,8 +41,6 @@ public class MotorIOTalonFX implements MotorIO {
   protected StatusSignal<AngularVelocity> motorVelocity;
   protected StatusSignal<Voltage> motorAppliedVolts;
   protected StatusSignal<Current> motorCurrent;
-
-  private final Queue<Double> motorQueue;
 
   private ClosedLoopOutputType motorClosedLoopOutput;
 
@@ -77,7 +73,6 @@ public class MotorIOTalonFX implements MotorIO {
     motorCurrent = motor.getStatorCurrent();
     BaseStatusSignal.setUpdateFrequencyForAll(100.0, motorPosition);
     BaseStatusSignal.setUpdateFrequencyForAll(50.0, motorVelocity, motorAppliedVolts, motorCurrent);
-    motorQueue = PhoenixOdometryThread.getInstance().registerSignal(motor.getPosition());
   }
 
   /**
@@ -91,16 +86,6 @@ public class MotorIOTalonFX implements MotorIO {
     inputs.velocityRadPerSec = Units.rotationsToRadians(motorVelocity.getValueAsDouble());
     inputs.appliedVolts = motorAppliedVolts.getValueAsDouble();
     inputs.currentAmps = new double[] {motorCurrent.getValueAsDouble()};
-  }
-
-  @Override
-  public Queue<Double> getMotorQueue() {
-    return motorQueue;
-  }
-
-  @Override
-  public void clearQueue() {
-    motorQueue.clear();
   }
 
   @Override

@@ -1,8 +1,6 @@
-package frc.robot.interfaces.Motor;
+package frc.robot.interfaces.motor;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface MotorIO {
@@ -53,10 +51,4 @@ public interface MotorIO {
     updateInputs(inputs);
     return inputs;
   }
-
-  public default Queue<Double> getMotorQueue() {
-    return new ArrayBlockingQueue<>(20);
-  }
-
-  public default void clearQueue() {}
 }

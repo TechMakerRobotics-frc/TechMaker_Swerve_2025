@@ -24,11 +24,11 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.generated.TunerConstants;
-import frc.robot.interfaces.Motor.MotorIO;
-import frc.robot.interfaces.Motor.MotorIO.MotorIOInputs;
-import frc.robot.interfaces.Motor.MotorIOSparkMax;
-import frc.robot.interfaces.Motor.MotorIOTalonFX;
-import java.util.Queue;
+import frc.robot.interfaces.motor.MotorIO;
+import frc.robot.interfaces.motor.MotorIO.MotorIOInputs;
+import frc.robot.interfaces.motor.MotorIOSparkMax;
+import frc.robot.interfaces.motor.MotorIOTalonFX;
+
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -41,8 +41,6 @@ public class ModuleIOSparkTalon implements ModuleIO {
   private final MotorIO turnIO;
   private CANcoder cancoder;
   private double offset;
-  private Rotation2d zeroRotation = Rotation2d.fromDegrees(0.0);
-  private final Queue<Double> timestampQueue;
 
   public ModuleIOSparkTalon(int module) {
     switch (module) {
@@ -125,8 +123,6 @@ public class ModuleIOSparkTalon implements ModuleIO {
         offset = 0.0;
         break;
     }
-    timestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
-    zeroRotation = Rotation2d.fromRotations(offset);
     cancoder.getConfigurator().apply(new CANcoderConfiguration());
     turnIO.setOffset(cancoder.getAbsolutePosition().getValueAsDouble() - offset);
     turnIO.setPosition(0);
@@ -140,31 +136,14 @@ public class ModuleIOSparkTalon implements ModuleIO {
     inputs.turnConnected = motorIOInputs.appliedVolts != 0.0;
     inputs.turnCurrentAmps = motorIOInputs.currentAmps[0];
     inputs.turnPosition = new Rotation2d(Units.rotationsToRadians(motorIOInputs.positionRot));
-    inputs.turnVelocityRadPerSec = motorIOInputs.velocityRadPerSec;
+    inputs.turnVelocityRadPerSec = motorIOInputs.velocityRadPerSec / TURN_GEAR_RATIO;
     inputs.turnPositionRot = motorIOInputs.positionRot;
     motorIOInputs = driveIO.getMotorIOInputs();
     inputs.driveAppliedVolts = motorIOInputs.appliedVolts;
     inputs.driveConnected = motorIOInputs.appliedVolts != 0.0;
     inputs.driveCurrentAmps = motorIOInputs.currentAmps[0];
-    inputs.drivePositionRad = Units.rotationsToRadians(motorIOInputs.positionRot);
-    inputs.driveVelocityRadPerSec = motorIOInputs.velocityRadPerSec;
-
-    inputs.odometryTimestamps =
-        timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-
-    inputs.odometryDrivePositionsRad =
-        driveIO.getMotorQueue().stream()
-            .mapToDouble((Double value) -> Units.rotationsToRadians(value))
-            .toArray();
-
-    inputs.odometryTurnPositions =
-        turnIO.getMotorQueue().stream()
-            .map((Double value) -> new Rotation2d(value).minus(zeroRotation))
-            .toArray(Rotation2d[]::new);
-
-    timestampQueue.clear();
-    driveIO.clearQueue();
-    turnIO.clearQueue();
+    inputs.drivePositionRad = Units.rotationsToRadians(motorIOInputs.positionRot) / DRIVE_GEAR_RATIO;
+    inputs.driveVelocityRadPerSec = motorIOInputs.velocityRadPerSec / DRIVE_GEAR_RATIO;
   }
 
   @Override

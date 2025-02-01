@@ -1,12 +1,10 @@
 package frc.robot.subsystems.drive;
 
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix6.configs.ParentConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import frc.robot.util.subsystemUtils.PhoenixUtil;
-import java.util.Arrays;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 
 /**
@@ -14,7 +12,7 @@ import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
  * constants from Phoenix. Simulation is always based on voltage control.
  */
 public class ModuleIOTalonFXSim extends ModuleIOTalonFX {
-  private final SwerveModuleSimulation simulation;
+  //private final SwerveModuleSimulation simulation;
 
   public ModuleIOTalonFXSim(
       SwerveModuleConstants<ParentConfiguration, ParentConfiguration, ParentConfiguration>
@@ -22,7 +20,7 @@ public class ModuleIOTalonFXSim extends ModuleIOTalonFX {
       SwerveModuleSimulation simulation) {
     super(constants);
 
-    this.simulation = simulation;
+    //this.simulation = simulation;
     simulation.useDriveMotorController(
         new PhoenixUtil.TalonFXMotorControllerSim(driveTalon, constants.DriveMotorInverted));
 
@@ -39,7 +37,7 @@ public class ModuleIOTalonFXSim extends ModuleIOTalonFX {
   public void updateInputs(ModuleIOInputs inputs) {
     super.updateInputs(inputs);
 
-    // Update odometry inputs
+    /* Update odometry inputs
     inputs.odometryTimestamps = PhoenixUtil.getSimulationOdometryTimeStamps();
 
     inputs.odometryDrivePositionsRad =
@@ -47,6 +45,6 @@ public class ModuleIOTalonFXSim extends ModuleIOTalonFX {
             .mapToDouble(angle -> angle.in(Radians))
             .toArray();
 
-    inputs.odometryTurnPositions = simulation.getCachedSteerAbsolutePositions();
+    inputs.odometryTurnPositions = simulation.getCachedSteerAbsolutePositions();*/
   }
 }
