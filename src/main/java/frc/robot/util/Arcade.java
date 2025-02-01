@@ -21,7 +21,7 @@ public class Arcade {
      */
     public Arcade(int port) {
         this.joy = new Joystick(port);
-        buttons = new Trigger[16];
+        buttons = new Trigger[14];
 
         for (int i = 0; i < buttons.length; i++) {
             buttons[i] = new JoystickButton(joy, i + 1);
@@ -34,119 +34,105 @@ public class Arcade {
      * @param index the 1-based index of the button
      * @return the corresponding Trigger object
      */
-    public Trigger getButton(int index) {
+    private Trigger getButton(int index) {
         return buttons[index - 1];
     }
 
     /**
      * @return the Trigger object for button A
      */
-    public Trigger a() {
+    public Trigger reefPosition1() {
         return getButton(1);
     }
 
     /**
      * @return the Trigger object for button B
      */
-    public Trigger b() {
+    public Trigger reefPosition2() {
         return getButton(2);
     }
 
     /**
      * @return the Trigger object for button C
      */
-    public Trigger c() {
+    public Trigger reefPosition3() {
         return getButton(3);
     }
 
     /**
      * @return the Trigger object for button D
      */
-    public Trigger d() {
+    public Trigger reefPosition4() {
         return getButton(4);
     }
 
     /**
      * @return the Trigger object for button E
      */
-    public Trigger e() {
+    public Trigger reefPosition5() {
         return getButton(5);
     }
 
     /**
      * @return the Trigger object for button F
      */
-    public Trigger f() {
+    public Trigger reefPosition6() {
         return getButton(6);
     }
 
     /**
      * @return the Trigger object for button G
      */
-    public Trigger g() {
+    public Trigger reefLevelA1() {
         return getButton(7);
     }
 
     /**
      * @return the Trigger object for button H
      */
-    public Trigger h() {
+    public Trigger reefLevelA2() {
         return getButton(8);
     }
 
     /**
      * @return the Trigger object for button I
      */
-    public Trigger i() {
+    public Trigger reefLevelA3() {
         return getButton(9);
     }
 
     /**
      * @return the Trigger object for button J)
      */
-    public Trigger j() {
+    public Trigger reefLevelA4() {
         return getButton(10);
     }
 
     /**
      * @return the Trigger object for button K)
      */
-    public Trigger k() {
+    public Trigger reefLevelB1() {
         return getButton(11);
     }
 
     /**
      * @return the Trigger object for button L)
      */
-    public Trigger l() {
+    public Trigger reefLevelB2() {
         return getButton(12);
     }
 
     /**
      * @return the Trigger object for button M)
      */
-    public Trigger m() {
+    public Trigger reefLevelB3() {
         return getButton(13);
     }
 
     /**
      * @return the Trigger object for button N)
      */
-    public Trigger n() {
+    public Trigger reefLevelB4() {
         return getButton(14);
-    }
-
-    /**
-     * @return the Trigger object for button O)
-     */
-    public Trigger o() {
-        return getButton(15);
-    }
-
-    /**
-     * @return the Trigger object for button P)
-     */
-    public Trigger p() {
-        return getButton(16);
     }
 }
