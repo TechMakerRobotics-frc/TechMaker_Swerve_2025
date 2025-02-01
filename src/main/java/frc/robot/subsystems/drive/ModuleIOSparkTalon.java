@@ -48,7 +48,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
             new MotorIOTalonFX(
                 TALON_FL,
                 CANBUS,
-                NeutralModeValue.Coast,
+                NeutralModeValue.Brake,
                 DRIVE_GAINS,
                 TunerConstants.kSlipCurrentDouble,
                 SUPPLY_CURRENT_LIMIT_ENABLE,
@@ -56,7 +56,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
                 TunerConstants.kDriveClosedLoopOutput);
         turnIO =
             new MotorIOSparkMax(
-                SPARK_FL, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
+                SPARK_FL, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
         cancoder = new CANcoder(CANCODER_FL, CANBUS);
         offset = ENCODER_OFFSET_FL;
 
@@ -67,7 +67,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
             new MotorIOTalonFX(
                 TALON_FR,
                 CANBUS,
-                NeutralModeValue.Coast,
+                NeutralModeValue.Brake,
                 DRIVE_GAINS,
                 TunerConstants.kSlipCurrentDouble,
                 SUPPLY_CURRENT_LIMIT_ENABLE,
@@ -75,7 +75,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
                 TunerConstants.kDriveClosedLoopOutput);
         turnIO =
             new MotorIOSparkMax(
-                SPARK_FR, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
+                SPARK_FR, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
         cancoder = new CANcoder(CANCODER_FR, CANBUS);
         offset = ENCODER_OFFSET_FR;
         break;
@@ -85,7 +85,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
             new MotorIOTalonFX(
                 TALON_BL,
                 CANBUS,
-                NeutralModeValue.Coast,
+                NeutralModeValue.Brake,
                 DRIVE_GAINS,
                 TunerConstants.kSlipCurrentDouble,
                 SUPPLY_CURRENT_LIMIT_ENABLE,
@@ -93,7 +93,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
                 TunerConstants.kDriveClosedLoopOutput);
         turnIO =
             new MotorIOSparkMax(
-                SPARK_BL, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
+                SPARK_BL, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
         cancoder = new CANcoder(CANCODER_BL, CANBUS);
         offset = ENCODER_OFFSET_BL;
         break;
@@ -103,7 +103,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
             new MotorIOTalonFX(
                 TALON_BR,
                 CANBUS,
-                NeutralModeValue.Coast,
+                NeutralModeValue.Brake,
                 DRIVE_GAINS,
                 TunerConstants.kSlipCurrentDouble,
                 SUPPLY_CURRENT_LIMIT_ENABLE,
@@ -111,7 +111,7 @@ public class ModuleIOSparkTalon implements ModuleIO {
                 TunerConstants.kDriveClosedLoopOutput);
         turnIO =
             new MotorIOSparkMax(
-                SPARK_BR, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kCoast);
+                SPARK_BR, MotorType.kBrushless, true, 250, 10.0, 30, IdleMode.kBrake);
         cancoder = new CANcoder(CANCODER_BR, CANBUS);
         offset = ENCODER_OFFSET_BR;
         break;

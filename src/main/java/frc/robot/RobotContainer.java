@@ -18,6 +18,8 @@ import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -167,7 +169,7 @@ public class RobotContainer {
                     driveSimulation
                         .getSimulatedDriveTrainPose()) // reset odometry to actual robot pose during
             // simulation
-            : () -> drive.setPose(new Pose2d(new Translation2d(), new Rotation2d())); // zero gyro
+            : () -> drive.setPose(new Pose2d(new Translation2d(2,7), new Rotation2d())); // zero gyro
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
@@ -214,7 +216,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return null;
+    return new PathPlannerAuto("AutoTest");
   }
 
   public void resetSimulationField() {
