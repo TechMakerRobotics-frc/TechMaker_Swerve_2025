@@ -88,7 +88,7 @@ public class MotorIOTalonFX implements MotorIO {
     BaseStatusSignal.refreshAll(motorPosition, motorVelocity, motorAppliedVolts, motorCurrent);
 
     inputs.positionRot = Units.rotationsToRadians(motorPosition.getValueAsDouble());
-    inputs.velocityRadPerSec = Units.rotationsToRadians(motorVelocity.getValueAsDouble());
+    inputs.velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(motorVelocity.getValueAsDouble());
     inputs.appliedVolts = motorAppliedVolts.getValueAsDouble();
     inputs.currentAmps = new double[] {motorCurrent.getValueAsDouble()};
   }
