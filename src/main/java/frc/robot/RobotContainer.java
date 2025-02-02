@@ -198,6 +198,8 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureButtonBindings();
+        updateState();
+        performAction();
     }
 
     /**
