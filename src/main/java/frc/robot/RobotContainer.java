@@ -119,7 +119,7 @@ public class RobotContainer {
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-        pathfinderTest = new LoggedDashboardChooser<>("Auto Reef Choices", AutoBuilder.buildAutoChooser());
+        pathfinderTest = new LoggedDashboardChooser<>("Auto Reef Choices");
 
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
