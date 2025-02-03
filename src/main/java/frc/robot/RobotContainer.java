@@ -198,8 +198,8 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureButtonBindings();
-        updateState();
-        performAction();
+        //updateState();
+        //performAction();
     }
 
     /**
@@ -288,7 +288,7 @@ public class RobotContainer {
     }
 
     //State Machine Configurations
-    public void updateState() {
+    private void updateState() {
         switch (currentState) {
             case NOT_ZONE:
                 new Trigger(() -> drive.getCurrentZone() == Zones.BLUE_LEFT_STATION)
@@ -340,7 +340,7 @@ public class RobotContainer {
         return currentState;
     }
 
-    public void performAction() {
+    private void performAction() {
         /*switch (currentState) {
         }*/
     }
