@@ -1,4 +1,4 @@
-package frc.robot.interfaces.Motor;
+package frc.robot.interfaces.motor;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.Queue;
@@ -29,7 +29,7 @@ public interface MotorIO {
   public default void setVelocity(double velocityRadPerSec) {}
 
   /** Run closed loop position */
-  public default void setPosition(double positionRad) {}
+  public default void setPosition(double position) {}
 
   /** Stop in open loop. */
   public default void stop() {}
