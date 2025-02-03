@@ -134,7 +134,8 @@ public class ModuleIOSparkTalon implements ModuleIO {
     inputs.turnAppliedVolts = motorIOInputs.appliedVolts;
     inputs.turnConnected = motorIOInputs.appliedVolts != 0.0;
     inputs.turnCurrentAmps = motorIOInputs.currentAmps[0];
-    inputs.turnAbsolutePosition = new Rotation2d(Units.rotationsToRadians(motorIOInputs.positionRot));
+    inputs.turnAbsolutePosition =
+        new Rotation2d(Units.rotationsToRadians(motorIOInputs.positionRot));
     inputs.turnVelocityRadPerSec = motorIOInputs.velocityRadPerSec / TURN_GEAR_RATIO;
     inputs.turnPositionRot = motorIOInputs.positionRot;
     motorIOInputs = driveIO.getMotorIOInputs();

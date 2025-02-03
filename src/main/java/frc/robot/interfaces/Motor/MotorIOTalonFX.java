@@ -71,7 +71,7 @@ public class MotorIOTalonFX implements MotorIO {
     motorVelocity = motor.getVelocity();
     motorAppliedVolts = motor.getMotorVoltage();
     motorCurrent = motor.getStatorCurrent();
-    BaseStatusSignal.setUpdateFrequencyForAll(50.0, motorPosition,motorVelocity);
+    BaseStatusSignal.setUpdateFrequencyForAll(50.0, motorPosition, motorVelocity);
     BaseStatusSignal.setUpdateFrequencyForAll(10.0, motorAppliedVolts, motorCurrent);
   }
 
@@ -151,7 +151,6 @@ public class MotorIOTalonFX implements MotorIO {
 
   @Override
   public void setBrakeMode(boolean set) {
-    motor.setNeutralMode(
-      set? NeutralModeValue.Brake : NeutralModeValue.Coast);
+    motor.setNeutralMode(set ? NeutralModeValue.Brake : NeutralModeValue.Coast);
   }
 }
