@@ -1,4 +1,4 @@
-// Copyright 2021-2024 FRC 6328
+// Copyright 2021-2025 FRC 6328
 // http://github.com/Mechanical-Advantage
 //
 // This program is free software; you can redistribute it and/or
@@ -13,16 +13,12 @@
 
 package frc.robot.subsystems.drive;
 
-import com.ctre.phoenix6.configs.ParentConfiguration;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -30,39 +26,13 @@ public class Module {
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
   private final int index;
-  private final SwerveModuleConstants<ParentConfiguration, ParentConfiguration, ParentConfiguration>
-      constants;
 
   private final Alert driveDisconnectedAlert;
   private final Alert turnDisconnectedAlert;
-  private final Alert turnEncoderDisconnectedAlert;
-  private SwerveModulePosition[] odometryPositions = new SwerveModulePosition[] {};
-
-  public Module(
-      ModuleIO io,
-      int index,
-      SwerveModuleConstants<ParentConfiguration, ParentConfiguration, ParentConfiguration>
-          constants) {
-    this.io = io;
-    this.index = index;
-    this.constants = constants;
-    driveDisconnectedAlert =
-        new Alert(
-            "Disconnected drive motor on module " + Integer.toString(index) + ".",
-            AlertType.kError);
-    turnDisconnectedAlert =
-        new Alert(
-            "Disconnected turn motor on module " + Integer.toString(index) + ".", AlertType.kError);
-    turnEncoderDisconnectedAlert =
-        new Alert(
-            "Disconnected turn encoder on module " + Integer.toString(index) + ".",
-            AlertType.kError);
-  }
 
   public Module(ModuleIO io, int index) {
     this.io = io;
     this.index = index;
-    constants = new SwerveModuleConstants<>();
     driveDisconnectedAlert =
         new Alert(
             "Disconnected drive motor on module " + Integer.toString(index) + ".",
@@ -70,10 +40,6 @@ public class Module {
     turnDisconnectedAlert =
         new Alert(
             "Disconnected turn motor on module " + Integer.toString(index) + ".", AlertType.kError);
-    turnEncoderDisconnectedAlert =
-        new Alert(
-            "Disconnected turn encoder on module " + Integer.toString(index) + ".",
-            AlertType.kError);
   }
 
   public void updateInputs() {
@@ -83,40 +49,24 @@ public class Module {
 
   public void periodic() {
 
-    // Calculate positions for odometry
-    int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
-    odometryPositions = new SwerveModulePosition[sampleCount];
-    for (int i = 0; i < sampleCount; i++) {
-      double positionMeters =
-          inputs.odometryDrivePositionsRad[i] * TunerConstants.wheelRadiusMeters;
-      Rotation2d angle = inputs.odometryTurnPositions[i];
-      odometryPositions[i] = new SwerveModulePosition(positionMeters, angle);
-    }
-
     // Update alerts
     driveDisconnectedAlert.set(!inputs.driveConnected);
     turnDisconnectedAlert.set(!inputs.turnConnected);
-    turnEncoderDisconnectedAlert.set(!inputs.turnEncoderConnected);
   }
 
   /** Runs the module with the specified setpoint state. Mutates the state to optimize it. */
   public void runSetpoint(SwerveModuleState state) {
-    // Optimize velocity setpoint
+    Logger.recordOutput("Rotation to optimize", getAngle());
+
     state.optimize(getAngle());
-    state.cosineScale(inputs.turnAbsolutePosition);
+    state.cosineScale(getAngle());
 
-    // Apply setpoints
-    io.runDriveVelocity(state.speedMetersPerSecond / constants.WheelRadius);
+    Logger.recordOutput("Rotation optimized", state.angle);
+
+    io.runDriveVelocity(state.speedMetersPerSecond / TunerConstants.wheelRadiusMeters);
     double setpoint = normalizeAngle(state.angle.getRotations(), getAngle().getRotations());
-    switch (Constants.currentMode) {
-      case REAL:
-        io.runTurnPosition(Rotation2d.fromRotations(setpoint));
-        break;
 
-      default:
-        io.runTurnPosition(state.angle);
-        break;
-    }
+    io.runTurnPosition(Rotation2d.fromRotations(setpoint));
   }
 
   private double normalizeAngle(double targetRotations, double currentRotations) {
@@ -132,7 +82,8 @@ public class Module {
 
   /** Disables all outputs to motors. */
   public void stop() {
-    io.stop();
+    io.runDriveOpenLoop(0.0);
+    io.runTurnOpenLoop(0.0);
   }
 
   /** Returns the current turn angle of the module. */
@@ -160,29 +111,18 @@ public class Module {
     return new SwerveModuleState(getVelocityMetersPerSec(), getAngle());
   }
 
-  /** Returns the module positions received this cycle. */
-  public SwerveModulePosition[] getOdometryPositions() {
-    return odometryPositions;
-  }
-
-  /** Returns the timestamps of the samples received this cycle. */
-  public double[] getOdometryTimestamps() {
-    return inputs.odometryTimestamps;
-  }
-
   /** Returns the module position in radians. */
   public double getWheelRadiusCharacterizationPosition() {
     return inputs.drivePositionRad;
   }
 
-  /** Returns the module velocity in rotations/sec (Phoenix native units). */
+  /** Returns the module velocity in rad/sec. */
   public double getFFCharacterizationVelocity() {
-    return Units.radiansToRotations(inputs.driveVelocityRadPerSec);
+    return inputs.driveVelocityRadPerSec;
   }
 
-  /** Sets whether brake mode is enabled. */
-  public void setBrakeMode(boolean enabled) {
-    io.runDriveBrakeMode(enabled);
-    io.runTurnBrakeMode(enabled);
+  public void setBrakeMode(boolean enable) {
+    io.runDriveBrakeMode(enable);
+    io.runTurnBrakeMode(enable);
   }
 }
