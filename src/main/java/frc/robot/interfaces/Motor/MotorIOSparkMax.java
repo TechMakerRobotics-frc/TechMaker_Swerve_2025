@@ -10,6 +10,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.LimitSwitchConfig.Type;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.util.Units;
@@ -141,5 +142,13 @@ public class MotorIOSparkMax implements MotorIO {
   public void resetOffset() {
     encoder.setPosition(0);
     setPosition(0);
+  }
+
+  @Override
+  public void setBrakeMode(boolean set) {
+    var config = new SparkMaxConfig();
+    config.idleMode(
+      set? IdleMode.kBrake : IdleMode.kCoast);
+    motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 }

@@ -148,4 +148,10 @@ public class MotorIOTalonFX implements MotorIO {
   public void setOffset(double offset) {
     motor.setPosition(offset);
   }
+
+  @Override
+  public void setBrakeMode(boolean set) {
+    motor.setNeutralMode(
+      set? NeutralModeValue.Brake : NeutralModeValue.Coast);
+  }
 }

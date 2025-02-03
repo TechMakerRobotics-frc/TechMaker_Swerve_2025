@@ -59,4 +59,6 @@ public interface MotorIO {
   }
 
   public default void clearQueue() {}
+
+  public default void setBrakeMode(boolean set) {}
 }

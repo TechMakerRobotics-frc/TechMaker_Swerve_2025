@@ -176,4 +176,14 @@ public class ModuleIOSparkTalon implements ModuleIO {
     driveIO.stop();
     turnIO.stop();
   }
+
+  @Override
+  public void runDriveBrakeMode(boolean enable) {
+    driveIO.setBrakeMode(enable);
+  }
+
+  @Override
+  public void runTurnBrakeMode(boolean enable) {
+    turnIO.setBrakeMode(enable);
+  }
 }
