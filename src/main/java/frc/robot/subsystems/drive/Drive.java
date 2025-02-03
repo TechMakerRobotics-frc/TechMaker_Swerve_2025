@@ -184,9 +184,13 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
         for (var module : modules) {
+          module.updateInputs();
+        } 
+        odometryLock.unlock();
+        for (var module : modules) {
             module.periodic();
         }
-        odometryLock.unlock();
+
 
         // Stop moving when disabled
         if (DriverStation.isDisabled()) {
@@ -400,5 +404,5 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
         modules[0].setBrakeMode(enable);
         modules[0].setBrakeMode(enable);
         modules[0].setBrakeMode(enable);
-    }   
+    } 
 }

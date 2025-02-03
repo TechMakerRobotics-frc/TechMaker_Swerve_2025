@@ -34,7 +34,6 @@ public interface ModuleIO {
         public double turnPositionRot = 0.0;
         public double turnOffset = 0.0;
 
-
         public double[] odometryTimestamps = new double[] {};
         public double[] odometryDrivePositionsRad = new double[] {};
         public Rotation2d[] odometryTurnPositions = new Rotation2d[] {};
